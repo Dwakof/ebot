@@ -1,0 +1,27 @@
+{
+  "name": "ebot",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dwakof/ebot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dwakof/ebot/issues"
+  },
+  "homepage": "https://github.com/Dwakof/ebot#readme",
+  "dependencies": {
+    "discord.js-commando": "0.10.0",
+    "envy": "1.1.0",
+    "raven": "2.6.1"
+  },
+  "devDependencies": {
+    "eslint": "4.19.1"
+  }
+}
