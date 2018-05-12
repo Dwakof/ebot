@@ -4,18 +4,18 @@ language: node_js
 node_js:
   - "8"
   - "9"
-  - "node"
 
 services:
   - docker
 
-script:
-  - if [ ${TRAVIS_PULL_REQUEST} = "false" ]; then
-      docker build -t dwakof/ebot:${TRAVIS_BRANCH} .;
-    else
-      docker build -t dwakof/ebot:${TRAVIS_PULL_REQUEST} .;
-    fi
-
-after_success:
-  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-  - docker push dwakof/ebot
+jobs:
+  include:
+    - stage: build
+      script:
+        - if [ ${TRAVIS_PULL_REQUEST} = "false" ]; then
+            docker build -t dwakof/ebot:${TRAVIS_BRANCH} .;
+          else
+            docker build -t dwakof/ebot:${TRAVIS_PULL_REQUEST} .;
+          fi
+        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+        - docker push dwakof/ebot
