@@ -3,9 +3,14 @@ const Raven    = require('raven');
 const Commando = require('discord.js-commando');
 const Sqlite   = require('sqlite');
 const Path     = require('path');
-const Pino     = require('pino')();
+const Pino     = require('pino');
 
 const settings = Envy(process.env.DOTENV_PATH || './.env');
+
+const pino = Pino({
+    name : 'ebot',
+    level : settings.logLevel || 'debug'
+});
 
 Raven.config(settings.sentryEndpoint).install();
 
@@ -14,33 +19,33 @@ exports.start = async (settings) => {
     const client = new Commando.Client({ owner : settings.discordOwnerId });
 
     client.on('error', (error) => {
-        Pino.error({ event : 'error' }, error);
+        pino.error({ event : 'error' }, error);
         Raven.captureException(error);
     });
 
     client.on('warning', (message) => {
-        Pino.warn({ event : 'warning' }, message);
+        pino.warn({ event : 'warning' }, message);
     });
 
     client.on('debug', (message) => {
-        Pino.debug({ event : 'debug' }, message);
+        pino.debug({ event : 'debug' }, message);
     });
 
     client.on('ready', () => {
         // NOTIFY IN #BLACKMESA
-        Pino.info({ event : 'ready' }, 'ready');
+        pino.info({ event : 'ready' }, 'ready');
     });
 
     client.on('disconnect', () => {
-        Pino.warn({ event : 'disconnect' }, 'disconnected');
+        pino.warn({ event : 'disconnect' }, 'disconnected');
     });
 
     client.on('reconnecting', () => {
-        Pino.warn({ event : 'reconnecting' }, 'reconnecting');
+        pino.warn({ event : 'reconnecting' }, 'reconnecting');
     });
 
     client.on('commandError', (command, error) => {
-        Pino.error({ event : 'commandError', data : { command, error } }, error.msg);
+        pino.error({ event : 'commandError', data : { command, error } }, error.msg);
 
         if (error instanceof Commando.FriendlyError) {
             return;
@@ -50,28 +55,28 @@ exports.start = async (settings) => {
     });
 
     client.on('commandBlocked', (msg, reason) => {
-        Pino.info({
+        pino.info({
             event : 'commandBlocked',
             data :  { msg, reason }
         }, `Command ${msg.command ? `${msg.command.groupID}:${msg.command.memberName}` : ''} blocked; ${reason}`);
     });
 
     client.on('commandPrefixChange', (guild, prefix) => {
-        Pino.info({
+        pino.info({
             event : 'commandPrefixChange',
             data :  { guild, prefix }
         }, `Prefix ${prefix === '' ? 'removed' : `changed to ${prefix || 'the default'}`} ${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}`);
     });
 
     client.on('commandStatusChange', (guild, command, enabled) => {
-        Pino.info({
+        pino.info({
             event : 'commandStatusChange',
             data :  { guild, command, enabled }
         }, `Command ${command.groupID}:${command.memberName} ${enabled ? 'enabled' : 'disabled'} ${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}`);
     });
 
     client.on('groupStatusChange', (guild, group, enabled) => {
-        Pino.info({
+        pino.info({
             event : 'commandStatusChange',
             data :  { guild, group, enabled }
         }, `Group ${group.id} ${enabled ? 'enabled' : 'disabled'} ${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}`);
@@ -93,13 +98,13 @@ exports.start = async (settings) => {
 if (!module.parent) {
 
     process.on('unhandledRejection', (error) => {
-        Pino.error({ event : 'unhandledRejection' }, error);
+        pino.error({ event : 'unhandledRejection' }, error);
         Raven.captureException(error);
         throw error;
     });
 
     exports.start(settings).catch((error) => {
-        Pino.fatal(error);
+        pino.fatal(error);
         throw error;
     });
 }
