@@ -1,0 +1,21 @@
+# IGNORE ALL
+*
+
+# ADD CODE
+!index.js
+!commands
+!commands/*
+!test
+!test/*
+
+# REMOVE ENV FILES
+*.env
+
+# ADD METADATA FILE
+!package.json
+
+# ADD DOCKER FILES
+!.dockerignore
+
+# ADD DOC FILE
+!*.env.example
