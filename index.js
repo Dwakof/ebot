@@ -1,8 +1,8 @@
-const Envy = require('envy');
-const Raven = require('raven');
+const Envy     = require('envy');
+const Raven    = require('raven');
 const Commando = require('discord.js-commando');
-const Sqlite = require('sqlite');
-const Path = require('path');
+const Sqlite   = require('sqlite');
+const Path     = require('path');
 
 exports.start = async (customSettings) => {
     const settings = customSettings || Envy(process.env.DOTENV_PATH || './.env');
