@@ -4,8 +4,9 @@
   "description": "Ebot aka Ecto Botanical Otherworldly Traitorbot",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node index.js | npx pino"
+    "test": "npm run eslint",
+    "dev": "node index.js | npx pino",
+    "eslint": "npx eslint ."
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,9 @@
     "sqlite": "2.9.1"
   },
   "devDependencies": {
-    "eslint": "4.19.1"
+    "eslint": "4.19.1",
+    "eslint-config-hapi": "11.1.0",
+    "eslint-plugin-hapi": "4.1.0",
+    "eslint-plugin-security": "1.4.0"
   }
 }
