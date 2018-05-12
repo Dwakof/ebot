@@ -16,6 +16,7 @@
 !.eslintrc
 !.gitignore
 !package.json
+!.travis.yml
 
 # ADD DOCKER FILES
 !.dockerignore
