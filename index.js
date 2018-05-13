@@ -7,6 +7,8 @@ const Sqlite   = require('sqlite');
 const Path     = require('path');
 const Pino     = require('pino');
 
+const Events = require('./lib/events');
+
 const settings = Envy(process.env.DOTENV_PATH || './.env');
 
 const pino = Pino({
@@ -24,99 +26,7 @@ exports.start = async (options) => {
     client.log   = pino;
     client.raven = Raven;
 
-    client.on('error', (error) => {
-
-        pino.error({ event : 'error' }, error);
-        Raven.captureException(error);
-    });
-
-    client.on('warning', (message) => {
-
-        pino.warn({ event : 'warning' }, message);
-    });
-
-    client.on('debug', (message) => {
-
-        pino.debug({ event : 'debug' }, message);
-    });
-
-    client.on('ready', () => {
-        // NOTIFY IN #BLACKMESA
-        pino.info({ event : 'ready' }, 'ready');
-    });
-
-    client.on('disconnect', () => {
-
-        pino.warn({ event : 'disconnect' }, 'disconnected');
-    });
-
-    client.on('reconnecting', () => {
-
-        pino.warn({ event : 'reconnecting' }, 'reconnecting');
-    });
-
-    client.on('commandError', (command, error) => {
-
-        pino.error({
-            event : 'commandError',
-            data :  {
-                command,
-                error
-            }
-        }, error.msg);
-
-        if (error instanceof Commando.FriendlyError) {
-            return;
-        }
-
-        Raven.captureException(error);
-    });
-
-    client.on('commandBlocked', (msg, reason) => {
-
-        pino.info({
-            event : 'commandBlocked',
-            data :  {
-                msg,
-                reason
-            }
-        }, `Command ${msg.command ? `${msg.command.groupID}:${msg.command.memberName}` : ''} blocked; ${reason}`);
-    });
-
-    client.on('commandPrefixChange', (guild, prefix) => {
-
-        pino.info({
-            event : 'commandPrefixChange',
-            data :  {
-                guild,
-                prefix
-            }
-        }, `Prefix ${prefix === '' ? 'removed' : `changed to ${prefix || 'the default'}`} ${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}`);
-    });
-
-    client.on('commandStatusChange', (guild, command, enabled) => {
-
-        pino.info({
-            event : 'commandStatusChange',
-            data :  {
-                guild,
-                command,
-                enabled
-            }
-        }, `Command ${command.groupID}:${command.memberName} ${enabled ? 'enabled' : 'disabled'} ${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}`);
-    });
-
-    client.on('groupStatusChange', (guild, group, enabled) => {
-
-        pino.info({
-            event : 'commandStatusChange',
-            data :  {
-                guild,
-                group,
-                enabled
-            }
-        }, `Group ${group.id} ${enabled ? 'enabled' : 'disabled'} ${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}`);
-    });
+    Events.bind(client);
 
     const db = await Sqlite.open(Path.resolve(__dirname, options.sqlitePath || './database.sqlite3'));
 

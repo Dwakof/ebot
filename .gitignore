@@ -4,9 +4,13 @@
 # ADD CODE
 !index.js
 !commands
-!commands/*
+!commands/**
+!lib
+!lib/**
+!events
+!events/**
 !test
-!test/*
+!test/**
 
 # REMOVE ENV FILES
 *.env
