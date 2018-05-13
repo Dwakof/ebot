@@ -1,27 +1,42 @@
 {
   "name": "ebot",
   "version": "0.1.0",
-  "description": "",
+  "description": "Ebot aka Ecto Botanical Otherworldly Traitorbot",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run eslint",
+    "dev": "node index.js | npx pino",
+    "eslint": "npx eslint ."
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Dwakof/ebot.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Yoann Mallemanche <yoann.mallemanche@gmail.com> (https://github.com/YoannMa)",
+  "license": "AGPL-3.0",
   "bugs": {
     "url": "https://github.com/Dwakof/ebot/issues"
   },
   "homepage": "https://github.com/Dwakof/ebot#readme",
   "dependencies": {
+    "discord.js": "11.3.2",
     "discord.js-commando": "0.10.0",
     "envy": "1.1.0",
-    "raven": "2.6.1"
+    "pino": "4.16.1",
+    "raven": "2.6.1",
+    "sqlite": "2.9.1",
+    "bufferutil": "3.0.5",
+    "erlpack": "discordapp/erlpack",
+    "node-opus": "0.3.0",
+    "opusscript": "0.0.6",
+    "sodium": "2.0.3",
+    "libsodium-wrappers": "0.7.3",
+    "uws": "10.148.0"
   },
   "devDependencies": {
-    "eslint": "4.19.1"
+    "eslint": "4.19.1",
+    "eslint-config-hapi": "11.1.0",
+    "eslint-plugin-hapi": "4.1.0",
+    "eslint-plugin-security": "1.4.0"
   }
 }

@@ -1,0 +1,21 @@
+sudo: required
+
+language: node_js
+node_js:
+  - "8"
+  - "9"
+
+services:
+  - docker
+
+jobs:
+  include:
+    - stage: build
+      script:
+        - if [ ${TRAVIS_PULL_REQUEST} = "false" ]; then
+            docker build -t dwakof/ebot:${TRAVIS_BRANCH} .;
+          else
+            docker build -t dwakof/ebot:pr-${TRAVIS_PULL_REQUEST} .;
+          fi
+        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+        - docker push dwakof/ebot

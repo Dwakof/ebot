@@ -12,17 +12,10 @@
 *.env
 
 # ADD METADATA FILE
-!.npmignore
-!.eslintrc
-!.gitignore
 !package.json
-!.travis.yml
 
 # ADD DOCKER FILES
 !.dockerignore
-!Dockerfile
 
 # ADD DOC FILE
 !*.env.example
-!LICENSE
-!README.md

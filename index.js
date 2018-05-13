@@ -1,48 +1,145 @@
-const Envy = require('envy');
-const Raven = require('raven');
+'use strict';
+
+const Envy     = require('envy');
+const Raven    = require('raven');
 const Commando = require('discord.js-commando');
+const Sqlite   = require('sqlite');
+const Path     = require('path');
+const Pino     = require('pino');
 
 const settings = Envy(process.env.DOTENV_PATH || './.env');
 
-Raven.config(settings.sentryEndpoint).install();
-
-const client = new Commando.Client({
-		owner: settings.discordOwnerId
+const pino = Pino({
+    name :  'ebot',
+    level : settings.logLevel || 'debug'
 });
 
-client.on('error', (error) => {
+Raven.config(settings.sentryEndpoint)
+    .install();
 
-		Raven.captureException(error);
-		console.error(error);
-});
+exports.start = async (options) => {
 
-client.on('warning', (...data) => {
+    const client = new Commando.Client({ owner : options.discordOwnerId });
 
-		console.warn(data);
-});
+    client.on('error', (error) => {
 
-client.on('ready', () => {
+        pino.error({ event : 'error' }, error);
+        Raven.captureException(error);
+    });
 
-		// NOTIFY IN #BLACKMESA
-		console.log('READY');
-});
+    client.on('warning', (message) => {
 
-client.on('disconnect', () => {
+        pino.warn({ event : 'warning' }, message);
+    });
 
-		console.warn('Disconnected!');
-});
+    client.on('debug', (message) => {
 
-client.on('reconnecting', () => {
+        pino.debug({ event : 'debug' }, message);
+    });
 
-		console.warn('Reconnecting...');
-});
+    client.on('ready', () => {
+        // NOTIFY IN #BLACKMESA
+        pino.info({ event : 'ready' }, 'ready');
+    });
 
-client.on('commandError', (command, error) => {
+    client.on('disconnect', () => {
 
-		if(error instanceof Commando.FriendlyError) {
-				return;
-		}
+        pino.warn({ event : 'disconnect' }, 'disconnected');
+    });
 
-		Raven.captureException(error);
-		console.error(`Error in command ${command.groupID}:${command.memberName}`, error);
-});
+    client.on('reconnecting', () => {
+
+        pino.warn({ event : 'reconnecting' }, 'reconnecting');
+    });
+
+    client.on('commandError', (command, error) => {
+
+        pino.error({
+            event : 'commandError',
+            data :  {
+                command,
+                error
+            }
+        }, error.msg);
+
+        if (error instanceof Commando.FriendlyError) {
+            return;
+        }
+
+        Raven.captureException(error);
+    });
+
+    client.on('commandBlocked', (msg, reason) => {
+
+        pino.info({
+            event : 'commandBlocked',
+            data :  {
+                msg,
+                reason
+            }
+        }, `Command ${msg.command ? `${msg.command.groupID}:${msg.command.memberName}` : ''} blocked; ${reason}`);
+    });
+
+    client.on('commandPrefixChange', (guild, prefix) => {
+
+        pino.info({
+            event : 'commandPrefixChange',
+            data :  {
+                guild,
+                prefix
+            }
+        }, `Prefix ${prefix === '' ? 'removed' : `changed to ${prefix || 'the default'}`} ${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}`);
+    });
+
+    client.on('commandStatusChange', (guild, command, enabled) => {
+
+        pino.info({
+            event : 'commandStatusChange',
+            data :  {
+                guild,
+                command,
+                enabled
+            }
+        }, `Command ${command.groupID}:${command.memberName} ${enabled ? 'enabled' : 'disabled'} ${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}`);
+    });
+
+    client.on('groupStatusChange', (guild, group, enabled) => {
+
+        pino.info({
+            event : 'commandStatusChange',
+            data :  {
+                guild,
+                group,
+                enabled
+            }
+        }, `Group ${group.id} ${enabled ? 'enabled' : 'disabled'} ${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}`);
+    });
+
+    const db = await Sqlite.open(Path.resolve(__dirname, options.sqlitePath || './database.sqlite3'));
+
+    const providerInitPromise = client.setProvider(new Commando.SQLiteProvider(db));
+
+    client.registry.registerDefaults();
+
+    await client.login(options.discordToken);
+
+    await providerInitPromise;
+
+    return client;
+};
+
+if (!module.parent) {
+
+    process.on('unhandledRejection', (error) => {
+
+        pino.error({ event : 'unhandledRejection' }, error);
+        Raven.captureException(error);
+        throw error;
+    });
+
+    exports.start(settings).catch((error) => {
+
+        pino.fatal(error);
+        throw error;
+    });
+}
