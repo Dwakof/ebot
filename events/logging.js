@@ -28,6 +28,29 @@ module.exports = (client, settings) => {
             }
         },
         {
+            event :   'message',
+            handler : (message) => {
+
+                client.log.debug({
+                    event :  'message',
+                    id :     message.id,
+                    author : {
+                        username :      message.author.username,
+                        id :            message.author.id,
+                        discriminator : message.author.discriminator
+                    },
+                    guild :  {
+                        id :   message.channel.guild.id,
+                        name : message.channel.guild.name
+                    },
+                    channel :  {
+                        id :   message.channel.id,
+                        name : message.channel.name
+                    }
+                }, `[${message.channel.guild.name}] [${message.channel.name}] [${message.author.username}#${message.author.discriminator}] ${message.content}`);
+            }
+        },
+        {
             event :   'disconnect',
             handler : () => {
 
