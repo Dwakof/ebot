@@ -21,6 +21,9 @@ exports.start = async (options) => {
 
     const client = new Commando.Client({ owner : options.discordOwnerId });
 
+    client.log   = pino;
+    client.raven = Raven;
+
     client.on('error', (error) => {
 
         pino.error({ event : 'error' }, error);
