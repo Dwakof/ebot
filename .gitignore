@@ -7,13 +7,10 @@
 !commands/**
 !lib
 !lib/**
-!events
-!events/**
+!plugins
+!plugins/**
 !test
 !test/**
-
-# REMOVE ENV FILES
-*.env
 
 # ADD METADATA FILE
 !.npmignore

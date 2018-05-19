@@ -7,17 +7,16 @@ const Sqlite   = require('sqlite');
 const Path     = require('path');
 const Pino     = require('pino');
 
-const Events = require('./lib/events');
+const Plugins = require('./lib/plugins');
 
 const settings = Envy(process.env.DOTENV_PATH || './.env');
 
 const pino = Pino({
-    name :  'ebot',
+    name  : 'ebot',
     level : settings.logLevel || 'debug'
 });
 
-Raven.config(settings.sentryEndpoint)
-    .install();
+Raven.config(settings.sentryEndpoint).install();
 
 exports.start = async (options) => {
 
@@ -26,17 +25,21 @@ exports.start = async (options) => {
     client.log   = pino;
     client.raven = Raven;
 
-    Events.bind(client);
-
     const db = await Sqlite.open(Path.resolve(__dirname, options.sqlitePath || './database.sqlite3'));
 
     const providerInitPromise = client.setProvider(new Commando.SQLiteProvider(db));
 
     client.registry.registerDefaults();
 
+    client.registry.registerCommandsIn(Path.join(__dirname, 'commands'));
+
     await client.login(options.discordToken);
 
     await providerInitPromise;
+
+    await Plugins.register(client, settings);
+
+    client.emit('ready', client);
 
     return client;
 };
