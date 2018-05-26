@@ -2,7 +2,7 @@
 
 const Commando = require('discord.js-commando');
 const Hoek     = require('hoek');
-const Events   = require('../lib/events');
+const Events   = require('../../lib/events');
 
 module.exports = {
     name     : 'logging',
