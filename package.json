@@ -30,7 +30,7 @@
     "node-opus": "0.3.0",
     "opusscript": "0.0.6",
     "sodium": "2.0.3",
-    "libsodium-wrappers": "0.7.3",
+    "libsodium-wrappers": "0.7.6",
     "uws": "10.148.0"
   },
   "devDependencies": {
