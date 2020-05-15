@@ -30,7 +30,7 @@
     "discord.js": "12.2.0",
     "dotenv": "8.2.0",
     "erlpack": "github:discordapp/erlpack",
-    "got": "^11.1.3",
+    "got": "11.1.3",
     "pino": "6.2.1",
     "pino-pretty": "4.0.0",
     "utf-8-validate": "5.0.2",
@@ -40,7 +40,7 @@
     "@hapi/eslint-config-hapi": "13.0.2",
     "@hapi/eslint-plugin-hapi": "4.3.5",
     "eslint": "7.0.0",
-    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-node": "11.1.0",
     "eslint-plugin-security": "1.4.0"
   }
 }
