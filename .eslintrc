@@ -1,14 +1,15 @@
 {
-  "extends": [
-    "hapi"
+  "extends"      : [
+    "plugin:node/recommended",
+    "@hapi/hapi"
   ],
   "parserOptions": {
-    "ecmaVersion": 8,
-    "ecmaFeatures": {
-      "experimentalObjectRestSpread": true
-    }
+    "ecmaVersion": 2020
   },
-  "plugins": [
+  "plugins"      : [
     "security"
-  ]
+  ],
+  "rules"        : {
+    "key-spacing": "off"
+  }
 }

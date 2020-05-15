@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:9
+FROM node:14-alpine
 
 MAINTAINER Yoann MALLEMANCHE <yoann.mallemanche@gmail.com>
 

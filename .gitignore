@@ -3,12 +3,8 @@
 
 # ADD CODE
 !index.js
-!commands
-!commands/**
-!lib
-!lib/**
-!plugins
-!plugins/**
+!src/
+!src/**
 !test
 !test/**
 

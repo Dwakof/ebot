@@ -1,61 +1,22 @@
 'use strict';
 
-const Envy     = require('envy');
-const Raven    = require('raven');
-const Commando = require('discord.js-commando');
-const Sqlite   = require('sqlite');
-const Path     = require('path');
-const Pino     = require('pino');
+const Client = require('./src/core/client');
 
-const Plugins = require('./lib/plugins');
+const UtilPlugin = require('./src/plugins/utils');
+const WeatherPlugin = require('./src/plugins/weather');
 
-const settings = Envy(process.env.DOTENV_PATH || './.env');
+exports.deployment = async () => {
 
-const pino = Pino({
-    name  : 'ebot',
-    level : settings.logLevel || 'debug'
-});
+    const client = new Client(require('./src/config'));
 
-Raven.config(settings.sentryEndpoint).install();
+    client.register(new UtilPlugin());
+    client.register(new WeatherPlugin());
 
-exports.start = async (options) => {
-
-    const client = new Commando.Client({ owner : options.discordOwnerId });
-
-    client.log   = pino;
-    client.raven = Raven;
-
-    const db = await Sqlite.open(Path.resolve(__dirname, options.sqlitePath || './database.sqlite3'));
-
-    const providerInitPromise = client.setProvider(new Commando.SQLiteProvider(db));
-
-    client.registry.registerDefaults();
-
-    client.registry.registerCommandsIn(Path.join(__dirname, 'commands'));
-
-    await client.login(options.discordToken);
-
-    await providerInitPromise;
-
-    await Plugins.register(client, settings);
-
-    client.emit('ready', client);
+    await client.start();
 
     return client;
 };
 
 if (!module.parent) {
-
-    process.on('unhandledRejection', (error) => {
-
-        pino.error({ event : 'unhandledRejection' }, error);
-        Raven.captureException(error);
-        throw error;
-    });
-
-    exports.start(settings).catch((error) => {
-
-        pino.fatal(error);
-        throw error;
-    });
+    return exports.deployment();
 }

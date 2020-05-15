@@ -3,13 +3,10 @@
 
 # ADD CODE
 !index.js
-!commands
-!commands/*
+!src/**
 !test
 !test/*
 
-# REMOVE ENV FILES
-*.env
 
 # ADD METADATA FILE
 !package.json
