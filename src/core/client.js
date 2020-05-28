@@ -3,8 +3,9 @@
 const Path   = require('path');
 const Pino   = require('pino');
 const Sentry = require('@sentry/node');
+const Emoji  = require('node-emoji');
 
-const { AkairoClient, ListenerHandler } = require('discord-akairo');
+const { AkairoClient, ListenerHandler, Provider, AkairoModule } = require('discord-akairo');
 
 const { CoreEvents } = require('./constants');
 
@@ -21,6 +22,8 @@ module.exports = class EbotClient extends AkairoClient {
     #coreListenerHandlers = new Map();
 
     #plugins = new Map();
+
+    #providers = new Map();
 
     constructor(settings) {
 
@@ -58,20 +61,10 @@ module.exports = class EbotClient extends AkairoClient {
         }
     };
 
-    #setupPlugins = async () => {
-
-        for (const plugin of this.#plugins.values()) {
-
-            await plugin.load(this);
-
-            this.logger.debug({ event : CoreEvents.PLUGIN_LOADED, emitter : 'core', id : plugin.id });
-        }
-    };
-
     /**
      * @param {Plugin} plugin
      */
-    register(plugin) {
+    async registerPlugin(plugin) {
 
         if (this.#plugins.has(plugin.id)) {
 
@@ -80,7 +73,39 @@ module.exports = class EbotClient extends AkairoClient {
 
         this.#plugins.set(plugin.id, plugin);
 
-        this.logger.debug({ event : CoreEvents.PLUGIN_REGISTERED, emitter : 'core', id : plugin.id });
+        await plugin.register(this);
+
+        this.logger.trace({ event : CoreEvents.PLUGIN_REGISTERED, emitter : 'core', id : plugin.id });
+
+        if (this.#started) {
+
+            await plugin.load(this);
+
+            this.logger.debug({ event : CoreEvents.PLUGIN_LOADED, emitter : 'core', id : plugin.id });
+        }
+    }
+
+    /**
+     * @param {string}   id
+     * @param {Provider} provider
+     */
+    async registerProvider(id, provider) {
+
+        if (this.#providers.has(id)) {
+
+            throw new Error('A provider under the same ID was already registered');
+        }
+
+        this.#providers.set(id, provider);
+
+        this.logger.trace({ event : CoreEvents.PROVIDER_REGISTERED, emitter : 'core', id });
+
+        if (this.#started) {
+
+            await provider.init();
+
+            this.logger.debug({ event : CoreEvents.PROVIDER_INITIALIZED, emitter : 'core', id });
+        }
     }
 
     async initialize() {
@@ -101,7 +126,19 @@ module.exports = class EbotClient extends AkairoClient {
             await this.initialize();
         }
 
-        await this.#setupPlugins();
+        for (const [id, provider] of this.#providers.entries()) {
+
+            await provider.init();
+
+            this.logger.debug({ event : CoreEvents.PROVIDER_INITIALIZED, emitter : 'core', id });
+        }
+
+        for (const plugin of this.#plugins.values()) {
+
+            await plugin.load(this);
+
+            this.logger.debug({ event : CoreEvents.PLUGIN_LOADED, emitter : 'core', id : plugin.id });
+        }
 
         await this.login(this.#settings.discord.token);
 
@@ -128,5 +165,37 @@ module.exports = class EbotClient extends AkairoClient {
     get settings() {
 
         return this.#settings;
+    }
+
+    get providers() {
+
+        return Array.from(this.#providers.entries()).reduce((acc, [k, v]) => ({ ...acc, [k] : v }), {});
+    }
+
+    get emoji() {
+
+        return Emoji;
+    }
+
+    /**
+     * @param {AkairoModule} module
+     * @param {Error}        error
+     * @param {String}       message
+     * @param {Object}       extraData
+     */
+    handleError(module, error, message, extraData = {}) {
+
+        this.#logger.error({
+            event        : CoreEvents.MODULE_ERROR,
+            emitter      : module.id,
+            error,
+            errorMessage : error.toString(),
+            message
+        });
+
+        if (this.#sentry) {
+
+            this.#sentry.captureException(error);
+        }
     }
 };

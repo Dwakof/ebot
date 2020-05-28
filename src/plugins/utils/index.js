@@ -15,7 +15,7 @@ module.exports = class Utils extends Plugin {
 
     afterLoad(client) {}
 
-    get commandHandler() {
+    commandHandler() {
 
         return {
             directory           : Path.join(__dirname, './commands/'),
@@ -25,14 +25,14 @@ module.exports = class Utils extends Plugin {
         };
     }
 
-    get inhibitorHandler() {
+    inhibitorHandler() {
 
         return {
             directory : Path.join(__dirname, './inhibitors/')
         };
     }
 
-    get listenerHandler() {
+    listenerHandler() {
 
         return {
             directory : Path.join(__dirname, './listeners/')

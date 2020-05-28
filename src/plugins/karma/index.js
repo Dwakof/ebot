@@ -2,13 +2,14 @@
 
 const Path = require('path');
 
-const Plugin = require('../../core/plugin');
+const Plugin            = require('../../core/plugin');
+const ObjectionProvider = require('../../core/objectionProvider');
 
-module.exports = class Weather extends Plugin {
+module.exports = class Karma extends Plugin {
 
     get id() {
 
-        return 'weather';
+        return 'karma';
     }
 
     beforeLoad(client) {}
@@ -46,6 +47,19 @@ module.exports = class Weather extends Plugin {
 
         return {
             directory : Path.join(__dirname, './listeners/')
+        };
+    }
+
+    providers(client) {
+
+        return {
+            id       : 'karma',
+            provider : new ObjectionProvider({
+                ...client.settings.plugins.karma.knex,
+                migrations : {
+                    directory : Path.join(__dirname, '/migrations')
+                }
+            }, [require('./models/karma')])
         };
     }
 };

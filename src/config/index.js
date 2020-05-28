@@ -13,8 +13,9 @@ const store = new Confidence.Store({
     discord : {
         $filter     : { $env : 'NODE_ENV' },
         $base       : {
-            ownerId : { $env : 'DISCORD_OWNER_ID' },
-            token   : { $env : 'DISCORD_TOKEN' }
+            partials : { $env : 'DISCORD_PARTIALS', $default : ['MESSAGE', 'CHANNEL', 'REACTION'] }, // Wait confidence v5 to coerce array
+            ownerId  : { $env : 'DISCORD_OWNER_ID' },                                                // Wait confidence v5 to coerce array
+            token    : { $env : 'DISCORD_TOKEN' }
         },
         development : {
             presence : {
@@ -68,6 +69,18 @@ const store = new Confidence.Store({
         }
     },
     plugins : {
+        karma   : {
+            knex : {
+                client     : 'pg',
+                connection : {
+                    host     : { $env : 'POSTGRES_HOST', $default : 'localhost' },
+                    user     : { $env : 'POSTGRES_USER', $default : 'ebot' },
+                    password : { $env : 'POSTGRES_PASS', $default : 'ebot' },
+                    database : { $env : 'POSTGRES_DB',   $default : 'ebot' },
+                    port     : { $env : 'POSTGRES_PORT', $coerce : 'number', $default : 5432 }
+                }
+            }
+        },
         weather : {
             openWeatherApiKey : { $env : 'OPEN_WEATHER_API_KEY' },
             LocationIQApiKey  : { $env : 'LOCATION_IQ_API_KEY' }

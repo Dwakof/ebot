@@ -1,16 +1,28 @@
 'use strict';
 
-const Client = require('./src/core/client');
+const Fs   = require('fs').promises;
+const Path = require('path');
 
-const UtilPlugin = require('./src/plugins/utils');
-const WeatherPlugin = require('./src/plugins/weather');
+const Client = require('./src/core/client');
+const Plugin = require('./src/core/plugin');
 
 exports.deployment = async () => {
 
     const client = new Client(require('./src/config'));
 
-    client.register(new UtilPlugin());
-    client.register(new WeatherPlugin());
+    await client.initialize();
+
+    const plugins = await Fs.readdir(Path.join(__dirname, './src/plugins'));
+
+    for (const plugin of plugins) {
+
+        const pluginToImport = require(Path.join(__dirname, './src/plugins/', plugin));
+
+        if (pluginToImport.prototype instanceof Plugin) {
+
+            await client.registerPlugin(new pluginToImport());
+        }
+    }
 
     await client.start();
 

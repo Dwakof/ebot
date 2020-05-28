@@ -2,7 +2,7 @@
 
 const { CommandHandler, InhibitorHandler, ListenerHandler } = require('discord-akairo');
 
-const { CoreEvents } = require('./constants')
+const { CoreEvents } = require('./constants');
 
 module.exports = class Plugin {
 
@@ -21,35 +21,79 @@ module.exports = class Plugin {
     /**
      * @param {EbotClient} client
      */
-    async load(client) {
+    async register(client) {
 
         this.#client = client;
+
+        if (this.providers) {
+
+            let providers = this.providers;
+
+            if (typeof this.providers === 'function') {
+
+                providers = await this.providers(client);
+            }
+
+            if (!Array.isArray(providers)) {
+
+                providers = [providers];
+            }
+
+            for (const data of providers) {
+
+                if (data) {
+
+                    await this.client.registerProvider(data.id, data.provider);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param {EbotClient} client
+     */
+    async load(client) {
+
 
         if (this.beforeLoad) {
 
             await this.beforeLoad(this.#client);
+
+            this.#client.logger.trace({ event : CoreEvents.PLUGIN_BEFORE_LOAD, emitter : 'core', plugin : this.id });
         }
 
         const emitters = {};
 
         if (this.commandHandler) {
 
-            this.#commandHandler = new CommandHandler(this.#client, {
-                ...this.commandHandler,
-                category : this.#id
-            });
+            let commandHandler = this.commandHandler;
+
+            if (typeof this.commandHandler === 'function') {
+
+                commandHandler = this.commandHandler(client);
+            }
+
+            this.#commandHandler = new CommandHandler(this.#client, { ...commandHandler, category : this.#id });
 
             emitters.commandHandler = this.#commandHandler;
 
-            this.#client.logger.trace({ event : CoreEvents.COMMAND_HANDLER_REGISTERED, emitter : 'core', plugin : this.id });
+            this.#client.logger.trace({
+                event   : CoreEvents.COMMAND_HANDLER_REGISTERED,
+                emitter : 'core',
+                plugin  : this.id
+            });
         }
 
         if (this.inhibitorHandler) {
 
-            this.#inhibitorHandler = new InhibitorHandler(this.#client, {
-                ...this.inhibitorHandler,
-                category : this.#id
-            });
+            let inhibitorHandler = this.inhibitorHandler;
+
+            if (typeof this.inhibitorHandler === 'function') {
+
+                inhibitorHandler = this.inhibitorHandler(client);
+            }
+
+            this.#inhibitorHandler = new InhibitorHandler(this.#client, { ...inhibitorHandler, category : this.#id });
 
             emitters.inhibitorHandler = this.#inhibitorHandler;
 
@@ -58,15 +102,23 @@ module.exports = class Plugin {
                 this.#commandHandler.useInhibitorHandler(this.#inhibitorHandler);
             }
 
-            this.#client.logger.trace({ event : CoreEvents.INHIBITOR_HANDLER_REGISTERED, emitter : 'core', plugin : this.id });
+            this.#client.logger.trace({
+                event   : CoreEvents.INHIBITOR_HANDLER_REGISTERED,
+                emitter : 'core',
+                plugin  : this.id
+            });
         }
 
         if (this.listenerHandler) {
 
-            this.#listenerHandler = new ListenerHandler(this.#client, {
-                ...this.listenerHandler,
-                category : this.#id
-            });
+            let listenerHandler = this.listenerHandler;
+
+            if (typeof this.listenerHandler === 'function') {
+
+                listenerHandler = this.listenerHandler(client);
+            }
+
+            this.#listenerHandler = new ListenerHandler(this.#client, { ...listenerHandler, category : this.#id });
 
             emitters.listenerHandler = this.#listenerHandler;
 
@@ -77,33 +129,51 @@ module.exports = class Plugin {
                 this.#commandHandler.useListenerHandler(this.#listenerHandler);
             }
 
-            this.#client.logger.trace({ event : CoreEvents.LISTENER_HANDLER_REGISTERED, emitter : 'core', plugin : this.id });
+            this.#client.logger.trace({
+                event   : CoreEvents.LISTENER_HANDLER_REGISTERED,
+                emitter : 'core',
+                plugin  : this.id
+            });
         }
 
         if (this.#commandHandler) {
 
             this.#commandHandler.loadAll();
 
-            this.#client.logger.trace({ event : CoreEvents.COMMAND_HANDLER_LOADED, emitter : 'core', plugin : this.id });
+            this.#client.logger.trace({
+                event   : CoreEvents.COMMAND_HANDLER_LOADED,
+                emitter : 'core',
+                plugin  : this.id
+            });
         }
 
         if (this.#inhibitorHandler) {
 
             this.#inhibitorHandler.loadAll();
 
-            this.#client.logger.trace({ event : CoreEvents.INHIBITOR_HANDLER_LOADED, emitter : 'core', plugin : this.id });
+            this.#client.logger.trace({
+                event   : CoreEvents.INHIBITOR_HANDLER_LOADED,
+                emitter : 'core',
+                plugin  : this.id
+            });
         }
 
         if (this.#listenerHandler) {
 
             this.#listenerHandler.loadAll();
 
-            this.#client.logger.trace({ event : CoreEvents.LISTENER_HANDLER_LOADED, emitter : 'core', plugin : this.id });
+            this.#client.logger.trace({
+                event   : CoreEvents.LISTENER_HANDLER_LOADED,
+                emitter : 'core',
+                plugin  : this.id
+            });
         }
 
         if (this.afterLoad) {
 
             await this.afterLoad(this.#client);
+
+            this.#client.logger.trace({ event : CoreEvents.PLUGIN_AFTER_LOAD, emitter : 'core', plugin : this.id });
         }
     }
 
@@ -116,4 +186,12 @@ module.exports = class Plugin {
 
         return this.#client;
     }
-}
+
+    providers() { return false; }
+
+    commandHandler() { return false; }
+
+    inhibitorHandler() { return false; }
+
+    listenerHandler() { return false; }
+};
