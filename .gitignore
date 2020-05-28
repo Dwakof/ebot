@@ -3,13 +3,10 @@
 
 # ADD CODE
 !index.js
-!commands
-!commands/*
+!src/
+!src/**
 !test
-!test/*
-
-# REMOVE ENV FILES
-*.env
+!test/**
 
 # ADD METADATA FILE
 !.npmignore
