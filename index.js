@@ -1,145 +1,34 @@
 'use strict';
 
-const Envy     = require('envy');
-const Raven    = require('raven');
-const Commando = require('discord.js-commando');
-const Sqlite   = require('sqlite');
-const Path     = require('path');
-const Pino     = require('pino');
+const Fs   = require('fs').promises;
+const Path = require('path');
 
-const settings = Envy(process.env.DOTENV_PATH || './.env');
+const Client = require('./src/core/client');
+const Plugin = require('./src/core/plugin');
 
-const pino = Pino({
-    name :  'ebot',
-    level : settings.logLevel || 'debug'
-});
+exports.deployment = async () => {
 
-Raven.config(settings.sentryEndpoint)
-    .install();
+    const client = new Client(require('./src/config'));
 
-exports.start = async (options) => {
+    await client.initialize();
 
-    const client = new Commando.Client({ owner : options.discordOwnerId });
+    const plugins = await Fs.readdir(Path.join(__dirname, './src/plugins'));
 
-    client.on('error', (error) => {
+    for (const plugin of plugins) {
 
-        pino.error({ event : 'error' }, error);
-        Raven.captureException(error);
-    });
+        const pluginToImport = require(Path.join(__dirname, './src/plugins/', plugin));
 
-    client.on('warning', (message) => {
+        if (pluginToImport.prototype instanceof Plugin) {
 
-        pino.warn({ event : 'warning' }, message);
-    });
-
-    client.on('debug', (message) => {
-
-        pino.debug({ event : 'debug' }, message);
-    });
-
-    client.on('ready', () => {
-        // NOTIFY IN #BLACKMESA
-        pino.info({ event : 'ready' }, 'ready');
-    });
-
-    client.on('disconnect', () => {
-
-        pino.warn({ event : 'disconnect' }, 'disconnected');
-    });
-
-    client.on('reconnecting', () => {
-
-        pino.warn({ event : 'reconnecting' }, 'reconnecting');
-    });
-
-    client.on('commandError', (command, error) => {
-
-        pino.error({
-            event : 'commandError',
-            data :  {
-                command,
-                error
-            }
-        }, error.msg);
-
-        if (error instanceof Commando.FriendlyError) {
-            return;
+            await client.registerPlugin(new pluginToImport());
         }
+    }
 
-        Raven.captureException(error);
-    });
-
-    client.on('commandBlocked', (msg, reason) => {
-
-        pino.info({
-            event : 'commandBlocked',
-            data :  {
-                msg,
-                reason
-            }
-        }, `Command ${msg.command ? `${msg.command.groupID}:${msg.command.memberName}` : ''} blocked; ${reason}`);
-    });
-
-    client.on('commandPrefixChange', (guild, prefix) => {
-
-        pino.info({
-            event : 'commandPrefixChange',
-            data :  {
-                guild,
-                prefix
-            }
-        }, `Prefix ${prefix === '' ? 'removed' : `changed to ${prefix || 'the default'}`} ${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}`);
-    });
-
-    client.on('commandStatusChange', (guild, command, enabled) => {
-
-        pino.info({
-            event : 'commandStatusChange',
-            data :  {
-                guild,
-                command,
-                enabled
-            }
-        }, `Command ${command.groupID}:${command.memberName} ${enabled ? 'enabled' : 'disabled'} ${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}`);
-    });
-
-    client.on('groupStatusChange', (guild, group, enabled) => {
-
-        pino.info({
-            event : 'commandStatusChange',
-            data :  {
-                guild,
-                group,
-                enabled
-            }
-        }, `Group ${group.id} ${enabled ? 'enabled' : 'disabled'} ${guild ? `in guild ${guild.name} (${guild.id})` : 'globally'}`);
-    });
-
-    const db = await Sqlite.open(Path.resolve(__dirname, options.sqlitePath || './database.sqlite3'));
-
-    const providerInitPromise = client.setProvider(new Commando.SQLiteProvider(db));
-
-    client.registry.registerDefaults();
-
-    await client.login(options.discordToken);
-
-    await providerInitPromise;
+    await client.start();
 
     return client;
 };
 
 if (!module.parent) {
-
-    process.on('unhandledRejection', (error) => {
-
-        pino.error({ event : 'unhandledRejection' }, error);
-        Raven.captureException(error);
-        throw error;
-    });
-
-    exports.start(settings).catch((error) => {
-
-        pino.fatal(error);
-        throw error;
-    });
+    return exports.deployment();
 }
