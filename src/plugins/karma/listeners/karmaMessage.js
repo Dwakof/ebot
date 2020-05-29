@@ -7,6 +7,9 @@ const Karma = require('../karma');
 
 module.exports = class KarmaMessageListener extends Listener {
 
+    static REGEX_KARMA           = /(\w+|<@![0-9]+>)(\+\+|--|\+5|-5)/gmi;
+    static REGEX_DISCORD_USER_ID = /^<@![0-9]+>$/gi;
+
     constructor() {
 
         super('karmaMessage', { emitter : 'client', event : Constants.Events.MESSAGE_CREATE });
@@ -30,7 +33,7 @@ module.exports = class KarmaMessageListener extends Listener {
             }
         }
 
-        const matches = message.content.match(Karma.REGEX_KARMA);
+        const matches = message.content.match(KarmaMessageListener.REGEX_KARMA);
 
         if (Array.isArray(matches)) {
 
@@ -58,7 +61,7 @@ module.exports = class KarmaMessageListener extends Listener {
                         return;
                 }
 
-                if (Karma.REGEX_DISCORD_USER_ID.test(string.slice(0, -2))) {
+                if (KarmaMessageListener.REGEX_DISCORD_USER_ID.test(string.slice(0, -2))) {
 
                     users.set(nameOrId.slice(3, nameOrId.length - 1), inc);
                 }

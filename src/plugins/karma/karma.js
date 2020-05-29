@@ -2,9 +2,6 @@
 
 module.exports = {
 
-    REGEX_KARMA           : /(\w+|<@![0-9]+>)(\+\+|--|\+5|-5)/gmi,
-    REGEX_DISCORD_USER_ID : /^<@![0-9]+>$/gi,
-
     NARCISSIST_RESPONSES : [
         (userId) => `Hey everyone ! <@${ userId }> is a narcissist !`
     ],
@@ -62,5 +59,60 @@ module.exports = {
         }
 
         return 'th';
+    },
+
+    getInfoUser(client, guildId, userId) {
+
+        const { Member } = client.providers.karma.models;
+
+        return Member.query()
+            .with('sumTable', Member.query()
+                .select('guildId', 'userId')
+                .sum({ karma : 'value' })
+                .groupBy('guildId', 'userId')
+            )
+            .with('rankTable', Member.query()
+                .select([
+                    '*',
+                    Member.knex().raw('RANK() OVER ( ORDER BY karma DESC ) rank'),
+                    Member.knex().raw(`COUNT(*) OVER () total`)
+                ])
+                .from('sumTable')
+            )
+            .from('rankTable')
+            .where({ guildId, userId })
+            .limit(1).first();
+    },
+
+    getStatsUser(client, guildId, userId) {
+
+        const { Member } = client.providers.karma.models;
+
+        return Member.query()
+            .with('dateTable',
+                Member.query().select({
+                    min   : Member.fn.min(Member.ref('createdAt')),
+                    max   : Member.fn.max(Member.ref('createdAt')),
+                    range : Member.raw('GREATEST(FLOOR((EXTRACT(EPOCH FROM max(??)) - EXTRACT(EPOCH FROM min(??))) / ?), 1)', [
+                        Member.ref('createdAt'),
+                        Member.ref('createdAt'),
+                        50
+                    ])
+                }).where({ guildId, userId })
+            )
+            .select({
+                time  : Member.raw('FLOOR(EXTRACT(EPOCH FROM ??) / ?) * ?', [
+                    'createdAt',
+                    Member.query().select('range').from('dateTable'),
+                    Member.query().select('range').from('dateTable')
+                ]),
+                value : Member.fn.sum(Member.ref('value'))
+            })
+            .whereBetween('createdAt', [
+                Member.query().select('min').from('dateTable'),
+                Member.query().select('max').from('dateTable')
+            ])
+            .where({ guildId, userId })
+            .groupBy('time').orderBy('time');
     }
 };
