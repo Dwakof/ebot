@@ -3,7 +3,6 @@
 const Path   = require('path');
 const Pino   = require('pino');
 const Sentry = require('@sentry/node');
-const Emoji  = require('node-emoji');
 
 const { AkairoClient, ListenerHandler, Provider, AkairoModule } = require('discord-akairo');
 
@@ -170,11 +169,6 @@ module.exports = class EbotClient extends AkairoClient {
     get providers() {
 
         return Array.from(this.#providers.entries()).reduce((acc, [k, v]) => ({ ...acc, [k] : v }), {});
-    }
-
-    get emoji() {
-
-        return Emoji;
     }
 
     /**
