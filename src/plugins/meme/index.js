@@ -15,7 +15,7 @@ module.exports = class Meme extends Plugin {
 
     afterLoad(client) {}
 
-    commandHandler() {
+    commandHandlerOptions() {
 
         return {
             directory           : Path.join(__dirname, './commands/'),
@@ -25,14 +25,14 @@ module.exports = class Meme extends Plugin {
         };
     }
 
-    inhibitorHandler() {
+    inhibitorHandlerOptions() {
 
         return {
             directory : Path.join(__dirname, './inhibitors/')
         };
     }
 
-    listenerHandler() {
+    listenerHandlerOptions() {
 
         return {
             directory : Path.join(__dirname, './listeners/')

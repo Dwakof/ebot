@@ -64,16 +64,16 @@ module.exports = class Plugin {
 
         const emitters = {};
 
-        if (this.commandHandler) {
+        if (this.commandHandlerOptions) {
 
-            let commandHandler = this.commandHandler;
+            let commandHandlerOptions = this.commandHandlerOptions;
 
-            if (typeof this.commandHandler === 'function') {
+            if (typeof this.commandHandlerOptions === 'function') {
 
-                commandHandler = this.commandHandler(client);
+                commandHandlerOptions = this.commandHandlerOptions(client);
             }
 
-            this.#commandHandler = new CommandHandler(this.#client, { ...commandHandler, category : this.#id });
+            this.#commandHandler = new CommandHandler(this.#client, { ...commandHandlerOptions, category : this.#id });
 
             emitters.commandHandler = this.#commandHandler;
 
@@ -84,16 +84,16 @@ module.exports = class Plugin {
             });
         }
 
-        if (this.inhibitorHandler) {
+        if (this.inhibitorHandlerOptions) {
 
-            let inhibitorHandler = this.inhibitorHandler;
+            let inhibitorHandlerOptions = this.inhibitorHandlerOptions;
 
-            if (typeof this.inhibitorHandler === 'function') {
+            if (typeof this.inhibitorHandlerOptions === 'function') {
 
-                inhibitorHandler = this.inhibitorHandler(client);
+                inhibitorHandlerOptions = this.inhibitorHandlerOptions(client);
             }
 
-            this.#inhibitorHandler = new InhibitorHandler(this.#client, { ...inhibitorHandler, category : this.#id });
+            this.#inhibitorHandler = new InhibitorHandler(this.#client, { ...inhibitorHandlerOptions, category : this.#id });
 
             emitters.inhibitorHandler = this.#inhibitorHandler;
 
@@ -109,16 +109,16 @@ module.exports = class Plugin {
             });
         }
 
-        if (this.listenerHandler) {
+        if (this.listenerHandlerOptions) {
 
-            let listenerHandler = this.listenerHandler;
+            let listenerHandlerOptions = this.listenerHandlerOptions;
 
-            if (typeof this.listenerHandler === 'function') {
+            if (typeof this.listenerHandlerOptions === 'function') {
 
-                listenerHandler = this.listenerHandler(client);
+                listenerHandlerOptions = this.listenerHandlerOptions(client);
             }
 
-            this.#listenerHandler = new ListenerHandler(this.#client, { ...listenerHandler, category : this.#id });
+            this.#listenerHandler = new ListenerHandler(this.#client, { ...listenerHandlerOptions, category : this.#id });
 
             emitters.listenerHandler = this.#listenerHandler;
 
@@ -189,9 +189,9 @@ module.exports = class Plugin {
 
     providers() { return false; }
 
-    commandHandler() { return false; }
+    commandHandlerOptions() { return false; }
 
-    inhibitorHandler() { return false; }
+    inhibitorHandlerOptions() { return false; }
 
-    listenerHandler() { return false; }
+    listenerHandlerOptions() { return false; }
 };
