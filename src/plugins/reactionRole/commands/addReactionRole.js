@@ -30,10 +30,9 @@ module.exports = class AddReactionRoleCommand extends Command {
                 },
                 {
                     id     : 'listeningChannels',
-                    type   : 'channels',
+                    type   : 'channels', // TODO Need a custom type to allow an "everywhere" options
                     prompt : {
                         infinite   : true,
-                        optional   : true,
                         cancelWord : 'cancel',
                         stopWord   : 'stop',
                         start      : [
