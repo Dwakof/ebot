@@ -32,7 +32,7 @@
     "discord.js": "12.3.1",
     "dotenv": "8.2.0",
     "erlpack": "github:discordapp/erlpack",
-    "got": "11.5.1",
+    "got": "11.5.2",
     "keyv": "4.0.1",
     "keyv-file": "0.2.0",
     "knex": "0.21.2",
