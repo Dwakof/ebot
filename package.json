@@ -36,7 +36,7 @@
     "keyv": "4.0.1",
     "keyv-file": "0.2.0",
     "knex": "0.21.2",
-    "objection": "2.2.1",
+    "objection": "2.2.3",
     "pg": "8.3.0",
     "pino": "6.4.1",
     "utf-8-validate": "5.0.2",
