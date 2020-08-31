@@ -37,7 +37,7 @@
     "keyv-file": "0.2.0",
     "knex": "0.21.5",
     "objection": "2.2.3",
-    "pg": "8.3.0",
+    "pg": "8.3.3",
     "pino": "6.5.1",
     "utf-8-validate": "5.0.2",
     "zlib-sync": "0.1.7"
