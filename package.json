@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@hapi/eslint-config-hapi": "13.0.2",
-    "@hapi/eslint-plugin-hapi": "4.3.5",
+    "@hapi/eslint-plugin-hapi": "4.3.6",
     "eslint": "7.7.0",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-security": "1.4.0",
