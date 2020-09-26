@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/Dwakof/ebot#readme",
   "dependencies": {
-    "@hapi/hoek": "9.0.4",
+    "@hapi/hoek": "9.1.0",
     "@sentry/node": "5.24.2",
     "bufferutil": "4.0.1",
     "chart.js": "2.9.3",
@@ -32,7 +32,7 @@
     "discord.js": "12.3.1",
     "dotenv": "8.2.0",
     "erlpack": "github:discordapp/erlpack",
-    "got": "11.5.2",
+    "got": "11.7.0",
     "keyv": "4.0.3",
     "keyv-file": "0.2.0",
     "knex": "0.21.5",
@@ -45,7 +45,7 @@
   "devDependencies": {
     "@hapi/eslint-config-hapi": "13.0.2",
     "@hapi/eslint-plugin-hapi": "4.3.6",
-    "eslint": "7.7.0",
+    "eslint": "7.9.0",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-security": "1.4.0",
     "pino-pretty": "4.2.1"
