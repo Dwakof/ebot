@@ -3,8 +3,9 @@
 const Path   = require('path');
 const Pino   = require('pino');
 const Sentry = require('@sentry/node');
+const Hoek   = require('@hapi/hoek');
 
-const { AkairoClient, ListenerHandler, Provider, AkairoModule } = require('discord-akairo');
+const { AkairoClient, AkairoModule, CommandHandler, ListenerHandler, InhibitorHandler } = require('discord-akairo');
 
 const { CoreEvents } = require('./constants');
 
@@ -20,9 +21,11 @@ module.exports = class EbotClient extends AkairoClient {
 
     #coreListenerHandlers = new Map();
 
-    #plugins = new Map();
-
     #providers = new Map();
+
+    #commandHandler;
+    #inhibitorHandler;
+    #listenerHandler;
 
     constructor(settings) {
 
@@ -61,34 +64,21 @@ module.exports = class EbotClient extends AkairoClient {
     };
 
     /**
-     * @param {Plugin} plugin
+     * @param {Function|Object} input
      */
-    async registerPlugin(plugin) {
+    async registerProvider(input) {
 
-        if (this.#plugins.has(plugin.id)) {
+        let id;
+        let provider;
 
-            throw new Error('A plugin under the same ID was already registered');
+        if (typeof input === 'function') {
+
+            ({ id, provider } = await input(this));
         }
+        else {
 
-        this.#plugins.set(plugin.id, plugin);
-
-        await plugin.register(this);
-
-        this.logger.trace({ event : CoreEvents.PLUGIN_REGISTERED, emitter : 'core', id : plugin.id });
-
-        if (this.#started) {
-
-            await plugin.load(this);
-
-            this.logger.debug({ event : CoreEvents.PLUGIN_LOADED, emitter : 'core', id : plugin.id });
+            ({ id, provider } = input);
         }
-    }
-
-    /**
-     * @param {string}   id
-     * @param {Provider} provider
-     */
-    async registerProvider(id, provider) {
 
         if (this.#providers.has(id)) {
 
@@ -105,6 +95,46 @@ module.exports = class EbotClient extends AkairoClient {
 
             this.logger.debug({ event : CoreEvents.PROVIDER_INITIALIZED, emitter : 'core', id });
         }
+    }
+
+    registerCommandHandler(settings) {
+
+        this.#commandHandler = new CommandHandler(this, Hoek.merge({
+            argumentDefaults    : {
+                prompt : {
+                    timeout : 'Time ran out, command has been cancelled.',
+                    ended   : 'Too many retries, command has been cancelled.',
+                    retry   : 'Could not find your argument, please try again! Say `cancel` to stop the command',
+                    cancel  : 'Command has been cancelled.',
+                    retries : 4,
+                    time    : 30000
+                }
+            },
+            commandUtil         : true,
+            commandUtilLifetime : 60000,
+            allowMention        : true,
+            handleEdits         : true,
+            ignorePermissions   : this.#settings.discord.ownerId,
+            ignoreCooldown      : this.#settings.discord.ownerId,
+            prefix              : this.#settings.discord.prefix
+
+        }, settings));
+
+        this.logger.trace({ event : CoreEvents.COMMAND_HANDLER_REGISTERED, emitter : 'core' });
+    }
+
+    registerListenerHandler(settings) {
+
+        this.#listenerHandler = new ListenerHandler(this, Hoek.merge({}, settings));
+
+        this.logger.trace({ event : CoreEvents.LISTENER_HANDLER_REGISTERED, emitter : 'core' });
+    }
+
+    registerInhibitorHandler(settings) {
+
+        this.#inhibitorHandler = new InhibitorHandler(this, Hoek.merge({}, settings));
+
+        this.logger.trace({ event : CoreEvents.INHIBITOR_HANDLER_REGISTERED, emitter : 'core' });
     }
 
     async initialize() {
@@ -132,11 +162,41 @@ module.exports = class EbotClient extends AkairoClient {
             this.logger.debug({ event : CoreEvents.PROVIDER_INITIALIZED, emitter : 'core', id });
         }
 
-        for (const plugin of this.#plugins.values()) {
+        if (this.#listenerHandler) {
 
-            await plugin.load(this);
+            this.#listenerHandler.setEmitters({
+                commandHandler   : this.#commandHandler,
+                inhibitorHandler : this.#inhibitorHandler,
+                listenerHandler  : this.#listenerHandler
+            });
 
-            this.logger.debug({ event : CoreEvents.PLUGIN_LOADED, emitter : 'core', id : plugin.id });
+            this.#listenerHandler.loadAll();
+
+            this.logger.trace({ event : CoreEvents.COMMAND_HANDLER_LOADED, emitter : 'core' });
+        }
+
+        if (this.#inhibitorHandler) {
+
+            this.#inhibitorHandler.loadAll();
+
+            this.logger.trace({ event : CoreEvents.INHIBITOR_HANDLER_LOADED, emitter : 'core' });
+        }
+
+        if (this.#commandHandler) {
+
+            if (this.#inhibitorHandler) {
+
+                this.#commandHandler.useInhibitorHandler(this.#inhibitorHandler);
+            }
+
+            if (this.#listenerHandler) {
+
+                this.#commandHandler.useListenerHandler(this.#listenerHandler);
+            }
+
+            this.#commandHandler.loadAll();
+
+            this.logger.trace({ event : CoreEvents.LISTENER_HANDLER_LOADED, emitter : 'core' });
         }
 
         await this.login(this.#settings.discord.token);

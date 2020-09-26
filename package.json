@@ -2,13 +2,13 @@
   "name": "ebot",
   "version": "0.2.0",
   "description": "Ebot aka Ecto Botanical Otherworldly Traitorbot",
-  "main": "index.js",
+  "main": "src/index.js",
   "engines": {
     "node": ">=14.0.0"
   },
   "scripts": {
     "test": "npm run eslint",
-    "dev": "node index.js | npx pino",
+    "dev": "node src/index.js | npx pino",
     "eslint": "npx eslint ."
   },
   "repository": {
@@ -28,11 +28,12 @@
     "chart.js": "2.9.3",
     "chartjs-node-canvas": "3.0.6",
     "confidence": "5.0.0",
+    "dayjs": "1.8.36",
     "discord-akairo": "8.1.0",
     "discord.js": "12.3.1",
     "dotenv": "8.2.0",
     "erlpack": "github:discordapp/erlpack",
-    "got": "11.7.0",
+    "got": "11.5.1",
     "keyv": "4.0.3",
     "keyv-file": "0.2.0",
     "knex": "0.21.5",
@@ -40,6 +41,7 @@
     "pg": "8.3.3",
     "pino": "6.6.1",
     "utf-8-validate": "5.0.2",
+    "uuid": "8.3.0",
     "zlib-sync": "0.1.7"
   },
   "devDependencies": {

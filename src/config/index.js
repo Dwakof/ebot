@@ -13,9 +13,10 @@ const store = new Confidence.Store({
     discord : {
         $filter     : { $env : 'NODE_ENV' },
         $base       : {
-            partials : { $env : 'DISCORD_PARTIALS', $default : ['MESSAGE', 'CHANNEL', 'REACTION'] }, // Wait confidence v5 to coerce array
-            ownerId  : { $env : 'DISCORD_OWNER_ID' },                                                // Wait confidence v5 to coerce array
-            token    : { $env : 'DISCORD_TOKEN' }
+            partials : { $env : 'DISCORD_PARTIALS', $coerce : 'array' },
+            ownerId  : { $env : 'DISCORD_OWNER_IDS', $coerce : 'array' },
+            token    : { $env : 'DISCORD_TOKEN' },
+            prefix   : { $env : 'DISCORD_COMMAND_PREFIX', $default : '?' }
         },
         development : {
             presence : {
@@ -69,31 +70,31 @@ const store = new Confidence.Store({
         }
     },
     plugins : {
-        karma         : {
+        karma        : {
             knex : {
                 client     : 'pg',
                 connection : {
                     host     : { $env : 'KARMA_POSTGRES_HOST', $default : 'localhost' },
                     user     : { $env : 'KARMA_POSTGRES_USER', $default : 'ebot' },
                     password : { $env : 'KARMA_POSTGRES_PASS', $default : 'ebot' },
-                    database : { $env : 'KARMA_POSTGRES_DB',   $default : 'karma' },
+                    database : { $env : 'KARMA_POSTGRES_DB', $default : 'karma' },
                     port     : { $env : 'KARMA_POSTGRES_PORT', $coerce : 'number', $default : 5432 }
                 }
             }
         },
-        reactionRoles : {
+        reactionRole : {
             knex : {
                 client     : 'pg',
                 connection : {
                     host     : { $env : 'REACTION_ROLE_POSTGRES_HOST', $default : 'localhost' },
                     user     : { $env : 'REACTION_ROLE_POSTGRES_USER', $default : 'ebot' },
                     password : { $env : 'REACTION_ROLE_POSTGRES_PASS', $default : 'ebot' },
-                    database : { $env : 'REACTION_ROLE_POSTGRES_DB',   $default : 'reactionRole' },
+                    database : { $env : 'REACTION_ROLE_POSTGRES_DB', $default : 'reactionRole' },
                     port     : { $env : 'REACTION_ROLE_POSTGRES_PORT', $coerce : 'number', $default : 5432 }
                 }
             }
         },
-        weather       : {
+        weather      : {
             openWeatherApiKey : { $env : 'OPEN_WEATHER_API_KEY' },
             LocationIQApiKey  : { $env : 'LOCATION_IQ_API_KEY' }
         }

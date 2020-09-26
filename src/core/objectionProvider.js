@@ -53,15 +53,7 @@ module.exports = class ObjectionProvider {
 
     async ping() {
 
-        try {
-            const value = await this.#knex.queryBuilder().select(this.#knex.raw('1'));
-
-            return value;
-        }
-        catch (error) {
-
-            throw error;
-        }
+        return this.#knex.queryBuilder().select(this.#knex.raw('1'));
     }
 
     /**
