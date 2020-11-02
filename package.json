@@ -48,6 +48,6 @@
     "eslint": "7.12.1",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-security": "1.4.0",
-    "pino-pretty": "4.2.1"
+    "pino-pretty": "4.3.0"
   }
 }
