@@ -25,7 +25,7 @@
     "@hapi/hoek": "9.1.0",
     "@sentry/node": "5.27.2",
     "bufferutil": "4.0.1",
-    "chart.js": "2.9.3",
+    "chart.js": "2.9.4",
     "chartjs-node-canvas": "3.0.6",
     "confidence": "5.0.0",
     "discord-akairo": "8.1.0",
