@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/Dwakof/ebot#readme",
   "dependencies": {
-    "@hapi/hoek": "9.1.0",
+    "@hapi/hoek": "9.2.0",
     "@sentry/node": "5.27.4",
     "bufferutil": "4.0.2",
     "chart.js": "2.9.4",
