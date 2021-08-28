@@ -3,10 +3,18 @@
 const Path   = require('path');
 const Pino   = require('pino');
 const Sentry = require('@sentry/node');
+const Hoek   = require('@hapi/hoek');
+const Fs     = require('fs/promises');
 
-const { AkairoClient, ListenerHandler, Provider, AkairoModule } = require('discord-akairo');
+const { Permissions } = require('discord.js');
+
+const { AkairoClient, AkairoModule, CommandHandler, ListenerHandler, InhibitorHandler } = require('discord-akairo');
 
 const { CoreEvents } = require('./constants');
+
+const Module = require('./module');
+
+const Utils = require('./utils');
 
 module.exports = class EbotClient extends AkairoClient {
 
@@ -20,9 +28,13 @@ module.exports = class EbotClient extends AkairoClient {
 
     #coreListenerHandlers = new Map();
 
-    #plugins = new Map();
-
     #providers = new Map();
+
+    #commandHandler;
+    #inhibitorHandler;
+    #listenerHandler;
+
+    #modules = new Map();
 
     constructor(settings) {
 
@@ -34,7 +46,9 @@ module.exports = class EbotClient extends AkairoClient {
 
         if (this.#settings.sentry.enabled) {
 
-            this.#sentry = Sentry.init(this.#settings.sentry);
+            Sentry.init(this.#settings.sentry);
+
+            this.#sentry = Sentry;
 
             this.logger.trace({ event : CoreEvents.SENTRY_INITIALIZED, emitter : 'core' });
         }
@@ -61,34 +75,21 @@ module.exports = class EbotClient extends AkairoClient {
     };
 
     /**
-     * @param {Plugin} plugin
+     * @param {Function|Object} input
      */
-    async registerPlugin(plugin) {
+    async registerProvider(input) {
 
-        if (this.#plugins.has(plugin.id)) {
+        let id;
+        let provider;
 
-            throw new Error('A plugin under the same ID was already registered');
+        if (typeof input === 'function') {
+
+            ({ id, provider } = await input(this));
         }
+        else {
 
-        this.#plugins.set(plugin.id, plugin);
-
-        await plugin.register(this);
-
-        this.logger.trace({ event : CoreEvents.PLUGIN_REGISTERED, emitter : 'core', id : plugin.id });
-
-        if (this.#started) {
-
-            await plugin.load(this);
-
-            this.logger.debug({ event : CoreEvents.PLUGIN_LOADED, emitter : 'core', id : plugin.id });
+            ({ id, provider } = input);
         }
-    }
-
-    /**
-     * @param {string}   id
-     * @param {Provider} provider
-     */
-    async registerProvider(id, provider) {
 
         if (this.#providers.has(id)) {
 
@@ -105,11 +106,86 @@ module.exports = class EbotClient extends AkairoClient {
 
             this.logger.debug({ event : CoreEvents.PROVIDER_INITIALIZED, emitter : 'core', id });
         }
+
+        return provider;
+    }
+
+    registerCommandHandler(settings) {
+
+        this.#commandHandler = new CommandHandler(this, Hoek.merge({
+            argumentDefaults    : {
+                prompt : {
+                    timeout : 'Time ran out, command has been cancelled.',
+                    ended   : 'Too many retries, command has been cancelled.',
+                    retry   : 'Could not find your argument, please try again! Say `cancel` to stop the command',
+                    cancel  : 'Command has been cancelled.',
+                    retries : 4,
+                    time    : 30000
+                }
+            },
+            commandUtil         : true,
+            commandUtilLifetime : 60000,
+            allowMention        : true,
+            handleEdits         : true,
+            ignorePermissions   : this.#settings.discord.ownerId,
+            ignoreCooldown      : this.#settings.discord.ownerId,
+            prefix              : this.#settings.discord.prefix
+
+        }, settings));
+
+        this.logger.trace({ event : CoreEvents.COMMAND_HANDLER_REGISTERED, emitter : 'core' });
+    }
+
+    registerListenerHandler(settings) {
+
+        this.#listenerHandler = new ListenerHandler(this, Hoek.merge({}, settings));
+
+        this.logger.trace({ event : CoreEvents.LISTENER_HANDLER_REGISTERED, emitter : 'core' });
+    }
+
+    registerInhibitorHandler(settings) {
+
+        this.#inhibitorHandler = new InhibitorHandler(this, Hoek.merge({}, settings));
+
+        this.logger.trace({ event : CoreEvents.INHIBITOR_HANDLER_REGISTERED, emitter : 'core' });
+    }
+
+    async registerModules(modulesPath) {
+
+        if (!this.#initialized) {
+
+            await this.initialize();
+        }
+
+        for (const name of await Fs.readdir(modulesPath)) {
+
+            if (this.#modules.has(name)) {
+
+                throw new Error('A module with this name already exists');
+            }
+
+            const path = Path.join(modulesPath, name);
+
+            const module = new Module(name, path);
+
+            await module.load(this);
+
+            this.#modules.set(name, { path, module });
+
+            this.logger.debug({
+                event   : CoreEvents.MODULE_LOADED,
+                emitter : 'core',
+                message : `Module ${ name } loaded from ${ path }`
+            });
+        }
     }
 
     async initialize() {
 
         this.#setupCoreListenerHandlers();
+        this.registerCommandHandler();
+        this.registerListenerHandler();
+        this.registerInhibitorHandler();
 
         this.#initialized = true;
 
@@ -132,16 +208,48 @@ module.exports = class EbotClient extends AkairoClient {
             this.logger.debug({ event : CoreEvents.PROVIDER_INITIALIZED, emitter : 'core', id });
         }
 
-        for (const plugin of this.#plugins.values()) {
+        if (this.#listenerHandler) {
 
-            await plugin.load(this);
+            this.#listenerHandler.setEmitters({
+                commandHandler   : this.#commandHandler,
+                inhibitorHandler : this.#inhibitorHandler,
+                listenerHandler  : this.#listenerHandler
+            });
 
-            this.logger.debug({ event : CoreEvents.PLUGIN_LOADED, emitter : 'core', id : plugin.id });
+            this.logger.trace({ event : CoreEvents.COMMAND_HANDLER_LOADED, emitter : 'core' });
+        }
+
+        if (this.#inhibitorHandler) {
+
+            this.logger.trace({ event : CoreEvents.INHIBITOR_HANDLER_LOADED, emitter : 'core' });
+        }
+
+        if (this.#commandHandler) {
+
+            if (this.#inhibitorHandler) {
+
+                this.#commandHandler.useInhibitorHandler(this.#inhibitorHandler);
+            }
+
+            if (this.#listenerHandler) {
+
+                this.#commandHandler.useListenerHandler(this.#listenerHandler);
+            }
+
+            this.#coreListenerHandlers.set('command', new ListenerHandler(this, { directory : Path.join(__dirname, './listeners/command/') }));
+
+            this.#coreListenerHandlers.get('command').setEmitters({ commandHandler : this.#commandHandler });
+
+            this.logger.trace({ event : CoreEvents.LISTENER_HANDLER_LOADED, emitter : 'core' });
         }
 
         await this.login(this.#settings.discord.token);
 
+        await this.warmupCache();
+
         this.#started = true;
+
+        await this.logInvite();
 
         return this;
     }
@@ -171,6 +279,62 @@ module.exports = class EbotClient extends AkairoClient {
         return Array.from(this.#providers.entries()).reduce((acc, [k, v]) => ({ ...acc, [k] : v }), {});
     }
 
+    get commandHandler() {
+
+        return this.#commandHandler;
+    }
+
+    get listenerHandler() {
+
+        return this.#listenerHandler;
+    }
+
+    get inhibitorHandler() {
+
+        return this.#inhibitorHandler;
+    }
+
+    get utils() {
+
+        return Utils;
+    }
+
+    async warmupCache() {
+
+        this.logger.info({ event : CoreEvents.CACHE_WARMUP_STARTED, emitter : 'core' });
+
+        for (const id of this.#settings.ebot.cacheWarmup.guilds) {
+
+            const guild = await this.guilds.fetch(id);
+
+            await guild.members.fetch();
+        }
+
+        for (const id of this.#settings.ebot.cacheWarmup.users) {
+
+            await this.users.fetch(id);
+        }
+
+        this.logger.info({ event : CoreEvents.CACHE_WARMUP_FINISHED, emitter : 'core' });
+    }
+
+    async logInvite() {
+
+        this.logger.info({
+            event   : CoreEvents.INVITE_LINK,
+            emitter : 'core',
+            url     : await this.generateInvite({
+                scopes      : ['bot'],
+                permissions : [
+                    Permissions.FLAGS.SEND_MESSAGES,
+                    Permissions.FLAGS.READ_MESSAGE_HISTORY,
+                    Permissions.FLAGS.ADD_REACTIONS,
+                    Permissions.FLAGS.VIEW_CHANNEL
+                ]
+            })
+        });
+    }
+
     /**
      * @param {AkairoModule} module
      * @param {Error}        error
@@ -179,7 +343,7 @@ module.exports = class EbotClient extends AkairoClient {
      */
     handleError(module, error, message, extraData = {}) {
 
-        this.#logger.error({
+        this.logger.error({
             event        : CoreEvents.MODULE_ERROR,
             emitter      : module.id,
             error,
@@ -187,9 +351,9 @@ module.exports = class EbotClient extends AkairoClient {
             message
         });
 
-        if (this.#sentry) {
+        if (this.sentry) {
 
-            this.#sentry.captureException(error);
+            this.sentry.captureException(error);
         }
     }
 };

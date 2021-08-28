@@ -2,11 +2,12 @@
 *
 
 # ADD CODE
-!index.js
 !src/
 !src/**
 !test
 !test/**
+!scripts
+!scripts/**
 
 # ADD METADATA FILE
 !.npmignore
@@ -17,6 +18,7 @@
 
 # ADD DOCKER FILES
 !.dockerignore
+!docker-compose.yml
 !Dockerfile
 
 # ADD DOC FILE

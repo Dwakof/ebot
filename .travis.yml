@@ -12,9 +12,9 @@ jobs:
     - stage: build
       script:
         - if [ ${TRAVIS_PULL_REQUEST} = "false" ]; then
-            docker build -t dwakof/ebot:${TRAVIS_BRANCH} .;
+            docker build -t dwakof/ebot:${TRAVIS_BRANCH} .
           else
-            docker build -t dwakof/ebot:pr-${TRAVIS_PULL_REQUEST} .;
+            docker build -t dwakof/ebot:pr-${TRAVIS_PULL_REQUEST} .
           fi
-        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - docker push dwakof/ebot

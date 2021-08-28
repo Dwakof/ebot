@@ -1,53 +1,54 @@
 {
   "name": "ebot",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Ebot aka Ecto Botanical Otherworldly Traitorbot",
-  "main": "index.js",
-  "engines": {
-    "node": ">=14.0.0"
-  },
-  "scripts": {
-    "test": "npm run eslint",
-    "dev": "node index.js | npx pino",
-    "eslint": "npx eslint ."
+  "homepage": "https://github.com/Dwakof/ebot#readme",
+  "bugs": {
+    "url": "https://github.com/Dwakof/ebot/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Dwakof/ebot.git"
   },
-  "author": "Yoann Mallemanche <yoann.mallemanche@gmail.com> (https://github.com/YoannMa)",
   "license": "AGPL-3.0",
-  "bugs": {
-    "url": "https://github.com/Dwakof/ebot/issues"
+  "author": "Yoann Mallemanche <yoann.mallemanche@gmail.com> (https://github.com/YoannMa)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "eslint": "npx eslint ."
   },
-  "homepage": "https://github.com/Dwakof/ebot#readme",
   "dependencies": {
-    "@hapi/hoek": "9.1.0",
-    "@sentry/node": "5.27.4",
-    "bufferutil": "4.0.2",
+    "@hapi/hoek": "9.2.0",
+    "@hapipal/confidence": "6.0.1",
+    "@sentry/node": "6.11.0",
+    "bufferutil": "4.0.3",
     "chart.js": "2.9.4",
-    "chartjs-node-canvas": "3.0.6",
-    "confidence": "5.0.0",
+    "chartjs-node-canvas": "3.2.0",
+    "dayjs": "1.10.6",
     "discord-akairo": "8.1.0",
-    "discord.js": "12.4.1",
-    "dotenv": "8.2.0",
+    "discord.js": "12.5.3",
+    "dotenv": "10.0.0",
     "erlpack": "github:discordapp/erlpack",
-    "got": "11.8.0",
+    "got": "11.8.2",
     "keyv": "4.0.3",
     "keyv-file": "0.2.0",
-    "knex": "0.21.12",
-    "objection": "2.2.3",
-    "pg": "8.5.1",
-    "pino": "6.7.0",
-    "utf-8-validate": "5.0.3",
+    "knex": "0.21.21",
+    "objection": "2.2.15",
+    "pg": "8.7.1",
+    "pino": "6.13.1",
+    "utf-8-validate": "5.0.5",
+    "uuid": "8.3.2",
     "zlib-sync": "0.1.7"
   },
   "devDependencies": {
     "@hapi/eslint-config-hapi": "13.0.2",
     "@hapi/eslint-plugin-hapi": "4.3.6",
-    "eslint": "7.13.0",
+    "eslint": "7.32.0",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-security": "1.4.0",
-    "pino-pretty": "4.3.0"
+    "pino-pretty": "6.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
