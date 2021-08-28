@@ -13,8 +13,6 @@ COPY package*.json .
 
 RUN npm i --production
 
-RUN apk del native-deps
-
 ADD . $APP_PATH
 
 CMD [ "npm", "start" ]
