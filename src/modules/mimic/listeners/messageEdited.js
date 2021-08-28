@@ -33,6 +33,11 @@ module.exports = class MimicMessageListener extends Listener {
             return;
         }
 
+        if (!newMessage.editedAt) { // Not really edited, it's more an update when there is an embed
+
+            return;
+        }
+
         if (this.client.utils.isString(newMessage?.content)) {
 
             const { Message } = this.client.providers.mimic.models;
