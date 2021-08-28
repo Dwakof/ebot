@@ -5,6 +5,8 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+    depends_on:
+      - postgres
   postgres:
     image: "postgres:13-alpine"
     ports:
