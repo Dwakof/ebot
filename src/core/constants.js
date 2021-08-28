@@ -3,6 +3,8 @@
 exports.CoreEvents = {
     SENTRY_INITIALIZED : 'sentryInitialized',
 
+    INVITE_LINK : 'inviteLink',
+
     PROVIDER_REGISTERED  : 'providerRegistered',
     PROVIDER_INITIALIZED : 'providerInitialized',
 
@@ -15,5 +17,9 @@ exports.CoreEvents = {
     INHIBITOR_HANDLER_LOADED : 'inhibitorHandlerLoaded',
     LISTENER_HANDLER_LOADED  : 'listenerHandlerLoaded',
 
-    MODULE_ERROR : 'moduleError'
+    MODULE_ERROR  : 'moduleError',
+    MODULE_LOADED : 'moduleLoaded',
+
+    CACHE_WARMUP_STARTED  : 'cacheWarmupStarted',
+    CACHE_WARMUP_FINISHED : 'cacheWarmupFinished'
 };

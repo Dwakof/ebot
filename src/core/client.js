@@ -4,10 +4,17 @@ const Path   = require('path');
 const Pino   = require('pino');
 const Sentry = require('@sentry/node');
 const Hoek   = require('@hapi/hoek');
+const Fs     = require('fs/promises');
+
+const { Permissions } = require('discord.js');
 
 const { AkairoClient, AkairoModule, CommandHandler, ListenerHandler, InhibitorHandler } = require('discord-akairo');
 
 const { CoreEvents } = require('./constants');
+
+const Module = require('./module');
+
+const Utils = require('./utils');
 
 module.exports = class EbotClient extends AkairoClient {
 
@@ -27,6 +34,8 @@ module.exports = class EbotClient extends AkairoClient {
     #inhibitorHandler;
     #listenerHandler;
 
+    #modules = new Map();
+
     constructor(settings) {
 
         super({ ownerId : settings.discord.ownerId }, settings.discord);
@@ -37,7 +46,9 @@ module.exports = class EbotClient extends AkairoClient {
 
         if (this.#settings.sentry.enabled) {
 
-            this.#sentry = Sentry.init(this.#settings.sentry);
+            Sentry.init(this.#settings.sentry);
+
+            this.#sentry = Sentry;
 
             this.logger.trace({ event : CoreEvents.SENTRY_INITIALIZED, emitter : 'core' });
         }
@@ -95,6 +106,8 @@ module.exports = class EbotClient extends AkairoClient {
 
             this.logger.debug({ event : CoreEvents.PROVIDER_INITIALIZED, emitter : 'core', id });
         }
+
+        return provider;
     }
 
     registerCommandHandler(settings) {
@@ -137,9 +150,42 @@ module.exports = class EbotClient extends AkairoClient {
         this.logger.trace({ event : CoreEvents.INHIBITOR_HANDLER_REGISTERED, emitter : 'core' });
     }
 
+    async registerModules(modulesPath) {
+
+        if (!this.#initialized) {
+
+            await this.initialize();
+        }
+
+        for (const name of await Fs.readdir(modulesPath)) {
+
+            if (this.#modules.has(name)) {
+
+                throw new Error('A module with this name already exists');
+            }
+
+            const path = Path.join(modulesPath, name);
+
+            const module = new Module(name, path);
+
+            await module.load(this);
+
+            this.#modules.set(name, { path, module });
+
+            this.logger.debug({
+                event   : CoreEvents.MODULE_LOADED,
+                emitter : 'core',
+                message : `Module ${ name } loaded from ${ path }`
+            });
+        }
+    }
+
     async initialize() {
 
         this.#setupCoreListenerHandlers();
+        this.registerCommandHandler();
+        this.registerListenerHandler();
+        this.registerInhibitorHandler();
 
         this.#initialized = true;
 
@@ -170,14 +216,10 @@ module.exports = class EbotClient extends AkairoClient {
                 listenerHandler  : this.#listenerHandler
             });
 
-            this.#listenerHandler.loadAll();
-
             this.logger.trace({ event : CoreEvents.COMMAND_HANDLER_LOADED, emitter : 'core' });
         }
 
         if (this.#inhibitorHandler) {
-
-            this.#inhibitorHandler.loadAll();
 
             this.logger.trace({ event : CoreEvents.INHIBITOR_HANDLER_LOADED, emitter : 'core' });
         }
@@ -194,14 +236,20 @@ module.exports = class EbotClient extends AkairoClient {
                 this.#commandHandler.useListenerHandler(this.#listenerHandler);
             }
 
-            this.#commandHandler.loadAll();
+            this.#coreListenerHandlers.set('command', new ListenerHandler(this, { directory : Path.join(__dirname, './listeners/command/') }));
+
+            this.#coreListenerHandlers.get('command').setEmitters({ commandHandler : this.#commandHandler });
 
             this.logger.trace({ event : CoreEvents.LISTENER_HANDLER_LOADED, emitter : 'core' });
         }
 
         await this.login(this.#settings.discord.token);
 
+        await this.warmupCache();
+
         this.#started = true;
+
+        await this.logInvite();
 
         return this;
     }
@@ -231,6 +279,62 @@ module.exports = class EbotClient extends AkairoClient {
         return Array.from(this.#providers.entries()).reduce((acc, [k, v]) => ({ ...acc, [k] : v }), {});
     }
 
+    get commandHandler() {
+
+        return this.#commandHandler;
+    }
+
+    get listenerHandler() {
+
+        return this.#listenerHandler;
+    }
+
+    get inhibitorHandler() {
+
+        return this.#inhibitorHandler;
+    }
+
+    get utils() {
+
+        return Utils;
+    }
+
+    async warmupCache() {
+
+        this.logger.info({ event : CoreEvents.CACHE_WARMUP_STARTED, emitter : 'core' });
+
+        for (const id of this.#settings.ebot.cacheWarmup.guilds) {
+
+            const guild = await this.guilds.fetch(id);
+
+            await guild.members.fetch();
+        }
+
+        for (const id of this.#settings.ebot.cacheWarmup.users) {
+
+            await this.users.fetch(id);
+        }
+
+        this.logger.info({ event : CoreEvents.CACHE_WARMUP_FINISHED, emitter : 'core' });
+    }
+
+    async logInvite() {
+
+        this.logger.info({
+            event   : CoreEvents.INVITE_LINK,
+            emitter : 'core',
+            url     : await this.generateInvite({
+                scopes      : ['bot'],
+                permissions : [
+                    Permissions.FLAGS.SEND_MESSAGES,
+                    Permissions.FLAGS.READ_MESSAGE_HISTORY,
+                    Permissions.FLAGS.ADD_REACTIONS,
+                    Permissions.FLAGS.VIEW_CHANNEL
+                ]
+            })
+        });
+    }
+
     /**
      * @param {AkairoModule} module
      * @param {Error}        error
@@ -239,7 +343,7 @@ module.exports = class EbotClient extends AkairoClient {
      */
     handleError(module, error, message, extraData = {}) {
 
-        this.#logger.error({
+        this.logger.error({
             event        : CoreEvents.MODULE_ERROR,
             emitter      : module.id,
             error,
@@ -247,9 +351,9 @@ module.exports = class EbotClient extends AkairoClient {
             message
         });
 
-        if (this.#sentry) {
+        if (this.sentry) {
 
-            this.#sentry.captureException(error);
+            this.sentry.captureException(error);
         }
     }
 };

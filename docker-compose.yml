@@ -1,14 +1,19 @@
 version: "3.7"
 services:
-  db:
-    container_name: "ebot-postgres"
-    image: "postgres:11-alpine"
+  ebot:
+    build: .
+    env_file:
+      - .env
+    restart: unless-stopped
+  postgres:
+    image: "postgres:13-alpine"
     ports:
-      - ${POSTGRES_PORT}:5432
+      - 127.0.0.1:${POSTGRES_PORT}:5432
     volumes:
       - ./scripts/pg-init-scripts:/docker-entrypoint-initdb.d
       - ./db:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASS}
-      - POSTGRES_MULTIPLE_DATABASES=karma,reactionRole
+      - POSTGRES_MULTIPLE_DATABASES=karma,reactionRole,mimic
+    restart: unless-stopped
