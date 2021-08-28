@@ -18,7 +18,7 @@ module.exports = class MimicUserCommand extends Command {
                     id     : 'member',
                     type   : 'member',
                     prompt : {
-                        start : 'which member do you want to see the karma balance?'
+                        start : 'which member do you me to mimic ?'
                     }
                 },
                 {
