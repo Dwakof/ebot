@@ -50,11 +50,9 @@ class Module {
 
     async registerCommands() {
 
-        for (const name of await Fs.readdir(Path.join(this.#path, 'commands'))) {
+        for (const { name, path, file } of await this.#client.utils.requireDir(Path.join(this.#path, 'commands'), true)) {
 
-            const path = Path.join(this.#path, 'commands', name);
-
-            const command = this.#client.commandHandler.load(require(Path.join(this.#path, 'commands', name)));
+            const command = this.#client.commandHandler.load(file);
 
             this.#commands.set(name, { path, command });
         }
@@ -62,11 +60,9 @@ class Module {
 
     async registerListeners() {
 
-        for (const name of await Fs.readdir(Path.join(this.#path, 'listeners'))) {
+        for (const { name, path, file } of await this.#client.utils.requireDir(Path.join(this.#path, 'listeners'), true)) {
 
-            const path = Path.join(this.#path, 'listeners', name);
-
-            const listener = this.#client.listenerHandler.load(require(Path.join(this.#path, 'listeners', name)));
+            const listener = this.#client.listenerHandler.load(file);
 
             this.#listeners.set(name, { path, listener });
         }
@@ -74,11 +70,9 @@ class Module {
 
     async registerInhibitors() {
 
-        for (const name of await Fs.readdir(Path.join(this.#path, 'inhibitors'))) {
+        for (const { name, path, file } of await this.#client.utils.requireDir(Path.join(this.#path, 'inhibitors'), true)) {
 
-            const path = Path.join(this.#path, 'inhibitors', name);
-
-            const inhibitor = this.#client.inhibitorHandler.load(require(Path.join(this.#path, 'inhibitors', name)));
+            const inhibitor = this.#client.inhibitorHandler.load(file);
 
             this.#inhibitors.set(name, { path, inhibitor });
         }

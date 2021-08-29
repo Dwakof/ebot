@@ -18,13 +18,22 @@ module.exports = {
         return typeof string === 'string' || string instanceof String;
     },
 
-    async requireDir(path) {
+    async requireDir(rootPath, info = false) {
 
         const requires = [];
 
-        for (const file of await Fs.readdir(path)) {
+        for (const file of await Fs.readdir(rootPath)) {
 
-            requires.push(require(Path.join(path, file)));
+            const path = Path.join(rootPath, file);
+
+            if (info) {
+
+                requires.push({ file : require(path), name : file, path });
+            }
+            else {
+
+                requires.push(require(path));
+            }
         }
 
         return requires;
