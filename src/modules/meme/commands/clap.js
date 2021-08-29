@@ -23,8 +23,8 @@ module.exports = class ClapCommand extends Command {
             ],
             description       : {
                 content  : 'replace 👏 the 👏 spaces 👏 with 👏 clap 👏',
-                usage    : '[text]',
-                examples : ['replace the spaces with clap']
+                usage    : 'clap [text]',
+                examples : ['clap replace the spaces with clap']
             }
         });
     }
