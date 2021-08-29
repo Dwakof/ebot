@@ -40,8 +40,8 @@ module.exports = class KarmaMessageListener extends Listener {
 
             for (const string of matches) {
 
-                const nameOrId = string.slice(0, -2);
-                let inc        = 0;
+                let nameOrId = string.slice(0, -2);
+                let inc      = 0;
 
                 switch (string.slice(-2)) {
                     case '++':
@@ -62,20 +62,22 @@ module.exports = class KarmaMessageListener extends Listener {
 
                 if (this.client.utils.REGEX_USER_MENTION.test(string.slice(0, -2))) {
 
-                    users.set(nameOrId.slice(3, nameOrId.length - 1), inc);
+                    const id = nameOrId.slice(3, nameOrId.length - 1);
+
+                    const member = await message.guild.members.fetch(id);
+
+                    users.set(member.id, { member, inc });
+
+                    continue;
                 }
-                else {
 
-                    const members = await message.guild.members.fetch({ query : nameOrId, limit : 1 });
+                const [[id, member]] = await message.guild.members.fetch({ query : nameOrId, limit : 1 });
 
-                    members.forEach((member) => {
+                if (!member.deleted) {
 
-                        if (!member.deleted) {
-
-                            users.set(member.user.id, inc);
-                        }
-                    });
+                    users.set(id, { member, inc });
                 }
+
             }
 
             if (users.size <= 0) {
@@ -83,21 +85,26 @@ module.exports = class KarmaMessageListener extends Listener {
                 return;
             }
 
-            const responses = await Promise.all(Array.from(users.entries()).map(async ([id, inc]) => {
+            for (const user of users) {
+
+                this.client.logger.info(user);
+            }
+
+            const responses = await Promise.all(Array.from(users.entries()).map(async ([id, { member, inc }]) => {
 
                 if (id === message.author.id) {
 
-                    return Karma.randomResponse(Karma.NARCISSIST_RESPONSES, id);
+                    return Karma.randomResponse(Karma.NARCISSIST_RESPONSES, member);
                 }
 
                 await Karma.insertValue(this.client, message.guild.id, id, inc);
 
                 if (inc > 0) {
 
-                    return Karma.randomResponse(Karma.INCREMENT_RESPONSES, id, inc);
+                    return Karma.randomResponse(Karma.INCREMENT_RESPONSES, member, inc);
                 }
 
-                return Karma.randomResponse(Karma.DECREMENT_RESPONSES, id, inc);
+                return Karma.randomResponse(Karma.DECREMENT_RESPONSES, member, inc);
             }));
 
             return message.channel.send(responses);

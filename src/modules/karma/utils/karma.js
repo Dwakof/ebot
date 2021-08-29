@@ -3,22 +3,22 @@
 module.exports = {
 
     NARCISSIST_RESPONSES : [
-        (userId) => `Hey everyone ! <@${ userId }> is a narcissist !`
+        ({ displayName }) => `Hey everyone ! ${ displayName } is a narcissist !`
     ],
 
     INCREMENT_RESPONSES : [
-        (userId, inc) => `<@${ userId }> +${ inc } !`,
-        (userId, inc) => `<@${ userId }> gained ${ inc > 1 ? inc : 'a' } level${ inc > 1 ? 's' : '' } !`,
-        (userId, inc) => `<@${ userId }> is on the rise !`,
-        (userId, inc) => `Toss ${ inc > 1 ? inc : 'a' } karma to your <@${ userId }>, oh valley of plenty !`,
-        (userId, inc) => `<@${ userId }> leveled up ${ inc > 1 ? `${ inc } times in a row` : '' } !`
+        ({ displayName }, inc) => `${ displayName } +${ inc } !`,
+        ({ displayName }, inc) => `${ displayName } gained ${ inc > 1 ? inc : 'a' } level${ inc > 1 ? 's' : '' } !`,
+        ({ displayName }, inc) => `${ displayName } is on the rise !`,
+        ({ displayName }, inc) => `Toss ${ inc > 1 ? inc : 'a' } karma to your ${ displayName }, oh valley of plenty !`,
+        ({ displayName }, inc) => `${ displayName } leveled up ${ inc > 1 ? `${ inc } times in a row` : '' } !`
     ],
 
     DECREMENT_RESPONSES : [
-        (userId, inc) => `<@${ userId }> took ${ inc < -1 ? inc : 'a' } hit${ inc < -1 ? 's' : '' } ! Ouch.`,
-        (userId, inc) => `<@${ userId }> took a dive.`,
-        (userId, inc) => `<@${ userId }> lost ${ inc < -1 ? inc : 'a' } life${ inc < -1 ? 's' : '' }.`,
-        (userId, inc) => `<@${ userId }> lost ${ inc < -1 ? inc : 'a' } level${ inc < -1 ? 's' : '' }.`
+        ({ displayName }, inc) => `${ displayName } took ${ inc < -1 ? inc : 'a' } hit${ inc < -1 ? 's' : '' } ! Ouch.`,
+        ({ displayName }, inc) => `${ displayName } took a dive.`,
+        ({ displayName }, inc) => `${ displayName } lost ${ inc < -1 ? inc : 'a' } life${ inc < -1 ? 's' : '' }.`,
+        ({ displayName }, inc) => `${ displayName } lost ${ inc < -1 ? inc : 'a' } level${ inc < -1 ? 's' : '' }.`
     ],
 
     randomResponse(array, ...args) {
