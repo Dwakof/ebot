@@ -1,14 +1,19 @@
 'use strict';
 
+const Sentry = require("@sentry/node");
+const Tracing = require("@sentry/tracing");
+
+
 const Path   = require('path');
 const Pino   = require('pino');
-const Sentry = require('@sentry/node');
 const Hoek   = require('@hapi/hoek');
 const Fs     = require('fs/promises');
 
 const { Permissions } = require('discord.js');
 
-const { AkairoClient, AkairoModule, CommandHandler, ListenerHandler, InhibitorHandler } = require('discord-akairo');
+const { AkairoClient, AkairoModule, ListenerHandler, InhibitorHandler } = require('discord-akairo');
+
+const CommandHandler = require('./CommandHandler');
 
 const { CoreEvents } = require('./constants');
 
@@ -46,11 +51,17 @@ module.exports = class EbotClient extends AkairoClient {
 
         if (this.#settings.sentry.enabled) {
 
-            Sentry.init(this.#settings.sentry);
+            Sentry.init({
+                ...this.#settings.sentry,
+                integrations : [
+                    new Sentry.Integrations.Http({ tracing: true }),
+                    new Tracing.Integrations.Postgres(),
+                ]
+            });
 
             this.#sentry = Sentry;
 
-            this.logger.trace({ event : CoreEvents.SENTRY_INITIALIZED, emitter : 'core' });
+            this.logger.debug({ event : CoreEvents.SENTRY_INITIALIZED, emitter : 'core' });
         }
     }
 
