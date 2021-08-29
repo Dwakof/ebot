@@ -7,8 +7,7 @@ const Karma = require('../utils/karma');
 
 module.exports = class KarmaMessageListener extends Listener {
 
-    static REGEX_KARMA           = /(\w+|<@![0-9]+>)(\+\+|--|\+5|-5)/gmi;
-    static REGEX_DISCORD_USER_ID = /^<@![0-9]+>$/gi;
+    static REGEX_KARMA = /(\w+|<@![0-9]+>)(\+\+|--|\+5|-5)/gmi;
 
     constructor() {
 
@@ -61,7 +60,7 @@ module.exports = class KarmaMessageListener extends Listener {
                         return;
                 }
 
-                if (KarmaMessageListener.REGEX_DISCORD_USER_ID.test(string.slice(0, -2))) {
+                if (this.client.utils.REGEX_USER_MENTION.test(string.slice(0, -2))) {
 
                     users.set(nameOrId.slice(3, nameOrId.length - 1), inc);
                 }
@@ -88,7 +87,7 @@ module.exports = class KarmaMessageListener extends Listener {
 
                 if (id === message.author.id) {
 
-                    return Karma.randomResponse(Karma.NARCISSIST_RESPONSES, id, inc);
+                    return Karma.randomResponse(Karma.NARCISSIST_RESPONSES, id);
                 }
 
                 await Karma.insertValue(this.client, message.guild.id, id, inc);

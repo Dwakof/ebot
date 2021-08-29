@@ -56,7 +56,7 @@ module.exports = class KarmaReactionAddListener extends Listener {
 
         if (user.id === authorId) {
 
-            return reaction.message.reply(Karma.randomResponse(Karma.NARCISSIST_RESPONSES, user.id, inc));
+            return reaction.message.channel.send(Karma.randomResponse(Karma.NARCISSIST_RESPONSES, authorId, inc));
         }
 
         await Karma.insertValue(this.client, reaction.message.guild.id, authorId, inc);
