@@ -47,8 +47,6 @@ module.exports = class KarmaReactionAddListener extends Listener {
             return;
         }
 
-        console.log(user);
-
         if (giverId === userId) {
 
             return reaction.message.channel.send(Karma.randomResponse(Karma.NARCISSIST_RESPONSES, user, value));
