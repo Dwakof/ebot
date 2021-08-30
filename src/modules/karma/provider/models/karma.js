@@ -2,8 +2,6 @@
 
 const { Model } = require('objection');
 
-const { v4 : uuidv4 } = require('uuid');
-
 class Member extends Model {
 
     static get tableName() {
@@ -13,28 +11,25 @@ class Member extends Model {
 
     static get idColumn() {
 
-        return 'id';
+        return ['guildId', 'userId', 'messageId', 'giverId', 'type', 'value'];
     }
 
     static get jsonSchema() {
 
         return {
             type     : 'object',
-            required : ['guildId', 'userId', 'value'],
+            required : ['guildId', 'userId', 'messageId', 'giverId', 'type', 'value'],
 
             properties : {
-                id        : { type : 'number' },
                 guildId   : { type : 'string' },
                 userId    : { type : 'string' },
+                messageId : { type : 'string' },
+                giverId   : { type : 'string' },
+                type      : { type : 'string' },
                 value     : { type : 'number' },
                 createdAt : { type : 'date' }
             }
         };
-    }
-
-    $beforeInsert(queryContext) {
-
-        this.id = uuidv4();
     }
 }
 

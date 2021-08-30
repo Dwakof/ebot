@@ -59,10 +59,7 @@ module.exports = class GetKarmaCommand extends Command {
                 embed.setColor(member.displayHexColor);
             }
 
-            const [info, stats] = await Promise.all([
-                Karma.getInfoUser(this.client, message.guild.id, member.user.id),
-                Karma.getStatsUser(this.client, message.guild.id, member.user.id)
-            ]);
+            const info = await Karma.getInfoUser(this.client, message.guild.id, member.user.id);
 
             if (!info) {
 
@@ -88,6 +85,21 @@ module.exports = class GetKarmaCommand extends Command {
                     break;
                 default:
             }
+
+            embed.addFields([
+                { name : 'Karma', value : info.karma, inline : true },
+                { name : 'Rank', value : rankString, inline : true }
+            ]);
+
+            if (info.transaction < 2 || (new Date() - info.first) < 50000) {
+
+                // Cannot display stats as we only have 1 transactions or
+                // 2 transactions too close to calculate a graph
+
+                return message.util.send(embed);
+            }
+
+            const stats = await Karma.getStatsUser(this.client, message.guild.id, member.user.id);
 
             if (stats) {
 
@@ -152,11 +164,6 @@ module.exports = class GetKarmaCommand extends Command {
 
                 embed.attachFiles([attachment]).setImage('attachment://chart.png');
             }
-
-            embed.addFields([
-                { name : 'Karma', value : info.karma, inline : true },
-                { name : 'Rank', value : rankString, inline : true }
-            ]);
 
             return message.util.send(embed);
         }
