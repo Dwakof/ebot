@@ -37,9 +37,16 @@ module.exports = class MimicUserCommand extends Command {
             try {
                 const temp = await message.util.send('thinking...');
 
-                const reply = await Mimic.mimicUser(this.client, message.guild.id, member.user.id, initialState);
+                const guildId = message.guild.id;
+                const userId  = member.user.id;
 
-                return Promise.all([temp.delete(), message.channel.send(reply)]);
+                const reply = await Mimic.mimicUser(this.client, guildId, userId, initialState);
+
+                const [, msg] = await Promise.all([temp.delete(), message.channel.send(reply)]);
+
+                const { Reply } = this.client.providers.mimic.models;
+
+                await Reply.query().insert({ messageId : msg.id, guildId, userId, content : reply });
             }
             catch (error) {
 
@@ -55,4 +62,3 @@ module.exports = class MimicUserCommand extends Command {
         }
     }
 };
-
