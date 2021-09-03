@@ -28,7 +28,7 @@ class RandomNumberCommand extends Command {
             ],
             description       : {
                 content  : 'Returns a random number within given range',
-                usage    : 'random <min> <max>',
+                usage    : 'random [min] [max]',
                 examples : ['random 1 4']
             }
         });

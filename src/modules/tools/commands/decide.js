@@ -18,7 +18,7 @@ class DecideCommand extends Command {
             ],
             description       : {
                 content  : 'Makes a random decision on one of the given options',
-                usage    : 'decide <options>',
+                usage    : 'decide [options]',
                 examples : ['decide option1 option2']
             }
         });
