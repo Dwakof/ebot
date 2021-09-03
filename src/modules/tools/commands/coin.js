@@ -20,8 +20,7 @@ class CoinFlipCommand extends Command {
     }
 
     async exec(message, args) {
-        const randomNumber = this.client.utils.randomInt(0, 1);
-        await message.channel.send(randomNumber === 0 ? 'Heads' : 'Tails');
+        return message.channel.send(this.client.utils.randomInt() ? 'Heads' : 'Tails');
     }
 };
 

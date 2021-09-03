@@ -35,8 +35,7 @@ class RandomNumberCommand extends Command {
     }
 
     async exec(message, { min, max }) {
-        const randomNumber = this.client.utils.randomInt(min, max);
-        await message.channel.send(`<@${message.author.id}> your number is ${randomNumber}.`);
+        return message.reply(`your number is ${ this.client.utils.randomInt(min, max) }.`);
     }
 };
 
