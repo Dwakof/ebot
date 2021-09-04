@@ -64,9 +64,9 @@ module.exports = class SyncService extends Service {
 
             await State.set('guild_import', guildId, status);
 
-            const { id, channel } = await this.progressGuild(guild, status, message);
+            const msg = await this.progressGuild(guild, status, message);
 
-            status.set({ url : `https://discordapp.com/channels/${ guildId }/${ channel.id }/${ id }` });
+            status.set({ url : `https://discordapp.com/channels/${ msg.guild.id }/${ msg.channel.id }/${ msg.id }` });
 
             await State.set('guild_import', guildId, status);
 
@@ -90,7 +90,7 @@ module.exports = class SyncService extends Service {
 
             this.client.logger.info({
                 message : `Finished guild ${ guildId } (${ guild.name }) import with ${ status.messages } messages imported`,
-                status  : status
+                status
             });
         }
         catch (error) {
