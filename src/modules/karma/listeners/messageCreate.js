@@ -42,8 +42,6 @@ module.exports = class KarmaMessageCreatedListener extends Listener {
             return;
         }
 
-        const { Member } = this.client.providers.karma.models;
-
         const responses = await Promise.all(Array.from(members.entries()).map(async ([id, { member, value }]) => {
 
             if (id === message.author.id) {
@@ -51,8 +49,7 @@ module.exports = class KarmaMessageCreatedListener extends Listener {
                 return Karma.randomResponse(Karma.NARCISSIST_RESPONSES, member);
             }
 
-            await Member.query().insert({ guildId, userId : id, messageId, giverId, type, value })
-                .onConflict(['guildId', 'userId', 'messageId', 'giverId', 'type', 'value']).ignore();
+            await Karma.addKarma(this.client, { guildId, userId : id, messageId, giverId, type, value });
 
             if (value > 0) {
 

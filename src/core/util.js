@@ -5,22 +5,14 @@ const Path = require('path');
 
 const { GuildMember, User, Guild, Channel, Message, Role } = require('discord.js');
 
-const internals = {
+module.exports = class CoreUtil {
 
-    REGEX_USER_MENTION    : /^<@![0-9]+>$/gi,
-    REGEX_CHANNEL_MENTION : /^<#[0-9]+>$/gi,
-
-    capitalize(string) {
-
-        return string[0].toUpperCase() + string.slice(1);
-    },
-
-    isString(string) {
+    static isString(string) {
 
         return typeof string === 'string' || string instanceof String;
-    },
+    }
 
-    async requireDir(rootPath, info = false) {
+    static async requireDir(rootPath, info = false) {
 
         const requires = [];
 
@@ -39,23 +31,23 @@ const internals = {
         }
 
         return requires;
-    },
+    }
 
-    flattenKeys(obj, separator = '.') {
+    static isValidObject(value) {
 
-        const isValidObject = (value) => {
+        if (!value) {
+            return false;
+        }
 
-            if (!value) {
-                return false;
-            }
+        const isArray  = Array.isArray(value);
+        const isBuffer = Buffer.isBuffer(value);
+        const isObject = Object.prototype.toString.call(value) === '[object Object]';
+        const hasKeys  = !!Object.keys(value).length;
 
-            const isArray  = Array.isArray(value);
-            const isBuffer = Buffer.isBuffer(value);
-            const isObject = Object.prototype.toString.call(value) === '[object Object]';
-            const hasKeys  = !!Object.keys(value).length;
+        return !isArray && !isBuffer && isObject && hasKeys;
+    }
 
-            return !isArray && !isBuffer && isObject && hasKeys;
-        };
+    static flattenKeys(obj, separator = '.') {
 
         const walker = (child, path = []) => {
 
@@ -66,7 +58,7 @@ const internals = {
                     return { [path.concat([key.slice(1)]).join(separator).replace(/[A-Z]/g, (letter) => `_${ letter.toLowerCase() }`)] : child[key] };
                 }
 
-                if (isValidObject(child[key])) {
+                if (CoreUtil.isValidObject(child[key])) {
 
                     return walker(child[key], path.concat([key]));
                 }
@@ -76,23 +68,23 @@ const internals = {
         };
 
         return Object.assign({}, walker(obj));
-    },
+    }
 
-    serializeArg(arg) {
+    static serializeArg(arg) {
 
         if (Array.isArray(arg)) {
 
-            return { type : 'array', ...internals.flattenKeys({ values : internals.serializeArgs(arg) }) };
+            return { type : 'array', ...CoreUtil.flattenKeys({ values : CoreUtil.serializeArgs(arg) }) };
         }
 
         if (arg instanceof Set) {
 
-            return { type : 'set', values : internals.serializeArgs(Object.fromEntries(Array.from(arg))) };
+            return { type : 'set', values : CoreUtil.serializeArgs(Object.fromEntries(Array.from(arg))) };
         }
 
         if (arg instanceof Map) {
 
-            return { type : 'map', values : internals.serializeArgs(Object.fromEntries(arg)) };
+            return { type : 'map', values : CoreUtil.serializeArgs(Object.fromEntries(arg)) };
         }
 
         if (arg instanceof GuildMember) {
@@ -129,38 +121,23 @@ const internals = {
             return { type : 'message', id : arg.id };
         }
 
-        if (internals.isString(arg)) {
+        if (CoreUtil.isString(arg)) {
 
             return { type : 'string', value : arg };
         }
 
         return { type : 'other', value : arg };
-    },
+    }
 
-    serializeArgs(args) {
+    static serializeArgs(args) {
 
         const result = {};
 
         for (const [key, value] of Object.entries(args)) {
 
-            result[key] = internals.serializeArg(value);
+            result[key] = CoreUtil.serializeArg(value);
         }
 
         return result;
-    },
-
-    /**
-     * Returns a random integer between the specified values. The value is no lower than min
-     * (or the next integer greater than min if min isn't an integer), and is less than (but 
-     * not equal to) max.
-     */
-    randomNumber(min = 0, max = 1) {
-        return Math.random() * (max - min) + min;
-    },
-
-    randomInt(min, max) {
-        return Math.round(internals.randomNumber(min, max));
     }
 };
-
-module.exports = internals;

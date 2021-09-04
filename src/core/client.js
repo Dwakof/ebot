@@ -1,26 +1,25 @@
 'use strict';
 
-const Sentry = require("@sentry/node");
-const Tracing = require("@sentry/tracing");
+const Sentry  = require('@sentry/node');
+const Tracing = require('@sentry/tracing');
 
-
-const Path   = require('path');
-const Pino   = require('pino');
-const Hoek   = require('@hapi/hoek');
-const Fs     = require('fs/promises');
+const Path = require('path');
+const Pino = require('pino');
+const Hoek = require('@hapi/hoek');
+const Fs   = require('fs/promises');
 
 const { Permissions, Intents } = require('discord.js');
 const { REST }                 = require('@discordjs/rest');
 
-const { AkairoClient, AkairoModule, ListenerHandler, InhibitorHandler } = require('discord-akairo');
-
-const CommandHandler = require('./CommandHandler');
+const { AkairoClient, AkairoModule, InhibitorHandler } = require('discord-akairo');
 
 const { CoreEvents } = require('./constants');
 
-const Module = require('./module');
+const CommandHandler  = require('./CommandHandler');
+const ListenerHandler = require('./ListenerHandler');
+const Module          = require('./module');
 
-const Utils = require('./utils');
+const ClientUtil = require('./clientUtil');
 
 module.exports = class EbotClient extends AkairoClient {
 
@@ -33,8 +32,6 @@ module.exports = class EbotClient extends AkairoClient {
     #sentry;
 
     #coreListenerHandlers = new Map();
-
-    #providers = new Map();
 
     #commandHandler;
     #inhibitorHandler;
@@ -66,8 +63,8 @@ module.exports = class EbotClient extends AkairoClient {
             Sentry.init({
                 ...this.#settings.sentry,
                 integrations : [
-                    new Sentry.Integrations.Http({ tracing: true }),
-                    new Tracing.Integrations.Postgres(),
+                    new Sentry.Integrations.Http({ tracing : true }),
+                    new Tracing.Integrations.Postgres()
                 ]
             });
 
@@ -77,61 +74,22 @@ module.exports = class EbotClient extends AkairoClient {
         }
     }
 
-    #setupCoreListenerHandlers = () => {
+    async #setupCoreListenerHandlers() {
 
-        this.#coreListenerHandlers.set('process', new ListenerHandler(this, { directory : Path.join(__dirname, './listeners/process/') }));
+        const rootPath = Path.join(__dirname, 'listeners');
+
+        for (const handler of await Fs.readdir(rootPath)) {
+
+            this.#coreListenerHandlers.set(handler, new ListenerHandler(this, { directory : Path.join(rootPath, handler) }));
+        }
 
         this.#coreListenerHandlers.get('process').setEmitters({ process });
-
-        this.#coreListenerHandlers.set('client', new ListenerHandler(this, { directory : Path.join(__dirname, './listeners/client/') }));
-
-        this.#coreListenerHandlers.set('shard', new ListenerHandler(this, { directory : Path.join(__dirname, './listeners/shard/') }));
-
-        this.#coreListenerHandlers.set('message', new ListenerHandler(this, { directory : Path.join(__dirname, './listeners/message/') }));
-
-        this.#coreListenerHandlers.set('guild', new ListenerHandler(this, { directory : Path.join(__dirname, './listeners/guild/') }));
 
         for (const module of this.#coreListenerHandlers.values()) {
 
             module.loadAll();
         }
     };
-
-    /**
-     * @param {Function|Object} input
-     */
-    async registerProvider(input) {
-
-        let id;
-        let provider;
-
-        if (typeof input === 'function') {
-
-            ({ id, provider } = await input(this));
-        }
-        else {
-
-            ({ id, provider } = input);
-        }
-
-        if (this.#providers.has(id)) {
-
-            throw new Error('A provider under the same ID was already registered');
-        }
-
-        this.#providers.set(id, provider);
-
-        this.logger.trace({ event : CoreEvents.PROVIDER_REGISTERED, emitter : 'core', id });
-
-        if (this.#started) {
-
-            await provider.init();
-
-            this.logger.debug({ event : CoreEvents.PROVIDER_INITIALIZED, emitter : 'core', id });
-        }
-
-        return provider;
-    }
 
     registerCommandHandler(settings) {
 
@@ -205,7 +163,8 @@ module.exports = class EbotClient extends AkairoClient {
 
     async initialize() {
 
-        this.#setupCoreListenerHandlers();
+        await this.#setupCoreListenerHandlers();
+
         this.registerCommandHandler();
         this.registerListenerHandler();
         this.registerInhibitorHandler();
@@ -224,11 +183,9 @@ module.exports = class EbotClient extends AkairoClient {
             await this.initialize();
         }
 
-        for (const [id, provider] of this.#providers.entries()) {
+        for (const [, { module }] of this.#modules.entries()) {
 
-            await provider.init();
-
-            this.logger.debug({ event : CoreEvents.PROVIDER_INITIALIZED, emitter : 'core', id });
+            await module.init();
         }
 
         if (this.#listenerHandler) {
@@ -297,9 +254,14 @@ module.exports = class EbotClient extends AkairoClient {
         return this.#settings;
     }
 
-    get providers() {
+    providers(moduleName) {
 
-        return Array.from(this.#providers.entries()).reduce((acc, [k, v]) => ({ ...acc, [k] : v }), {});
+        if (this.#modules.has(moduleName)) {
+
+            return this.#modules.get(moduleName).module.providers();
+        }
+
+        throw new Error(`module ${ moduleName } not found`);
     }
 
     get commandHandler() {
@@ -315,11 +277,6 @@ module.exports = class EbotClient extends AkairoClient {
     get inhibitorHandler() {
 
         return this.#inhibitorHandler;
-    }
-
-    get utils() {
-
-        return Utils;
     }
 
     async warmupCache() {
@@ -369,8 +326,8 @@ module.exports = class EbotClient extends AkairoClient {
         this.logger.error({
             event        : CoreEvents.MODULE_ERROR,
             emitter      : module.id,
-            error,
             errorMessage : error.toString(),
+            error,
             message
         });
 

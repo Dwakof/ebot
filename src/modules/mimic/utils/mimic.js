@@ -6,7 +6,9 @@ module.exports = {
 
     async mimicUser(client, guildId, userId, initialState) {
 
-        const { Model } = client.providers.mimic.models;
+        const { Mimic } = client.providers('mimic');
+
+        const { Model } = Mimic.models;
 
         const member = await Model.query().findById([guildId, userId]).throwIfNotFound();
 

@@ -52,10 +52,7 @@ module.exports = class KarmaReactionAddListener extends Listener {
             return reaction.message.channel.send(Karma.randomResponse(Karma.NARCISSIST_RESPONSES, user, value));
         }
 
-        const { Member } = this.client.providers.karma.models;
-
-        await Member.query().insert({ guildId, userId, messageId, giverId, type, value })
-            .onConflict(['guildId', 'userId', 'messageId', 'giverId', 'type', 'value']).ignore();
+        await Karma.addKarma(this.client, { guildId, userId, messageId, giverId, type, value });
 
         if (value > 0) {
 

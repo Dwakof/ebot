@@ -42,11 +42,9 @@ module.exports = class KarmaMessageDeletedListener extends Listener {
             return;
         }
 
-        const { Member } = this.client.providers.karma.models;
-
         for (const [userId, { value }] of members) {
 
-            await Member.query().deleteById([guildId, userId, messageId, giverId, type, value]);
+            await Karma.cancelKarma(this.client, { guildId, userId, messageId, giverId, type, value });
         }
     }
 };

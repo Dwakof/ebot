@@ -6,6 +6,7 @@ const { Command }     = require('discord-akairo');
 class HelpCommand extends Command {
 
     constructor() {
+
         super('help', {
             aliases           : ['help'],
             description       : {
@@ -28,35 +29,36 @@ class HelpCommand extends Command {
 
         const { prefix } = this.handler;
 
-        const embed = this.client.util.embed();
+        const util = this.client.util;
+
+        const embed = util.embed();
 
         if (command) {
 
-            embed.setTitle(`Command \`${ command.description?.name || command.aliases[0] }\``);
+            embed.setTitle(`Command ${ util.code(command.description?.name || command.aliases[0]) }`);
 
-            embed.addField('Usage', `\`${ prefix }${ command.description?.usage }\`` || 'Unavailable');
+            embed.addField('Usage', util.code(prefix + command.description?.usage) || 'Unavailable');
             embed.addField('Description', command.description?.content || 'Unavailable');
             embed.addField('Usable by', command.description?.permissions || 'Everyone');
 
             if (command.aliases.length > 1) {
-                embed.addField('Alias', `\`${ command.aliases.join('` • `') }\``);
+                embed.addField('Alias', `${ util.code(command.aliases.join('` • `')) }`);
             }
 
             if (command.description?.examples?.length) {
-                embed.addField('Examples', `\`${ prefix }${ command.description.examples.join(`\` • \`${ prefix }`) }\``);
+                embed.addField('Examples', `${ util.code(prefix + command.description.examples.join(`\` • \`${ prefix }`)) }`);
             }
-
         }
         else {
             // For each category, return the array of all the commands it contains, flat it and get its length.
-            const number = this.handler.categories.array().flatMap((category) => category.array()).length;
+            const number = [...this.handler.categories.values()].flatMap((category) => Array.from(category.values())).length;
 
             embed.setTitle(`Listing of all the commands (${ number })`)
-                .setDescription(`Use \`${ prefix } help [command]\` to have more information on a command`);
+                .setDescription(`Use ${ util.code(`${ prefix }help [command]`) } to have more information on a command`);
 
-            for (const category of this.handler.categories.array()) {
+            for (const category of this.handler.categories.values()) {
 
-                embed.addField(`${ this.client.utils.capitalize(category.id) }`, category.map((cmd) => `\`${ cmd.aliases[0] }\``).join(' • '));
+                embed.addField(`${ this.client.util.capitalize(category.id) }`, category.map((cmd) => util.code(cmd.aliases[0])).join(' • '));
             }
         }
 

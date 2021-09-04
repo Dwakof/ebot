@@ -6,6 +6,7 @@ const { Command }     = require('discord-akairo');
 class CoinFlipCommand extends Command {
 
     constructor() {
+
         super('coin', {
             aliases           : ['coin', 'coinflip'],
             category          : 'tools',
@@ -19,9 +20,10 @@ class CoinFlipCommand extends Command {
         });
     }
 
-    async exec(message, args) {
-        return message.channel.send(this.client.utils.randomInt() ? 'Heads' : 'Tails');
+    exec(message, args) {
+
+        return message.channel.send(this.client.util.randomInt() ? 'Heads' : 'Tails');
     }
-};
+}
 
 module.exports = CoinFlipCommand;

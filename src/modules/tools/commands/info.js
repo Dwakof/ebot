@@ -38,7 +38,7 @@ class InfoCommand extends Command {
             .addField('Memory', `${ (process.memoryUsage().rss / 1024 / 1024).toFixed(2) } MB`, true)
             .addField('Uptime', DayJS.duration(this.client.uptime).humanize(false), true)
             .addField('Commands', totalCommands.toString(), true)
-            .addField('Admins', this.client.settings.discord.ownerId.map((id) => `<@${ id }>`).join(', '), true)
+            .addField('Admins', this.client.util.ownerIds(), true)
             .setFooter(`Asked by ${ message.author.username }`)
             .setTimestamp();
 

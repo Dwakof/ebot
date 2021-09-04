@@ -2,9 +2,10 @@
 
 const Path = require('path');
 
-const ObjectionProvider = require('../../../core/providers/objection');
+const ObjectionProvider = require('../../../../core/providers/objection');
+const CoreUtil          = require('../../../../core/util');
 
-module.exports = (client) => {
+module.exports = async (client) => {
 
     return {
         id       : 'reactionRole',
@@ -13,6 +14,6 @@ module.exports = (client) => {
             migrations : {
                 directory : Path.join(__dirname, '/migrations')
             }
-        }, [require('./models/reactionRole')])
+        }, await CoreUtil.requireDir(Path.join(__dirname, './models')))
     };
 };

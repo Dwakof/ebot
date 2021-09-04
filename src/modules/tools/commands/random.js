@@ -6,11 +6,12 @@ const { Command }     = require('discord-akairo');
 class RandomNumberCommand extends Command {
 
     constructor() {
+
         super('random', {
             aliases           : ['random'],
             category          : 'tools',
             clientPermissions : [Permissions.FLAGS.SEND_MESSAGES],
-            args     : [
+            args              : [
                 {
                     id     : 'min',
                     type   : 'number',
@@ -24,7 +25,7 @@ class RandomNumberCommand extends Command {
                     prompt : {
                         start : 'What\'s the maximum number you want?'
                     }
-                },
+                }
             ],
             description       : {
                 content  : 'Returns a random number within given range',
@@ -34,9 +35,10 @@ class RandomNumberCommand extends Command {
         });
     }
 
-    async exec(message, { min, max }) {
-        return message.reply(`your number is ${ this.client.utils.randomInt(min, max) }.`);
+    exec(message, { min, max }) {
+
+        return message.reply(`your number is ${ this.client.util.randomInt(min, max) }.`);
     }
-};
+}
 
 module.exports = RandomNumberCommand;

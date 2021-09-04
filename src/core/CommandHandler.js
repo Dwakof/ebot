@@ -2,6 +2,8 @@
 
 const { CommandHandler : AkairoCommandHandler } = require('discord-akairo');
 
+const CoreUtil = require('./util');
+
 module.exports = class CommandHandler extends AkairoCommandHandler {
 
     async runCommand(message, command, args) {
@@ -14,7 +16,7 @@ module.exports = class CommandHandler extends AkairoCommandHandler {
 
                 transaction = this.client.sentry.startTransaction({
                     op       : `command`,
-                    name     : `[${ this.client.utils.capitalize(command.categoryID) }] ${ command.id }`,
+                    name     : `[${ this.client.util.capitalize(command.categoryID) }] ${ command.id }`,
                     metadata : {
                         method : 'COMMAND'
                     }
@@ -33,7 +35,7 @@ module.exports = class CommandHandler extends AkairoCommandHandler {
 
                     if (Object.keys(args).length > 0) {
 
-                        scope.setContext('args', this.client.utils.serializeArgs(args));
+                        scope.setContext('args', CoreUtil.serializeArgs(args));
                     }
 
                     scope.setUser({

@@ -74,7 +74,9 @@ const internals = {
 
     getInfoUser(client, guildId, userId) {
 
-        const { Member } = client.providers.karma.models;
+        const { Karma } = client.providers('karma');
+
+        const { Member } = Karma.models;
 
         return Member.query()
             .with('sumTable', Member.query()
@@ -99,7 +101,9 @@ const internals = {
 
     getStatsUser(client, guildId, userId) {
 
-        const { Member } = client.providers.karma.models;
+        const { Karma } = client.providers('karma');
+
+        const { Member } = Karma.models;
 
         const { fn, raw, ref } = Member;
 
@@ -172,7 +176,7 @@ const internals = {
                         return;
                 }
 
-                if (client.utils.REGEX_USER_MENTION.test(string.slice(0, -2))) {
+                if (client.util.REGEX_USER_MENTION.test(string.slice(0, -2))) {
 
                     const id = nameOrId.slice(3, nameOrId.length - 1);
 
@@ -194,6 +198,48 @@ const internals = {
         }
 
         return users;
+    },
+
+    /**
+     * @param {EbotClient} client
+     * @param {Object}     karma
+     * @param {Snowflake}  karma.guildId
+     * @param {Snowflake}  karma.userId
+     * @param {Snowflake}  karma.messageId
+     * @param {Snowflake}  karma.giverId
+     * @param {String}     karma.type
+     * @param {Number}     karma.value
+     *
+     * @return {Promise}
+     */
+    addKarma(client, karma) {
+
+        const { Karma } = client.providers('karma');
+
+        const { Member } = Karma.models;
+
+        return Member.query().insert(karma)
+            .onConflict(['guildId', 'userId', 'messageId', 'giverId', 'type', 'value']).ignore();
+    },
+
+    /**
+     * @param {EbotClient} client
+     * @param {Snowflake}  guildId
+     * @param {Snowflake}  userId
+     * @param {Snowflake}  messageId
+     * @param {Snowflake}  giverId
+     * @param {String}     type
+     * @param {Number}     value
+     *
+     * @return {Promise}
+     */
+    cancelKarma(client, { guildId, userId, messageId, giverId, type, value }) {
+
+        const { Karma } = client.providers('karma');
+
+        const { Member } = Karma.models;
+
+        return Member.query().deleteById([guildId, userId, messageId, giverId, type, value]);
     }
 };
 

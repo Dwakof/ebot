@@ -2,7 +2,8 @@
 
 const Path = require('path');
 
-const ObjectionProvider = require('../../../core/providers/objection');
+const ObjectionProvider = require('../../../../core/providers/objection');
+const CoreUtil          = require('../../../../core/util');
 
 module.exports = async (client) => {
 
@@ -13,6 +14,6 @@ module.exports = async (client) => {
             migrations : {
                 directory : Path.join(__dirname, '/migrations')
             }
-        }, await client.utils.requireDir(Path.join(__dirname, './models')))
+        }, await CoreUtil.requireDir(Path.join(__dirname, './models')))
     };
 };
