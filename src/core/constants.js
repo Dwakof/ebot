@@ -8,6 +8,9 @@ exports.CoreEvents = {
     PROVIDER_REGISTERED  : 'providerRegistered',
     PROVIDER_INITIALIZED : 'providerInitialized',
 
+    SERVICE_REGISTERED  : 'serviceRegistered',
+    SERVICE_INITIALIZED : 'serviceInitialized',
+
     COMMAND_HANDLER_REGISTERED   : 'commandHandlerRegistered',
     INHIBITOR_HANDLER_REGISTERED : 'inhibitorHandlerRegistered',
 

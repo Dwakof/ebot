@@ -1,5 +1,23 @@
 'use strict';
 
+const Service = require('../../../core/service');
+
+module.exports = class MimicService extends Service {
+
+    async mimicUser(guildId, userId, initialState) {
+
+        const { Mimic } = this.client.providers('mimic');
+
+        const { Model } = Mimic.models;
+
+        const { model : json } = await Model.query().findById([guildId, userId]).throwIfNotFound();
+
+        const model = Chain.fromJSON(json);
+
+        return model.walk(initialState).join(' ');
+    }
+};
+
 class State {
 
     static SEPARATOR = '|';
@@ -590,5 +608,3 @@ class Chain {
         return low;
     }
 }
-
-module.exports = { State, Model, Chain };

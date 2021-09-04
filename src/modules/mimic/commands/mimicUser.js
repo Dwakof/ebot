@@ -2,8 +2,6 @@
 
 const { Command } = require('discord-akairo');
 
-const Mimic = require('../utils/mimic');
-
 module.exports = class MimicUserCommand extends Command {
 
     constructor() {
@@ -34,6 +32,8 @@ module.exports = class MimicUserCommand extends Command {
 
         if (member) {
 
+            const { MimicService, ReplyService }  = this.client.services('mimic');
+
             try {
                 const temp = await message.util.send('thinking...');
 
@@ -46,13 +46,11 @@ module.exports = class MimicUserCommand extends Command {
                     this.client.sentry.setTag('mimicked_username', `${ member.user.username }#${ member.user.discriminator }`);
                 }
 
-                const reply = await Mimic.mimicUser(this.client, guildId, userId, initialState);
+                const reply = await MimicService.mimicUser(this.client, guildId, userId, initialState);
 
                 const [, msg] = await Promise.all([temp.delete(), message.channel.send(reply)]);
 
-                const { Reply } = this.client.providers.mimic.models;
-
-                await Reply.query().insert({ messageId : msg.id, guildId, userId, content : reply });
+                await ReplyService.saveReply(msg, userId);
             }
             catch (error) {
 

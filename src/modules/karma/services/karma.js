@@ -1,40 +1,36 @@
 'use strict';
 
-// eslint-disable-next-line no-unused-vars
-const DiscordJS = require('discord.js');
+const Service = require('../../../core/service');
 
-const internals = {
+module.exports = class KarmaService extends Service {
 
-    REGEX_KARMA : /(\w+|<@![0-9]+>)(\+\+|--|\+5|-5)/gmi,
+    REGEX_KARMA = /(\w+|<@![0-9]+>)(\+\+|--|\+5|-5)/gmi;
 
-    TYPES : {
-        REACTION : 'reaction',
-        MESSAGE  : 'message'
-    },
+    TYPES = { REACTION : 'reaction', MESSAGE : 'message' };
 
-    NARCISSIST_RESPONSES : [
+    NARCISSIST_RESPONSES = [
         ({ displayName }) => `Hey everyone ! ${ displayName } is a narcissist !`
-    ],
+    ];
 
-    INCREMENT_RESPONSES : [
+    INCREMENT_RESPONSES = [
         ({ displayName }, inc) => `${ displayName } +${ inc } !`,
         ({ displayName }, inc) => `${ displayName } gained ${ inc > 1 ? inc : 'a' } level${ inc > 1 ? 's' : '' } !`,
         ({ displayName }, inc) => `${ displayName } is on the rise ! (${ inc } point${ inc > 1 ? 's' : '' })`,
         ({ displayName }, inc) => `Toss ${ inc > 1 ? inc : 'a' } karma to your ${ displayName }, oh valley of plenty !`,
         ({ displayName }, inc) => `${ displayName } leveled up ${ inc > 1 ? `${ inc } times in a row` : '' } !`
-    ],
+    ];
 
-    DECREMENT_RESPONSES : [
+    DECREMENT_RESPONSES = [
         ({ displayName }, inc) => `${ displayName } took ${ inc < -1 ? inc : 'a' } hit${ inc < -1 ? 's' : '' } ! Ouch.`,
         ({ displayName }, inc) => `${ displayName } took a dive (${ inc } point${ inc < -1 ? 's' : '' }).`,
         ({ displayName }, inc) => `${ displayName } lost ${ inc < -1 ? inc : 'a' } life${ inc < -1 ? 's' : '' }.`,
         ({ displayName }, inc) => `${ displayName } lost ${ inc < -1 ? inc : 'a' } level${ inc < -1 ? 's' : '' }.`
-    ],
+    ];
 
     randomResponse(array, ...args) {
 
         return array[Math.floor(Math.random() * array.length)](...args);
-    },
+    }
 
     emojiToValue(emoji) {
 
@@ -50,7 +46,7 @@ const internals = {
             default:
                 return null;
         }
-    },
+    }
 
     ordinalSuffix(i) {
 
@@ -70,11 +66,11 @@ const internals = {
         }
 
         return 'th';
-    },
+    }
 
-    getInfoUser(client, guildId, userId) {
+    getInfoUser(guildId, userId) {
 
-        const { Karma } = client.providers('karma');
+        const { Karma } = this.client.providers('karma');
 
         const { Member } = Karma.models;
 
@@ -97,11 +93,11 @@ const internals = {
             .from('rankTable')
             .where({ guildId, userId })
             .limit(1).first();
-    },
+    }
 
-    getStatsUser(client, guildId, userId) {
+    getStatsUser(guildId, userId) {
 
-        const { Karma } = client.providers('karma');
+        const { Karma } = this.client.providers('karma');
 
         const { Member } = Karma.models;
 
@@ -138,18 +134,18 @@ const internals = {
                     .where({ guildId, userId })
                     .where('createdAt', '<', ref('period').from('periods'))
             }).from('periods');
-    },
+    }
 
     /**
-     * @param {EbotClient} client
      * @param {DiscordJS.Message} message
+     *
      * @return {Promise<Map<Snowflake, { member : DiscordJS.GuildMember, value : integer }>>}
      */
-    async parseMessage(client, message) {
+    async parseMessage(message) {
 
         const users = new Map();
 
-        const matches = message.content.match(internals.REGEX_KARMA);
+        const matches = message.content.match(this.REGEX_KARMA);
 
         if (Array.isArray(matches)) {
 
@@ -176,7 +172,7 @@ const internals = {
                         return;
                 }
 
-                if (client.util.REGEX_USER_MENTION.test(string.slice(0, -2))) {
+                if (this.client.util.REGEX_USER_MENTION.test(string.slice(0, -2))) {
 
                     const id = nameOrId.slice(3, nameOrId.length - 1);
 
@@ -198,10 +194,9 @@ const internals = {
         }
 
         return users;
-    },
+    }
 
     /**
-     * @param {EbotClient} client
      * @param {Object}     karma
      * @param {Snowflake}  karma.guildId
      * @param {Snowflake}  karma.userId
@@ -212,18 +207,17 @@ const internals = {
      *
      * @return {Promise}
      */
-    addKarma(client, karma) {
+    addKarma(karma) {
 
-        const { Karma } = client.providers('karma');
+        const { Karma } = this.client.providers('karma');
 
         const { Member } = Karma.models;
 
         return Member.query().insert(karma)
             .onConflict(['guildId', 'userId', 'messageId', 'giverId', 'type', 'value']).ignore();
-    },
+    }
 
     /**
-     * @param {EbotClient} client
      * @param {Snowflake}  guildId
      * @param {Snowflake}  userId
      * @param {Snowflake}  messageId
@@ -233,14 +227,12 @@ const internals = {
      *
      * @return {Promise}
      */
-    cancelKarma(client, { guildId, userId, messageId, giverId, type, value }) {
+    cancelKarma({ guildId, userId, messageId, giverId, type, value }) {
 
-        const { Karma } = client.providers('karma');
+        const { Karma } = this.client.providers('karma');
 
         const { Member } = Karma.models;
 
         return Member.query().deleteById([guildId, userId, messageId, giverId, type, value]);
     }
 };
-
-module.exports = internals;

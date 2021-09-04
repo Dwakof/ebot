@@ -6,6 +6,8 @@ const Path = require('path');
 const CoreUtil       = require('./util');
 const { CoreEvents } = require('./constants');
 
+const Service = require('./service');
+
 class Module {
 
     #name;
@@ -17,6 +19,7 @@ class Module {
     #listeners  = new Map();
     #inhibitors = new Map();
     #providers  = new Map();
+    #services   = new Map();
 
     constructor(name, path) {
 
@@ -33,6 +36,11 @@ class Module {
         if (components.includes('providers')) {
 
             await this.registerProviders();
+        }
+
+        if (components.includes('services')) {
+
+            await this.registerServices();
         }
 
         if (components.includes('listeners')) {
@@ -141,6 +149,44 @@ class Module {
         }
     }
 
+    async registerServices() {
+
+        for (const { name, path, file } of await CoreUtil.requireDir(Path.join(this.#path, 'services'), true)) {
+
+            try {
+
+                let id;
+                let service;
+
+                if (!file instanceof Service) {
+
+                    throw new Error('Only instance of Service can be registered as service');
+                }
+
+                service = new file(this.#client);
+                id      = service.id;
+
+                if (this.#services.has(id)) {
+
+                    throw new Error('A service under the same name was already registered');
+                }
+
+                this.#services.set(id, { path, service });
+
+                this.#client.logger.trace({
+                    event   : CoreEvents.SERVICE_REGISTERED,
+                    emitter : 'core',
+                    module  : this.#name,
+                    service : id
+                });
+            }
+            catch (error) {
+
+                throw new Error(`Could not register service ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
+            }
+        }
+    }
+
     async init() {
 
         for (const [id, { provider }] of this.#providers.entries()) {
@@ -154,6 +200,18 @@ class Module {
                 provider : id
             });
         }
+
+        for (const [id, { service }] of this.#services.entries()) {
+
+            await service.init();
+
+            this.#client.logger.debug({
+                event   : CoreEvents.SERVICE_INITIALIZED,
+                emitter : 'core',
+                module  : this.#name,
+                service : id
+            });
+        }
     }
 
     providers() {
@@ -162,6 +220,15 @@ class Module {
             .reduce((providers, [id, { provider }]) => {
 
                 return { ...providers, [this.#client.util.capitalize(id)] : provider };
+            }, {});
+    }
+
+    services() {
+
+        return Array.from(this.#services.entries())
+            .reduce((services, [name, { service }]) => {
+
+                return { ...services, [name] : service };
             }, {});
     }
 }

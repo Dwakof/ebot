@@ -2,8 +2,6 @@
 
 const { Command } = require('discord-akairo');
 
-const Sync = require('../utils/sync');
-
 module.exports = class SyncCommand extends Command {
 
     constructor(commandHandler) {
@@ -18,27 +16,33 @@ module.exports = class SyncCommand extends Command {
             commandUtil : true,
             args        : [
                 {
-                    id      : 'channel',
-                    type    : 'channel',
-                    default : null
+                    id        : 'guild',
+                    type      : 'guild',
+                    default   : (message) => message.guild,
+                    unordered : true
+                },
+                {
+                    id        : 'channel',
+                    type      : 'channel',
+                    default   : null,
+                    unordered : true
                 }
             ],
             description : {
                 content     : 'Sync messages history with discord',
-                usage       : 'sync [channel]',
+                usage       : 'sync [guild] [channel]',
                 examples    : ['sync', 'sync #general'],
                 permissions : commandHandler.client.util.ownerIds()
             }
         });
     }
 
-    async exec(message, { channel }) {
+    async exec(message, { guild, channel }) {
 
-        const guildId = message.guild.id;
+        const { State }       = this.client.providers('history');
+        const { SyncService } = this.client.services('history');
 
-        const { State } = this.client.providers('history');
-
-        const guildStatus = await State.get('guild_import', guildId, { doing : false });
+        const guildStatus = await State.get('guild_import', guild.id, { doing : false });
 
         if (guildStatus.doing) {
 
@@ -56,12 +60,14 @@ module.exports = class SyncCommand extends Command {
 
             if (channelStatus.doing) {
 
-                return message.channel.send(`Already syncing this guild, see ${ guildStatus.url }`);
+                return message.channel.send(`Already syncing this channel, see ${ channelStatus.url }`);
             }
 
-            Sync.syncChannel(this.client, channel.id, message);
+            SyncService.syncChannel(channel.id, message);
+
+            return;
         }
 
-        Sync.syncGuild(this.client, guildId, message);
+        SyncService.syncGuild(guild.id, message);
     }
 };

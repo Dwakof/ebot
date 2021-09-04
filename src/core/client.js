@@ -15,11 +15,12 @@ const { AkairoClient, AkairoModule, InhibitorHandler } = require('discord-akairo
 
 const { CoreEvents } = require('./constants');
 
-const CommandHandler  = require('./CommandHandler');
-const ListenerHandler = require('./ListenerHandler');
+const CommandHandler  = require('./commandHandler');
+const ListenerHandler = require('./listenerHandler');
 const Module          = require('./module');
 
 const ClientUtil = require('./clientUtil');
+const CoreUtil   = require('./util');
 
 module.exports = class EbotClient extends AkairoClient {
 
@@ -264,6 +265,16 @@ module.exports = class EbotClient extends AkairoClient {
         throw new Error(`module ${ moduleName } not found`);
     }
 
+    services(moduleName) {
+
+        if (this.#modules.has(moduleName)) {
+
+            return this.#modules.get(moduleName).module.services();
+        }
+
+        throw new Error(`module ${ moduleName } not found`);
+    }
+
     get commandHandler() {
 
         return this.#commandHandler;
@@ -303,7 +314,7 @@ module.exports = class EbotClient extends AkairoClient {
         this.logger.info({
             event   : CoreEvents.INVITE_LINK,
             emitter : 'core',
-            url     : await this.generateInvite({
+            url     : this.generateInvite({
                 scopes      : ['bot'],
                 permissions : [
                     Permissions.FLAGS.SEND_MESSAGES,
@@ -323,6 +334,8 @@ module.exports = class EbotClient extends AkairoClient {
      */
     handleError(module, error, message, extraData = {}) {
 
+        console.error(error);
+
         this.logger.error({
             event        : CoreEvents.MODULE_ERROR,
             emitter      : module.id,
@@ -332,6 +345,14 @@ module.exports = class EbotClient extends AkairoClient {
         });
 
         if (this.sentry) {
+
+            this.client.sentry.configureScope((scope) => {
+
+                scope.setContext('module', {
+                    categoryID : module.categoryID,
+                    id         : module.id
+                });
+            });
 
             this.sentry.captureException(error);
         }
