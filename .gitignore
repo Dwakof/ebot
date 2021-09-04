@@ -15,6 +15,7 @@
 !.gitignore
 !package.json
 !.travis.yml
+!.babelrc
 
 # ADD DOCKER FILES
 !.dockerignore
