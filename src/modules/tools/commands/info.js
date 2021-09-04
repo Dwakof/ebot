@@ -28,7 +28,9 @@ class InfoCommand extends Command {
 
     exec(message, args) {
 
-        const totalCommands = this.handler.categories.array().flatMap((cat) => cat.array()).length;
+        const totalCommands = (Array.from(this.handler.categories.values())
+            .flatMap((cat) => (Array.from(cat.values()).length)))
+            .reduce((acc, x) => (acc += x), 0);
 
         const embed = this.client.util.embed()
             .setAuthor('Statistics of Ebot', this.client.user.avatarURL({ dynamic : true }))
@@ -40,7 +42,7 @@ class InfoCommand extends Command {
             .setFooter(`Asked by ${ message.author.username }`)
             .setTimestamp();
 
-        return message.util.send(embed);
+        return message.util.send({ embeds : [embed] });
     }
 }
 

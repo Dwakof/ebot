@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:16.6
 
 MAINTAINER Yoann MALLEMANCHE <yoann.mallemanche@gmail.com>
 

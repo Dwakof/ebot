@@ -65,7 +65,7 @@ module.exports = class GetKarmaCommand extends Command {
 
                 embed.setDescription('User not ranked yet');
 
-                return message.util.send(embed);
+                return message.util.send({ embeds : [embed] });
             }
 
             let rankString = `${ info.rank }${ Karma.ordinalSuffix(info.rank) }`;
@@ -96,7 +96,7 @@ module.exports = class GetKarmaCommand extends Command {
                 // Cannot display stats as we only have 1 transactions or
                 // 2 transactions too close to calculate a graph
 
-                return message.util.send(embed);
+                return message.util.send({ embeds : [embed] });
             }
 
             const stats = await Karma.getStatsUser(this.client, message.guild.id, member.user.id);
@@ -162,10 +162,12 @@ module.exports = class GetKarmaCommand extends Command {
 
                 }), 'chart.png');
 
-                embed.attachFiles([attachment]).setImage('attachment://chart.png');
+                embed.setImage('attachment://chart.png');
+
+                return message.util.send({ embeds : [embed], files : [attachment] });
             }
 
-            return message.util.send(embed);
+            return message.util.send({ embeds : [embed] });
         }
     }
 };

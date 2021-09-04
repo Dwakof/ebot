@@ -9,7 +9,8 @@ const Pino   = require('pino');
 const Hoek   = require('@hapi/hoek');
 const Fs     = require('fs/promises');
 
-const { Permissions } = require('discord.js');
+const { Permissions, Intents } = require('discord.js');
+const { REST }                 = require('@discordjs/rest');
 
 const { AkairoClient, AkairoModule, ListenerHandler, InhibitorHandler } = require('discord-akairo');
 
@@ -43,9 +44,20 @@ module.exports = class EbotClient extends AkairoClient {
 
     constructor(settings) {
 
-        super({ ownerId : settings.discord.ownerId }, settings.discord);
+        super({ ownerID : settings.discord.ownerID }, {
+            ...settings.discord,
+            intents : [
+                Intents.FLAGS.GUILDS,
+                Intents.FLAGS.GUILD_MEMBERS,
+                Intents.FLAGS.GUILD_MESSAGES,
+                Intents.FLAGS.GUILD_MESSAGE_REACTIONS
+            ]
+        });
 
         this.#settings = settings;
+
+        this.util = new ClientUtil(this);
+        this.API  = new REST({ version : '9' }).setToken(this.#settings.discord.token);
 
         this.#logger = Pino(this.#settings.logger);
 

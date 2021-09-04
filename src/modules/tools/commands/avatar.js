@@ -1,6 +1,6 @@
 'use strict';
 
-const { Permissions } = require('discord.js');
+const { Permissions, Constants } = require('discord.js');
 const { Command }     = require('discord-akairo');
 
 class AvatarCommand extends Command {
@@ -30,11 +30,11 @@ class AvatarCommand extends Command {
     exec(message, { member }) {
 
         const embed = this.client.util.embed()
-            .setColor(member.displayHexColor || 'NAVY')
+            .setColor(member.displayHexColor || Constants.Colors.NAVY)
             .setTitle(`Avatar for ${ member.user.username }`)
             .setImage(member.user.avatarURL({ dynamic : true, size : 4096 }));
 
-        return message.channel.send(embed);
+        return message.channel.send({ embeds : [embed] });
     }
 }
 

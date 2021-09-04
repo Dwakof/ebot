@@ -18,7 +18,7 @@ class PingCommand extends Command {
         const embed = this.client.util.embed()
             .setTitle('Pong!');
 
-        const sent = await message.util.send(embed);
+        const sent = await message.util.send({ embeds : [embed] });
 
         const timeDiff = (sent.editedAt || sent.createdAt) - (message.editedAt || message.createdAt);
 
@@ -38,7 +38,7 @@ class PingCommand extends Command {
             embed.setColor(Constants.Colors.RED);
         }
 
-        return message.util.send(embed);
+        return message.util.send({ embeds : [embed] });
     }
 }
 
