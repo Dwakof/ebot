@@ -111,6 +111,18 @@ const store = new Confidence.Store({
                 }
             }
         },
+        history      : {
+            knex : {
+                client     : 'pg',
+                connection : {
+                    host     : { $env : 'HISTORY_POSTGRES_HOST', $default : knexDefault.host },
+                    user     : { $env : 'HISTORY_POSTGRES_USER', $default : knexDefault.user },
+                    password : { $env : 'HISTORY_POSTGRES_PASS', $default : knexDefault.password },
+                    database : { $env : 'HISTORY_POSTGRES_DB', $default : 'history' },
+                    port     : { $env : 'HISTORY_POSTGRES_PORT', $coerce : 'number', $default : knexDefault.port }
+                }
+            }
+        },
         reactionRole : {
             knex : {
                 client     : 'pg',

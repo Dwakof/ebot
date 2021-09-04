@@ -3,11 +3,11 @@
 const { Listener }  = require('discord-akairo');
 const { Constants } = require('discord.js');
 
-module.exports = class MimicMessageListener extends Listener {
+module.exports = class HistoryMessageCreatedListener extends Listener {
 
     constructor() {
 
-        super('mimicMessageCreated', { emitter : 'client', event : Constants.Events.MESSAGE_CREATE });
+        super('historyMessageCreated', { emitter : 'client', event : Constants.Events.MESSAGE_CREATE });
     }
 
     async exec(message) {
@@ -28,14 +28,11 @@ module.exports = class MimicMessageListener extends Listener {
             }
         }
 
-        if (message.author.bot || message.system) {
+        if (this.client.util.isString(message?.content)) {
 
-            return;
-        }
+            const { History } = this.client.providers('history');
 
-        if (this.client.utils.isString(message?.content)) {
-
-            const { Message } = this.client.providers.mimic.models;
+            const { Message } = History.models;
 
             return Message.query()
                 .insert({
@@ -43,7 +40,8 @@ module.exports = class MimicMessageListener extends Listener {
                     guildId   : message.guild.id,
                     authorId  : message.author.id,
                     content   : message.content,
-                    createdAt : message.createdAt
+                    createdAt : message.createdAt,
+                    updatedAt : message.editedAt || new Date()
                 });
         }
     }

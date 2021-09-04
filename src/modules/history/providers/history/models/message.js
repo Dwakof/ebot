@@ -25,7 +25,6 @@ class Message extends Model {
                 guildId   : { type : 'string' },
                 authorId  : { type : 'string' },
                 content   : { type : 'string' },
-                imported  : { type : 'boolean' },
                 createdAt : { type : 'date' },
                 updatedAt : { type : 'date' }
             }
