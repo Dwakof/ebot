@@ -28,17 +28,15 @@ module.exports = class MimicUserCommand extends Command {
         });
     }
 
-    async exec(message, { member, initialState }) {
+    async exec(message, { guild, member, initialState }) {
 
         if (member) {
 
-            const { MimicService, ReplyService }  = this.client.services('mimic');
+            const { MimicService, ReplyService } = this.client.services('mimic');
 
             try {
-                const temp = await message.util.send('thinking...');
-
-                const guildId = message.guild.id;
-                const userId  = member.user.id;
+                const temp   = await message.util.send('thinking...');
+                const userId = member.user.id;
 
                 if (this.client.sentry) {
 
@@ -46,7 +44,7 @@ module.exports = class MimicUserCommand extends Command {
                     this.client.sentry.setTag('mimicked_username', `${ member.user.username }#${ member.user.discriminator }`);
                 }
 
-                const reply = await MimicService.mimicUser(this.client, guildId, userId, initialState);
+                const reply = await MimicService.mimicUser(guild.id, userId, initialState);
 
                 const [, msg] = await Promise.all([temp.delete(), message.channel.send(reply)]);
 
