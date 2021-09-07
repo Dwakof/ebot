@@ -1,3 +1,10 @@
+## [0.4.3](https://github.com/Dwakof/ebot/compare/v0.4.2...v0.4.3) (2021-09-07)
+
+
+### Bug Fixes
+
+* retry 5 time before abandoning to generate a mimic response ([12d32bd](https://github.com/Dwakof/ebot/commit/12d32bd1fc75de3c50916e5d19b9f8f64139f713))
+
 ## [0.4.2](https://github.com/Dwakof/ebot/compare/v0.4.1...v0.4.2) (2021-09-07)
 
 
