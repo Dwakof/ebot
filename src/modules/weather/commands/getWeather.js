@@ -74,7 +74,7 @@ module.exports = class WeatherCommand extends Command {
             try {
 
                 const [, { body : weatherBody }] = await Promise.all([
-                    message.util.send(embed),
+                    message.util.send({ embeds : [embed] }),
                     this.#weatherApi.get('data/2.5/weather', {
                         searchParams : {
                             lat : mapBody[0].lat,
@@ -98,7 +98,7 @@ module.exports = class WeatherCommand extends Command {
                     .addField('Wind speed', `${ Math.round(weatherBody.wind.speed * 3.6) } Km/h (${ Math.round(weatherBody.wind.speed * 2.23694) } Mph)`, false)
                     .setThumbnail(`http://openweathermap.org/img/wn/${ weatherBody.weather[0].icon }@2x.png`);
 
-                return message.util.send(embed);
+                return message.util.send({ embeds : [embed] });
             }
             catch (error) {
 

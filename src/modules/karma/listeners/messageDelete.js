@@ -3,8 +3,6 @@
 const { Listener }  = require('discord-akairo');
 const { Constants } = require('discord.js');
 
-const Karma = require('../utils/karma');
-
 module.exports = class KarmaMessageDeletedListener extends Listener {
 
     constructor() {
@@ -30,23 +28,23 @@ module.exports = class KarmaMessageDeletedListener extends Listener {
             }
         }
 
+        const { KarmaService } = this.client.services('karma');
+
         const guildId   = message.guild.id;
         const messageId = message.id;
         const giverId   = message.author.id;
-        const type      = Karma.TYPES.MESSAGE;
+        const type      = KarmaService.TYPES.MESSAGE;
 
-        const members = await Karma.parseMessage(this.client, message);
+        const members = await KarmaService.parseMessage(message);
 
         if (members.size <= 0) {
 
             return;
         }
 
-        const { Member } = this.client.providers.karma.models;
-
         for (const [userId, { value }] of members) {
 
-            await Member.query().deleteById([guildId, userId, messageId, giverId, type, value]);
+            await KarmaService.cancelKarma({ guildId, userId, messageId, giverId, type, value });
         }
     }
 };

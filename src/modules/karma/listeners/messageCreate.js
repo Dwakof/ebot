@@ -3,8 +3,6 @@
 const { Listener }  = require('discord-akairo');
 const { Constants } = require('discord.js');
 
-const Karma = require('../utils/karma');
-
 module.exports = class KarmaMessageCreatedListener extends Listener {
 
     constructor() {
@@ -30,36 +28,35 @@ module.exports = class KarmaMessageCreatedListener extends Listener {
             }
         }
 
+        const { KarmaService } = this.client.services('karma');
+
         const guildId   = message.guild.id;
         const messageId = message.id;
         const giverId   = message.author.id;
-        const type      = Karma.TYPES.MESSAGE;
+        const type      = KarmaService.TYPES.MESSAGE;
 
-        const members = await Karma.parseMessage(this.client, message);
+        const members = await KarmaService.parseMessage(message);
 
         if (members.size <= 0) {
 
             return;
         }
 
-        const { Member } = this.client.providers.karma.models;
-
         const responses = await Promise.all(Array.from(members.entries()).map(async ([id, { member, value }]) => {
 
             if (id === message.author.id) {
 
-                return Karma.randomResponse(Karma.NARCISSIST_RESPONSES, member);
+                return KarmaService.randomResponse(KarmaService.NARCISSIST_RESPONSES, member);
             }
 
-            await Member.query().insert({ guildId, userId : id, messageId, giverId, type, value })
-                .onConflict(['guildId', 'userId', 'messageId', 'giverId', 'type', 'value']).ignore();
+            await KarmaService.addKarma({ guildId, userId : id, messageId, giverId, type, value });
 
             if (value > 0) {
 
-                return Karma.randomResponse(Karma.INCREMENT_RESPONSES, member, value);
+                return KarmaService.randomResponse(KarmaService.INCREMENT_RESPONSES, member, value);
             }
 
-            return Karma.randomResponse(Karma.DECREMENT_RESPONSES, member, value);
+            return KarmaService.randomResponse(KarmaService.DECREMENT_RESPONSES, member, value);
         }));
 
         return message.channel.send(responses);

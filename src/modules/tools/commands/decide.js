@@ -6,15 +6,16 @@ const { Command }     = require('discord-akairo');
 class DecideCommand extends Command {
 
     constructor() {
+
         super('decide', {
             aliases           : ['decide'],
             category          : 'tools',
             clientPermissions : [Permissions.FLAGS.SEND_MESSAGES],
             args              : [
                 {
-                    id     : 'options',
-                    type   : 'string',
-                },
+                    id   : 'options',
+                    type : 'string'
+                }
             ],
             description       : {
                 content  : 'Makes a random decision on one of the given options',
@@ -24,19 +25,21 @@ class DecideCommand extends Command {
         });
     }
 
-    async exec(message, args) {
+    exec(message, args) {
+
         const input = message.content.replace(/[~!?]decide/, '').trim();
+
         if (input.length === 0) {
             return message.channel.send('Please specify some options (e.g. "option1 option2")');
         }
 
         const options = input.split(' ');
-        const randomIndex = this.client.utils.randomInt(0, options.length - 1);
-        const result = options[randomIndex];
-        const inputWithHighlightedResult = input.replace(/ /g, ' | ').replace(result, `**${result}**`);
+        const result  = this.client.util.randomValue(options);
+
+        const inputWithHighlightedResult = input.replace(/ /g, ' | ').replace(result, `**${ result }**`);
 
         return message.channel.send(inputWithHighlightedResult);
     }
-};
+}
 
 module.exports = DecideCommand;

@@ -27,30 +27,33 @@ const store = new Confidence.Store({
         $filter     : { $env : 'NODE_ENV' },
         $base       : {
             partials : { $env : 'DISCORD_PARTIALS', $coerce : 'array' },
-            ownerId  : { $env : 'DISCORD_OWNER_IDS', $coerce : 'array' },
+            ownerID  : { $env : 'DISCORD_OWNER_IDS', $coerce : 'array' },
             token    : { $env : 'DISCORD_TOKEN' },
-            prefix   : { $env : 'DISCORD_COMMAND_PREFIX', $default : '!' }
+            prefix   : { $env : 'DISCORD_COMMAND_PREFIX', $default : '!' },
+            intends  : {}
         },
         development : {
             presence : {
-                status   : 'online',
-                afk      : false,
-                activity : {
-                    type        : 'WATCHING',
-                    name        : 'my owner work on me',
-                    application : 'my owner work on me'
-                }
+                status     : 'online',
+                afk        : false,
+                activities : [
+                    {
+                        type : 'PLAYING',
+                        name : `with my owner | ${ process.env.DISCORD_COMMAND_PREFIX || '!' }help`
+                    }
+                ]
             }
         },
         production  : {
             presence : {
-                status   : 'online',
-                afk      : false,
-                activity : {
-                    type        : 'PLAYING',
-                    name        : `Ebot | ${ process.env.DISCORD_COMMAND_PREFIX || '!' }help`,
-                    application : 'Ebot'
-                }
+                status     : 'online',
+                afk        : false,
+                activities : [
+                    {
+                        type : 'PLAYING',
+                        name : `Ebot | ${ process.env.DISCORD_COMMAND_PREFIX || '!' }help`
+                    }
+                ]
             }
         }
     },
@@ -105,6 +108,18 @@ const store = new Confidence.Store({
                     password : { $env : 'MIMIC_POSTGRES_PASS', $default : knexDefault.password },
                     database : { $env : 'MIMIC_POSTGRES_DB', $default : 'mimic' },
                     port     : { $env : 'MIMIC_POSTGRES_PORT', $coerce : 'number', $default : knexDefault.port }
+                }
+            }
+        },
+        history      : {
+            knex : {
+                client     : 'pg',
+                connection : {
+                    host     : { $env : 'HISTORY_POSTGRES_HOST', $default : knexDefault.host },
+                    user     : { $env : 'HISTORY_POSTGRES_USER', $default : knexDefault.user },
+                    password : { $env : 'HISTORY_POSTGRES_PASS', $default : knexDefault.password },
+                    database : { $env : 'HISTORY_POSTGRES_DB', $default : 'history' },
+                    port     : { $env : 'HISTORY_POSTGRES_PORT', $coerce : 'number', $default : knexDefault.port }
                 }
             }
         },

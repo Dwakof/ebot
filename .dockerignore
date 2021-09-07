@@ -9,7 +9,7 @@
 
 
 # ADD METADATA FILE
-!package.json
+!package*.json
 
 # ADD DOCKER FILES
 !.dockerignore

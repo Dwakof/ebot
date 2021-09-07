@@ -28,7 +28,9 @@ class InfoCommand extends Command {
 
     exec(message, args) {
 
-        const totalCommands = this.handler.categories.array().flatMap((cat) => cat.array()).length;
+        const totalCommands = (Array.from(this.handler.categories.values())
+            .flatMap((cat) => (Array.from(cat.values()).length)))
+            .reduce((acc, x) => (acc += x), 0);
 
         const embed = this.client.util.embed()
             .setAuthor('Statistics of Ebot', this.client.user.avatarURL({ dynamic : true }))
@@ -36,11 +38,11 @@ class InfoCommand extends Command {
             .addField('Memory', `${ (process.memoryUsage().rss / 1024 / 1024).toFixed(2) } MB`, true)
             .addField('Uptime', DayJS.duration(this.client.uptime).humanize(false), true)
             .addField('Commands', totalCommands.toString(), true)
-            .addField('Admins', this.client.settings.discord.ownerId.map((id) => `<@${ id }>`).join(', '), true)
+            .addField('Admins', this.client.util.ownerIds(), true)
             .setFooter(`Asked by ${ message.author.username }`)
             .setTimestamp();
 
-        return message.util.send(embed);
+        return message.util.send({ embeds : [embed] });
     }
 }
 

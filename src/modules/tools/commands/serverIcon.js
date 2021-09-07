@@ -24,7 +24,7 @@ class AvatarCommand extends Command {
             .setTitle(`Icon for ${ message.guild.name }`)
             .setImage(message.guild.iconURL({ dynamic : true, size : 4096 }));
 
-        return message.channel.send(embed);
+        return message.channel.send({ embeds : [embed] });
     }
 }
 

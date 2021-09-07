@@ -14,7 +14,12 @@
 !.eslintrc
 !.gitignore
 !package.json
+!package-lock.json
 !.travis.yml
+!.babelrc
+!.github/**
+!.github
+!.releaserc.js
 
 # ADD DOCKER FILES
 !.dockerignore

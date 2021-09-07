@@ -3,8 +3,6 @@
 const { Command }             = require('discord-akairo');
 const { CanvasRenderService } = require('chartjs-node-canvas');
 
-const Karma = require('../utils/karma');
-
 module.exports = class GetKarmaCommand extends Command {
 
     constructor() {
@@ -50,6 +48,8 @@ module.exports = class GetKarmaCommand extends Command {
 
         if (member) {
 
+            const { KarmaService } = this.client.services('karma');
+
             const embed = this.client.util.embed()
                 .setTitle(`Karma for ${ member.user.username }`)
                 .setThumbnail(member.user.avatarURL({ dynamic : true, size : 128 }));
@@ -59,16 +59,16 @@ module.exports = class GetKarmaCommand extends Command {
                 embed.setColor(member.displayHexColor);
             }
 
-            const info = await Karma.getInfoUser(this.client, message.guild.id, member.user.id);
+            const info = await KarmaService.getInfoUser(message.guild.id, member.user.id);
 
             if (!info) {
 
                 embed.setDescription('User not ranked yet');
 
-                return message.util.send(embed);
+                return message.util.send({ embeds : [embed] });
             }
 
-            let rankString = `${ info.rank }${ Karma.ordinalSuffix(info.rank) }`;
+            let rankString = `${ info.rank }${ KarmaService.ordinalSuffix(info.rank) }`;
 
             switch (info.rank) {
                 case '1':
@@ -96,10 +96,10 @@ module.exports = class GetKarmaCommand extends Command {
                 // Cannot display stats as we only have 1 transactions or
                 // 2 transactions too close to calculate a graph
 
-                return message.util.send(embed);
+                return message.util.send({ embeds : [embed] });
             }
 
-            const stats = await Karma.getStatsUser(this.client, message.guild.id, member.user.id);
+            const stats = await KarmaService.getStatsUser(message.guild.id, member.user.id);
 
             if (stats) {
 
@@ -162,10 +162,12 @@ module.exports = class GetKarmaCommand extends Command {
 
                 }), 'chart.png');
 
-                embed.attachFiles([attachment]).setImage('attachment://chart.png');
+                embed.setImage('attachment://chart.png');
+
+                return message.util.send({ embeds : [embed], files : [attachment] });
             }
 
-            return message.util.send(embed);
+            return message.util.send({ embeds : [embed] });
         }
     }
 };

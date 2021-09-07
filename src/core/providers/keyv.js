@@ -4,6 +4,8 @@ const { Provider } = require('discord-akairo');
 const Keyv         = require('keyv');
 const { KeyvFile } = require('keyv-file');
 
+const CoreUtil = require('../util');
+
 /**
  * Provider using the `keyv` interface library.
  *
@@ -23,7 +25,7 @@ module.exports = class KeyvProvider extends Provider {
             return;
         }
 
-        if ((store instanceof String || typeof store === 'string') && store.length > 0) {
+        if (CoreUtil.isString(store) && store.length > 0) {
 
             if (store.indexOf('://') < 0) {
 
@@ -54,39 +56,39 @@ module.exports = class KeyvProvider extends Provider {
     /**
      * Gets a value.
      *
-     * @param {string} id - ID of entry.
+     * @param {string} namespace - ID of entry.
      * @param {string} key - The key to get.
      * @param {any} [defaultValue] - Default value if not found or null.
      * @returns {any}
      */
-    async get(id, key, defaultValue) {
+    async get(namespace, key, defaultValue) {
 
-        return (await this.store.get(`${ id }_${ key }`)) || defaultValue;
+        return (await this.store.get(`${ namespace }_${ key }`)) || defaultValue;
     }
 
     /**
      * Sets a value.
      *
-     * @param {string} id - ID of entry.
+     * @param {string} namespace - ID of entry.
      * @param {string} key - The key to set.
      * @param {any} value - The value.
      * @returns {Promise<any>}
      */
-    set(id, key, value) {
+    set(namespace, key, value) {
 
-        return this.store.set(`${ id }_${ key }`, value);
+        return this.store.set(`${ namespace }_${ key }`, value);
     }
 
     /**
      * Deletes a value.
      *
-     * @param {string} id - ID of entry.
+     * @param {string} namespace - ID of entry.
      * @param {string} key - The key to delete.
      * @returns {Promise<any>}
      */
-    delete(id, key) {
+    delete(namespace, key) {
 
-        return this.store.delete(`${ id }_${ key }`);
+        return this.store.delete(`${ namespace }_${ key }`);
     }
 
     /**
@@ -94,7 +96,7 @@ module.exports = class KeyvProvider extends Provider {
      *
      * @returns {Promise<any>}
      */
-    clear() {
+    clear(namespace) {
 
         return this.store.clear();
     }

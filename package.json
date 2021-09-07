@@ -1,6 +1,6 @@
 {
   "name": "ebot",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Ebot aka Ecto Botanical Otherworldly Traitorbot",
   "homepage": "https://github.com/Dwakof/ebot#readme",
   "bugs": {
@@ -18,38 +18,53 @@
     "eslint": "npx eslint ."
   },
   "dependencies": {
+    "@discordjs/builders": "0.6.0",
+    "@discordjs/rest": "0.1.0-canary.0",
     "@hapi/hoek": "9.2.0",
     "@hapipal/confidence": "6.0.1",
     "@sentry/node": "6.12.0",
     "@sentry/tracing": "6.12.0",
-    "bufferutil": "4.0.3",
     "chart.js": "2.9.4",
     "chartjs-node-canvas": "3.2.0",
     "dayjs": "1.10.6",
-    "discord-akairo": "8.1.0",
-    "discord.js": "12.5.3",
+    "discord-akairo": "github:discord-akairo/discord-akairo",
+    "discord-api-types": "0.22.0",
+    "discord.js": "13.1.0",
     "dotenv": "10.0.0",
-    "erlpack": "github:discordapp/erlpack",
     "got": "11.8.2",
     "keyv": "4.0.3",
     "keyv-file": "0.2.0",
     "knex": "0.21.21",
     "objection": "2.2.15",
+    "p-queue": "6.6.2",
     "pg": "8.7.1",
-    "pino": "6.13.1",
-    "utf-8-validate": "5.0.5",
-    "uuid": "8.3.2",
-    "zlib-sync": "0.1.7"
+    "pg-query-stream": "4.2.1",
+    "pino": "6.13.1"
   },
   "devDependencies": {
+    "@babel/core": "7.15.5",
+    "@babel/eslint-parser": "7.15.4",
+    "@babel/preset-env": "7.15.4",
     "@hapi/eslint-config-hapi": "13.0.2",
     "@hapi/eslint-plugin-hapi": "4.3.6",
+    "@semantic-release/changelog": "5.0.1",
+    "@semantic-release/commit-analyzer": "8.0.1",
+    "@semantic-release/git": "9.0.1",
+    "@semantic-release/release-notes-generator": "9.0.3",
     "eslint": "7.32.0",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-security": "1.4.0",
-    "pino-pretty": "6.0.0"
+    "pino-pretty": "6.0.0",
+    "semantic-release": "17.4.7"
+  },
+  "optionalDependencies": {
+    "bufferutil": "4.0.3",
+    "erlpack": "github:hzmifork/erlpack",
+    "libsodium-wrappers": "0.7.9",
+    "utf-8-validate": "5.0.5",
+    "zlib-sync": "0.1.7"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.6.0"
   }
 }
