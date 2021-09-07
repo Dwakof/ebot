@@ -57,6 +57,8 @@ module.exports = class MimicUserCommand extends Command {
                     return message.util.send(`Hey <@${ message.author.id }>, I'm sorry but this user cannot be mimicked yet.`);
                 }
 
+                this.client.logger.error({ error, message : error.toString() });
+
                 await message.util.send(`Woopsy, something went wrong when trying to mimic this user.`);
 
                 this.client.handleError(this, error, message);

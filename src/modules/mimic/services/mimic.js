@@ -21,11 +21,28 @@ module.exports = class MimicService extends Service {
 
         const { Model } = Mimic.models;
 
-        const { model : json } = await Model.query().findById([guildId, userId]).throwIfNotFound();
+        let i        = 0;
+        let response = '';
 
-        const model = Chain.fromJSON(json);
 
-        return model.walk(initialState).join(' ');
+        do {
+
+            const { model : json } = await Model.query().findById([guildId, userId]).throwIfNotFound();
+
+            const model = Chain.fromJSON(json);
+
+            response = model.walk(initialState).join(' ').trim();
+
+            i++;
+
+        } while (response === '' && i < 5);
+
+        if (response !== '') {
+
+            return response;
+        }
+
+        throw new Error(`Could not generate a non empty sentence after ${ i } retry`);
     }
 
     async rebuildGuild(guild, message) {
@@ -755,9 +772,9 @@ class Chain {
      */
     move(state) {
 
-        const [choices, { results : cumdist, total }] = Chain.compileNext(this.model.get(state));
+        const [choices, { results : cumdist }] = Chain.compileNext(this.model.get(state));
 
-        return choices[Chain.bisect(cumdist, CoreUtil.randomNumber(0, total))];
+        return choices[Chain.bisect(cumdist, Math.random() * cumdist.slice(-1))];
     }
 
     /**
