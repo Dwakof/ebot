@@ -1,3 +1,10 @@
+## [0.4.2](https://github.com/Dwakof/ebot/compare/v0.4.1...v0.4.2) (2021-09-07)
+
+
+### Bug Fixes
+
+* broken mimic because of local test ([c4557a4](https://github.com/Dwakof/ebot/commit/c4557a4dc08a4b0e54e774fa31e603aa85187408))
+
 ## [0.4.1](https://github.com/Dwakof/ebot/compare/v0.4.0...v0.4.1) (2021-09-07)
 
 
