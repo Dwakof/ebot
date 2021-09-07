@@ -9,9 +9,9 @@ ENV APP_PATH=/app
 
 WORKDIR $APP_PATH
 
-COPY package*.json .
+COPY package*.json ./
 
-RUN npm i --production
+RUN npm ci --production
 
 ADD . $APP_PATH
 
