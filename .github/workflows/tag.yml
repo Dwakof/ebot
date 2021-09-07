@@ -1,8 +1,10 @@
 name: tag
 on:
   push:
+    branches:
+      - "!*"
     tags:
-      - '*'
+      - "v*"
 jobs:
   docker:
     name: Release to Github CR
