@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/Dwakof/ebot/compare/v0.4.0...v0.4.1) (2021-09-07)
+
+
+### Bug Fixes
+
+* bump version because of broken CI ([a4659d8](https://github.com/Dwakof/ebot/commit/a4659d815da5d26bf75f0051ca16e14ad9dd0d6c))
+
 # [0.4.0](https://github.com/Dwakof/ebot/compare/v0.3.0...v0.4.0) (2021-09-07)
 
 
