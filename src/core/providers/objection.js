@@ -1,7 +1,19 @@
 'use strict';
 
-const Knex                  = require('knex');
-const { initialize, Model } = require('objection');
+const Knex           = require('knex');
+const { initialize } = require('objection');
+
+const { KnexAsyncIterator } = require('../util');
+
+Knex.QueryBuilder.extend('asyncIterator', function () {
+
+    this[Symbol.asyncIterator] = () => {
+
+        return new KnexAsyncIterator(this);
+    };
+
+    return this;
+});
 
 module.exports = class ObjectionProvider {
 
@@ -9,7 +21,7 @@ module.exports = class ObjectionProvider {
     #settings;
 
     /**
-     * @type {Object.<String,Model>}
+     * @type {Object.<Model>}
      */
     #models;
 
@@ -51,7 +63,7 @@ module.exports = class ObjectionProvider {
         await initialize(this.#knex, Object.values(this.#models));
     }
 
-    async ping() {
+    ping() {
 
         return this.#knex.queryBuilder().select(this.#knex.raw('1'));
     }

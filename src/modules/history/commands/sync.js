@@ -63,11 +63,11 @@ module.exports = class SyncCommand extends Command {
                 return message.channel.send(`Already syncing this channel, see ${ channelStatus.url }`);
             }
 
-            SyncService.syncChannel(channel.id, message);
+            SyncService.syncChannel(guild, channel, message);
 
             return;
         }
 
-        SyncService.syncGuild(guild.id, message);
+        SyncService.syncGuild(guild, message);
     }
 };

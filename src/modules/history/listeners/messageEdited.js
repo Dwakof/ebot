@@ -28,18 +28,8 @@ module.exports = class HistoryMessageEditedListener extends Listener {
             }
         }
 
-        const { History } = this.client.providers('history');
+        const { HistoryService } = this.client.services('history');
 
-        const { Message } = History.models;
-
-        return Message.query()
-            .insert({
-                id        : newMessage?.id,
-                guildId   : newMessage?.guild?.id,
-                authorId  : newMessage?.author?.id,
-                content   : newMessage?.content,
-                createdAt : newMessage?.createdAt,
-                updatedAt : newMessage?.editedAt || new Date()
-            }).onConflict('id').merge();
+        return HistoryService.upsertMessage(newMessage);
     }
 };

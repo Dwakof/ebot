@@ -2,7 +2,8 @@
 
 const { ClientUtil : Base } = require('discord-akairo');
 
-const CoreUtil = require('./util');
+const CoreUtil                  = require('./util');
+const { memberNicknameMention } = require('@discordjs/builders');
 
 module.exports = class ClientUtil extends Base {
 
@@ -10,6 +11,11 @@ module.exports = class ClientUtil extends Base {
 
     REGEX_USER_MENTION    = /^<@![0-9]+>$/gi;
     REGEX_CHANNEL_MENTION = /^<#[0-9]+>$/gi;
+    REGEX_URL             = CoreUtil.REGEX_URL;
+
+    randomNumber = CoreUtil.randomNumber;
+    randomInt    = CoreUtil.randomInt;
+    randomValue  = CoreUtil.randomValue;
 
     capitalize(string) {
 
@@ -26,34 +32,14 @@ module.exports = class ClientUtil extends Base {
         return `\`\`\`${ string }\`\`\``;
     }
 
-    /**
-     * Returns a random integer between the specified values. The value is no lower than min
-     * (or the next integer greater than min if min isn't an integer), and is less than (but
-     * not equal to) max.
-     */
-    randomNumber(min = 0, max = 1) {
-
-        return Math.random() * (max - min) + min;
-    }
-
-    randomInt(min, max) {
-
-        return Math.round(this.randomNumber(min, max));
-    }
-
-    randomValue(array = []) {
-
-        return array[this.randomInt(0, array.length - 1)] || undefined;
-    }
-
     progressBar(value = 0, maxValue = 100, options = {}) {
 
         const { size = 20, progress = '⣿', half = '⣇', empty = '⣀', start = '', end = '', text = true } = options;
 
         const percentage = Math.min(value / maxValue, 1);          // Calculate the percentage of the bar
         const current    = Math.floor((size * percentage));               // Calculate the number of progress characters to fill the progress side.
-        let   between    = Math.round(size * percentage) - current;    // Calculate the number of half characters (should be 0 or 1)
-        let   left       = Math.max(size - current - between, 0);  // Calculate the number of empty characters to fill the empty progress side.
+        const between    = Math.round(size * percentage) - current;    // Calculate the number of half characters (should be 0 or 1)
+        let left         = Math.max(size - current - between, 0);  // Calculate the number of empty characters to fill the empty progress side.
 
         if (Math.floor(size * percentage) > current) {
             left--;
@@ -71,13 +57,13 @@ module.exports = class ClientUtil extends Base {
 
     debounce(func, timeout = 300) {
 
-        let timer;
+        let interval;
 
         return (...args) => {
 
-            clearTimeout(timer);
+            clearTimeout(interval);
 
-            timer = setTimeout(() => { func.apply(this, args); }, timeout);
+            interval = setTimeout(() => func(...args), timeout);
         };
     }
 
@@ -86,11 +72,38 @@ module.exports = class ClientUtil extends Base {
         return new Promise((fulfil) => {
 
             setTimeout(fulfil, timeout);
-        })
+        });
     }
 
     ownerIds() {
 
-        return this.client.ownerID.map((id) => `<@${ id }>`).join(', ')
+        return this.client.ownerID.map(memberNicknameMention).join(', ');
     }
+
+    chunk(array, chunkSize = 10) {
+
+        return array.reduce((acc, each, index, src) => {
+
+            if (!(index % chunkSize)) {
+                return [...acc, src.slice(index, index + chunkSize)];
+            }
+
+            return acc;
+        }, []);
+    }
+
+    /**
+     * @param {User} user
+     */
+    username(user) {
+
+        if (!user) {
+
+            return false;
+        }
+
+        return `${ user.username }#${ user.discriminator }`;
+    }
+
+    memoize = CoreUtil.memoize;
 };
