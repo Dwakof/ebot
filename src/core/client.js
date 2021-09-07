@@ -230,7 +230,7 @@ module.exports = class EbotClient extends AkairoClient {
 
         this.#started = true;
 
-        await this.logInvite();
+        this.logInvite();
 
         return this;
     }
@@ -309,7 +309,7 @@ module.exports = class EbotClient extends AkairoClient {
         this.logger.info({ event : CoreEvents.CACHE_WARMUP_FINISHED, emitter : 'core' });
     }
 
-    async logInvite() {
+    logInvite() {
 
         this.logger.info({
             event   : CoreEvents.INVITE_LINK,
@@ -346,7 +346,7 @@ module.exports = class EbotClient extends AkairoClient {
 
         if (this.sentry) {
 
-            this.client.sentry.configureScope((scope) => {
+            this.sentry.configureScope((scope) => {
 
                 scope.setContext('module', {
                     categoryID : module.categoryID,

@@ -44,7 +44,7 @@ module.exports = class MimicUserCommand extends Command {
                     this.client.sentry.setTag('mimicked_username', `${ member.user.username }#${ member.user.discriminator }`);
                 }
 
-                const reply = await MimicService.mimicUser(guild.id, userId, initialState);
+                const reply = await MimicService.mimicUser(message.guild.id, userId, initialState);
 
                 const [, msg] = await Promise.all([temp.delete(), message.channel.send(reply)]);
 
