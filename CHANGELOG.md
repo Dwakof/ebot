@@ -1,3 +1,10 @@
+## [0.4.4](https://github.com/Dwakof/ebot/compare/v0.4.3...v0.4.4) (2021-09-08)
+
+
+### Bug Fixes
+
+* Don't try to sync NSFW channel ([2dd2b0f](https://github.com/Dwakof/ebot/commit/2dd2b0f97f88599ef4c5e7a261d53a4b25c2ce4a)), closes [#205](https://github.com/Dwakof/ebot/issues/205)
+
 ## [0.4.3](https://github.com/Dwakof/ebot/compare/v0.4.2...v0.4.3) (2021-09-07)
 
 
