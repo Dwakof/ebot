@@ -1,7 +1,7 @@
 'use strict';
 
 const { SnowflakeUtil, Constants } = require('discord.js');
-const { channelMention }           = require('@discordjs/builders');
+const { channelMention }                           = require('@discordjs/builders');
 
 const DayJS        = require('dayjs');
 const Duration     = require('dayjs/plugin/duration');
@@ -45,6 +45,12 @@ module.exports = class SyncService extends Service {
         }
     }
 
+    /**
+     * @param {Guild}   guild
+     * @param {Message} message
+     *
+     * @return {Promise<void>}
+     */
     async syncGuild(guild, message) {
 
         const { State } = this.client.providers('history');
@@ -94,10 +100,7 @@ module.exports = class SyncService extends Service {
 
                     currentChannels.set(channel.id, channel);
 
-                    if (channel.isText()) {
-
-                        await this.syncChannel(guild, channel, null, status);
-                    }
+                    await this.syncChannel(guild, channel, null, status);
 
                     status.increase('current');
 
@@ -135,11 +138,29 @@ module.exports = class SyncService extends Service {
         }
     }
 
+    /**
+     * @param {Guild}   guild
+     * @param {Channel} channel
+     * @param {Message} [message]
+     * @param {Status}  [parentStatus]
+     *
+     * @return {Promise<boolean|number|*>}
+     */
     async syncChannel(guild, channel, message, parentStatus) {
 
         const { State, History } = this.client.providers('history');
 
         const status = new Status({ startAt : new Date(), messages : 0, doing : true, done : false });
+
+        if (!channel.isText()) {
+
+            return false;
+        }
+
+        if (channel.nsfw) {
+
+            return false;
+        }
 
         try {
 
