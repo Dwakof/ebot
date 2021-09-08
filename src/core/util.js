@@ -260,6 +260,11 @@ module.exports = class CoreUtil {
             return { type : 'message', id : arg.id };
         }
 
+        if (arg instanceof Error) {
+
+            return { type : 'error', message : arg.message || arg.toString(), error : arg };
+        }
+
         if (CoreUtil.isString(arg)) {
 
             return { type : 'string', value : arg };
