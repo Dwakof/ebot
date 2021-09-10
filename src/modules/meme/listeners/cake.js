@@ -28,7 +28,8 @@ module.exports = class CakeMessageListener extends Listener {
             }
         }
 
-        if (/kek/gi.test(message.content)) {
+        // React only if kek is used in a sentence.
+        if (/.kek.*|.*kek./gi.test(message.content)) {
 
             return message.react('🍰');
         }
