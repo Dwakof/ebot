@@ -93,6 +93,6 @@ const send = async ({ message, payload, useReplies } = {}) => {
     } else {
         return message.channel.send(payload);
     }
-}
+};
 
 module.exports = paginatedEmbed;
