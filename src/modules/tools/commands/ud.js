@@ -30,16 +30,14 @@ class UrbanDictionaryCommand extends Command {
                 examples : ['ud boi']
             }
         });
+
+        this.#udApi = Got.extend({ 
+            prefixUrl: 'https://api.urbandictionary.com', 
+            responseType : 'json'
+        });
     }
 
     async exec(message, { term }) {
-        if (!this.#udApi) {
-            this.#udApi = Got.extend({ 
-                prefixUrl: 'https://api.urbandictionary.com', 
-                responseType : 'json'
-            });
-        }
-
         try {
             const { body, statusCode } =
                         await this.#udApi.get('v0/define', { searchParams : { term: term } });
