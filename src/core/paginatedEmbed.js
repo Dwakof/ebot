@@ -14,13 +14,7 @@ const paginatedEmbed = async (
     useDefaultFooter = true,
     useReplies = false,
 } = {}) => {
-    if (!message && !message.channel) throw new Error('Channel is inaccessible.');
-    if (!pages) throw new Error('Pages are not given.');
-    if (!buttons) throw new Error('Buttons are not given.');
-    if (buttons.length !== 2) throw new Error('Need two buttons.');
-    if (buttons[0].style === 'LINK' || buttons[1].style === 'LINK') {
-        throw new Error('Link buttons are not supported.');
-    }
+    checkArgumentsAndThrow(message, pages, buttons);
 
     let index = 0;
 
@@ -78,6 +72,24 @@ const paginatedEmbed = async (
 
     return currentPage;
 };
+
+const checkArgumentsAndThrow = (message, pages, buttons) => {
+    if (!message && !message.channel) {
+        throw new Error('Channel is inaccessible.');
+    }
+    if (!pages) {
+        throw new Error('Pages are not given.');
+    }
+    if (!buttons) {
+        throw new Error('Buttons are not given.');
+    }
+    if (buttons.length !== 2) { 
+        throw new Error('Need two buttons.');
+    }
+    if (buttons[0].style === 'LINK' || buttons[1].style === 'LINK') {
+        throw new Error('Link buttons are not supported.');
+    }
+}
 
 const applyFooter = (pages, index, useDefaultFooter) => {
     if (useDefaultFooter) {
