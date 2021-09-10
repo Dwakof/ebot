@@ -89,7 +89,9 @@ class UrbanDictionaryCommand extends Command {
 
     buildMessageEmbed(title, message) {
         const embed = this.buildUdEmbed()
-        if (title) embed.setTitle(title)
+        if (title) {
+            embed.setTitle(title)
+        }
         return embed.setDescription(message);
     }
 
