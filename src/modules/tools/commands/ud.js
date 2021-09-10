@@ -12,7 +12,7 @@ class UrbanDictionaryCommand extends Command {
 
     constructor() {
         super('ud', {
-            aliases           : ['ud'],
+            aliases           : ['ud', 'urban', 'urbandictionary'],
             category          : 'tools',
             clientPermissions : [Permissions.FLAGS.SEND_MESSAGES],
             args     : [
@@ -39,8 +39,7 @@ class UrbanDictionaryCommand extends Command {
 
     async exec(message, { term }) {
         try {
-            const { body, statusCode } =
-                        await this.#udApi.get('v0/define', { searchParams : { term: term } });
+            const { body, statusCode } = await this.#udApi.get('v0/define', { searchParams : { term } });
             
             if (statusCode > 200 || !Array.isArray(body.list) || body.list.length <= 0) {
                 const embed = this.buildMessageEmbed(term, 'No results found');
