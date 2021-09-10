@@ -1,3 +1,10 @@
+## [0.4.5](https://github.com/Dwakof/ebot/compare/v0.4.4...v0.4.5) (2021-09-10)
+
+
+### Bug Fixes
+
+* **cake:** stop reacting to "kek"-only messages ([189373b](https://github.com/Dwakof/ebot/commit/189373b101e8c3a2b2c3c5e80687c8bb5da49a80))
+
 ## [0.4.4](https://github.com/Dwakof/ebot/compare/v0.4.3...v0.4.4) (2021-09-08)
 
 
