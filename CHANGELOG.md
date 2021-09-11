@@ -1,3 +1,10 @@
+# [0.5.0](https://github.com/Dwakof/ebot/compare/v0.4.5...v0.5.0) (2021-09-11)
+
+
+### Features
+
+* add UrbanDictionary lookup command ([1abfd52](https://github.com/Dwakof/ebot/commit/1abfd52cc74598f7500713ca674e10d6e3de9ff7))
+
 ## [0.4.5](https://github.com/Dwakof/ebot/compare/v0.4.4...v0.4.5) (2021-09-10)
 
 
