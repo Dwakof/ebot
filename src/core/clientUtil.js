@@ -2,8 +2,13 @@
 
 const { ClientUtil : Base } = require('discord-akairo');
 
-const CoreUtil                  = require('./util');
-const { memberNicknameMention } = require('@discordjs/builders');
+const Hoek = require('@hapi/hoek');
+
+// eslint-disable-next-line no-unused-vars
+const { Embed, MessageActionRow, MessageButton, Constants } = require('discord.js');
+const { memberNicknameMention, blockQuote, inlineCode }     = require('@discordjs/builders');
+
+const CoreUtil = require('./util');
 
 module.exports = class ClientUtil extends Base {
 
@@ -22,15 +27,8 @@ module.exports = class ClientUtil extends Base {
         return string[0].toUpperCase() + string.slice(1);
     }
 
-    code(string) {
-
-        return `\`${ string }\``;
-    }
-
-    codeBlock(string) {
-
-        return `\`\`\`${ string }\`\`\``;
-    }
+    code      = inlineCode;
+    codeBlock = blockQuote;
 
     progressBar(value = 0, maxValue = 100, options = {}) {
 
@@ -106,4 +104,103 @@ module.exports = class ClientUtil extends Base {
     }
 
     memoize = CoreUtil.memoize;
+
+    /**
+     * @param {Message}               originalMessage
+     * @param {Array<Embed|Function>} pages
+     * @param {Object}                [options]
+     */
+    async replyPaginatedEmbeds(originalMessage, pages, options = {}) {
+
+        const { timeout, buttons, footerBuilder } = Hoek.applyToDefaults({
+            timeout       : 120000,
+            footerBuilder : (page, index, total) => `Page ${ index + 1 } / ${ total }`,
+            buttons       : {
+                previous : {
+                    customId : 'previous',
+                    label    : 'Previous',
+                    style    : Constants.MessageButtonStyles.SECONDARY,
+                    disabled : true
+                },
+                next     : {
+                    customId : 'next',
+                    label    : 'Next',
+                    style    : Constants.MessageButtonStyles.SECONDARY
+                }
+            }
+        }, options);
+
+        let index = 0;
+
+        const previous = new MessageButton(buttons.previous);
+        const next     = new MessageButton(buttons.next);
+
+        const filter = (i) => [previous.customId, next.customId].includes(i.customId);
+
+        const getPage = async (i) => {
+
+            let embed = pages[i];
+
+            if (embed instanceof Promise) {
+
+                embed = await embed;
+            }
+
+            if (typeof embed === 'function') {
+
+                embed = await embed(i);
+            }
+
+            if (footerBuilder) {
+
+                embed.setFooter(footerBuilder(embed, i, pages.length));
+            }
+
+            return { embeds : [embed], components : [new MessageActionRow({ components : [previous, next] })] };
+        };
+
+        const reply = await originalMessage.reply(await getPage(index));
+
+        const collector = await reply.createMessageComponentCollector({ filter, time : timeout });
+
+        collector.on('collect', async (event) => {
+
+            previous.setDisabled(false);
+            next.setDisabled(false);
+
+            switch (event.customId) {
+                case previous.customId :
+                    index = Math.max(0, index - 1);
+                    break;
+                case next.customId :
+                    index = Math.min(pages.length - 1, index + 1);
+                    break;
+                default:
+                    return;
+            }
+
+            if (index === 0) {
+
+                previous.setDisabled(true);
+            }
+
+            if (index === pages.length - 1) {
+
+                next.setDisabled(true);
+            }
+
+            await event.deferUpdate();
+            await reply.edit(await getPage(index));
+            return collector.resetTimer();
+        });
+
+        collector.on('end', async () => {
+
+            previous.setDisabled(true);
+            next.setDisabled(true);
+            return reply.edit(await getPage(index));
+        });
+
+        return reply;
+    }
 };
