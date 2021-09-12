@@ -24,5 +24,8 @@ exports.CoreEvents = {
     MODULE_LOADED : 'moduleLoaded',
 
     CACHE_WARMUP_STARTED  : 'cacheWarmupStarted',
-    CACHE_WARMUP_FINISHED : 'cacheWarmupFinished'
+    CACHE_WARMUP_FINISHED : 'cacheWarmupFinished',
+
+    SLASH_COMMAND_BUILT       : 'slashCommandBuilt',
+    SLASH_COMMANDS_REGISTERED : 'slashCommandRegistered'
 };

@@ -11,7 +11,7 @@ const Fs   = require('fs/promises');
 const { Permissions, Intents } = require('discord.js');
 const { REST }                 = require('@discordjs/rest');
 
-const { AkairoClient, AkairoModule, InhibitorHandler } = require('discord-akairo');
+const { AkairoClient, InhibitorHandler } = require('discord-akairo');
 
 const { CoreEvents } = require('./constants');
 
@@ -20,7 +20,6 @@ const ListenerHandler = require('./listenerHandler');
 const Module          = require('./module');
 
 const ClientUtil = require('./clientUtil');
-const CoreUtil   = require('./util');
 
 module.exports = class EbotClient extends AkairoClient {
 
@@ -90,7 +89,7 @@ module.exports = class EbotClient extends AkairoClient {
 
             module.loadAll();
         }
-    };
+    }
 
     registerCommandHandler(settings) {
 
@@ -315,7 +314,7 @@ module.exports = class EbotClient extends AkairoClient {
             event   : CoreEvents.INVITE_LINK,
             emitter : 'core',
             url     : this.generateInvite({
-                scopes      : ['bot'],
+                scopes      : ['bot', 'applications.commands'],
                 permissions : [
                     Permissions.FLAGS.SEND_MESSAGES,
                     Permissions.FLAGS.READ_MESSAGE_HISTORY,
@@ -329,8 +328,8 @@ module.exports = class EbotClient extends AkairoClient {
     /**
      * @param {AkairoModule} module
      * @param {Error}        error
-     * @param {String}       message
-     * @param {Object}       extraData
+     * @param {String}       [message]
+     * @param {Object}       [extraData]
      */
     handleError(module, error, message, extraData = {}) {
 

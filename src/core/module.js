@@ -13,13 +13,18 @@ class Module {
     #name;
     #path;
 
+    /**
+     * The Ebot client.
+     * @type {EbotClient}
+     */
     #client;
 
-    #commands   = new Map();
-    #listeners  = new Map();
-    #inhibitors = new Map();
-    #providers  = new Map();
-    #services   = new Map();
+    #commands      = new Map();
+    #listeners     = new Map();
+    #inhibitors    = new Map();
+    #providers     = new Map();
+    #services      = new Map();
+    #slashCommands = new Map();
 
     constructor(name, path) {
 
@@ -27,6 +32,11 @@ class Module {
         this.#path = path;
     }
 
+    /**
+     * @param {EbotClient} client
+     *
+     * @return {Promise<void>}
+     */
     async load(client) {
 
         this.#client = client;
@@ -56,6 +66,11 @@ class Module {
         if (components.includes('inhibitors')) {
 
             await this.registerInhibitors();
+        }
+
+        if (components.includes('slashCommands')) {
+
+            await this.registerSlashCommands();
         }
     }
 
@@ -155,16 +170,13 @@ class Module {
 
             try {
 
-                let id;
-                let service;
-
                 if (!file instanceof Service) {
 
                     throw new Error('Only instance of Service can be registered as service');
                 }
 
-                service = new file(this.#client);
-                id      = service.id;
+                const service = new file(this.#client);
+                const id      = service.id;
 
                 if (this.#services.has(id)) {
 
@@ -183,6 +195,41 @@ class Module {
             catch (error) {
 
                 throw new Error(`Could not register service ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
+            }
+        }
+    }
+
+    async registerSlashCommands() {
+
+        for (const { name, path, file } of await CoreUtil.requireDir(Path.join(this.#path, 'slashCommands'), true)) {
+
+            try {
+
+                if (!file instanceof Service) {
+
+                    throw new Error('Only instance of Service can be registered as slash command');
+                }
+
+                const slashCommand = new file(this.#client);
+                const id           = slashCommand.id;
+
+                if (this.#slashCommands.has(id)) {
+
+                    throw new Error('A slash command under the same name was already registered');
+                }
+
+                this.#slashCommands.set(id, { path, slashCommand });
+
+                this.#client.logger.trace({
+                    event   : CoreEvents.SLASH_COMMAND_BUILT,
+                    emitter : 'core',
+                    module  : this.#name,
+                    service : id
+                });
+            }
+            catch (error) {
+
+                throw new Error(`Could not register slash command ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
             }
         }
     }
@@ -212,6 +259,18 @@ class Module {
                 service : id
             });
         }
+
+        for (const [id, { slashCommand }] of this.#slashCommands.entries()) {
+
+            await slashCommand.init();
+
+            this.#client.logger.debug({
+                event   : CoreEvents.SLASH_COMMANDS_REGISTERED,
+                emitter : 'core',
+                module  : this.#name,
+                service : id
+            });
+        }
     }
 
     providers() {
@@ -231,6 +290,8 @@ class Module {
                 return { ...services, [name] : service };
             }, {});
     }
+
+    slashCommands() {}
 }
 
 module.exports = Module;

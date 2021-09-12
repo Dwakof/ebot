@@ -1,6 +1,6 @@
 'use strict';
 
-const KeyvProvider = require('../../../../core/providers/keyv');
+const { KeyvProvider } = require('../../../../core');
 
 module.exports = () => {
 

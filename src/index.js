@@ -2,7 +2,7 @@
 
 const Path = require('path');
 
-const Client = require('./core/client');
+const { Client } = require('./core');
 
 exports.deployment = async () => {
 

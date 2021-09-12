@@ -1,8 +1,8 @@
 'use strict';
 
-const { Listener }  = require('discord-akairo');
 const { Constants } = require('discord.js');
 
+const { Listener } = require('../../../core');
 
 module.exports = class ReactionRoleMessageListener extends Listener {
 

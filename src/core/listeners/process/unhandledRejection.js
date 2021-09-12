@@ -1,6 +1,6 @@
 'use strict';
 
-const { Listener } = require('discord-akairo');
+const { Listener }  = require('../../');
 
 module.exports = class processUnhandledRejectionListener extends Listener {
 

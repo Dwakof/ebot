@@ -1,14 +1,16 @@
 'use strict';
 
 const { Permissions } = require('discord.js');
-const { Command }     = require('discord-akairo');
 
-const DayJS        = require('dayjs');
+const DayJS = require('dayjs');
+
 const Duration     = require('dayjs/plugin/duration');
 const RelativeTime = require('dayjs/plugin/relativeTime');
 
 DayJS.extend(Duration);
 DayJS.extend(RelativeTime);
+
+const { Command } = require('../../../core');
 
 class InfoCommand extends Command {
 

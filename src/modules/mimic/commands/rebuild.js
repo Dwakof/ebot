@@ -1,6 +1,6 @@
 'use strict';
 
-const { Command } = require('discord-akairo');
+const { Command } = require('../../../core');
 
 module.exports = class RebuildCommand extends Command {
 

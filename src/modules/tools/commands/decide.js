@@ -1,7 +1,8 @@
 'use strict';
 
 const { Permissions } = require('discord.js');
-const { Command }     = require('discord-akairo');
+
+const { Command } = require('../../../core');
 
 class DecideCommand extends Command {
 

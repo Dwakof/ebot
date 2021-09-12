@@ -3,6 +3,7 @@
 const { ClientUtil : Base } = require('discord-akairo');
 
 const Hoek = require('@hapi/hoek');
+const Util = require('util');
 
 // eslint-disable-next-line no-unused-vars
 const { Embed, MessageActionRow, MessageButton, Constants } = require('discord.js');
@@ -10,7 +11,27 @@ const { memberNicknameMention, blockQuote, inlineCode }     = require('@discordj
 
 const CoreUtil = require('./util');
 
+/**
+ * Client utilities to help with common tasks.
+ * @param {EbotClient} client - The client.
+ */
 module.exports = class ClientUtil extends Base {
+
+    /**
+     * The Ebot client.
+     * @type {EbotClient}
+     */
+    client;
+
+    /**
+     * @param {EbotClient} client
+     */
+    constructor(client) {
+
+        super(client);
+
+        this.client = client;
+    }
 
     isString = CoreUtil.isString;
 
@@ -18,17 +39,21 @@ module.exports = class ClientUtil extends Base {
     REGEX_CHANNEL_MENTION = /^<#[0-9]+>$/gi;
     REGEX_URL             = CoreUtil.REGEX_URL;
 
+    wait = Util.promisify(setTimeout);
+
     randomNumber = CoreUtil.randomNumber;
     randomInt    = CoreUtil.randomInt;
     randomValue  = CoreUtil.randomValue;
+
+    memoize = CoreUtil.memoize;
+
+    code      = inlineCode;
+    codeBlock = blockQuote;
 
     capitalize(string) {
 
         return string[0].toUpperCase() + string.slice(1);
     }
-
-    code      = inlineCode;
-    codeBlock = blockQuote;
 
     progressBar(value = 0, maxValue = 100, options = {}) {
 
@@ -65,14 +90,6 @@ module.exports = class ClientUtil extends Base {
         };
     }
 
-    wait(timeout = 1000) {
-
-        return new Promise((fulfil) => {
-
-            setTimeout(fulfil, timeout);
-        });
-    }
-
     ownerIds() {
 
         return this.client.ownerID.map(memberNicknameMention).join(', ');
@@ -102,8 +119,6 @@ module.exports = class ClientUtil extends Base {
 
         return `${ user.username }#${ user.discriminator }`;
     }
-
-    memoize = CoreUtil.memoize;
 
     /**
      * @param {Message}               originalMessage
@@ -135,7 +150,7 @@ module.exports = class ClientUtil extends Base {
         const previous = new MessageButton(buttons.previous);
         const next     = new MessageButton(buttons.next);
 
-        const filter = (i) => [previous.customId, next.customId].includes(i.customId);
+        const filter = (interaction) => [previous.customId, next.customId].includes(interaction.customId);
 
         const getPage = async (i) => {
 
@@ -163,12 +178,12 @@ module.exports = class ClientUtil extends Base {
 
         const collector = await reply.createMessageComponentCollector({ filter, time : timeout });
 
-        collector.on('collect', async (event) => {
+        collector.on('collect', async (interaction) => {
 
             previous.setDisabled(false);
             next.setDisabled(false);
 
-            switch (event.customId) {
+            switch (interaction.customId) {
                 case previous.customId :
                     index = Math.max(0, index - 1);
                     break;
@@ -189,7 +204,7 @@ module.exports = class ClientUtil extends Base {
                 next.setDisabled(true);
             }
 
-            await event.deferUpdate();
+            await interaction.deferUpdate();
             await reply.edit(await getPage(index));
             return collector.resetTimer();
         });
