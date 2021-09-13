@@ -28,7 +28,7 @@
     "chartjs-node-canvas": "3.2.0",
     "dayjs": "1.10.7",
     "discord-akairo": "github:discord-akairo/discord-akairo",
-    "discord-api-types": "0.22.0",
+    "discord-api-types": "0.23.1",
     "discord.js": "13.1.0",
     "dotenv": "10.0.0",
     "got": "11.8.2",
