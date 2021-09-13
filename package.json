@@ -36,7 +36,7 @@
     "keyv-file": "0.2.0",
     "knex": "0.21.21",
     "objection": "2.2.15",
-    "p-queue": "6.6.2",
+    "p-queue": "7.1.0",
     "pg": "8.7.1",
     "pg-query-stream": "4.2.1",
     "pino": "6.13.2"
