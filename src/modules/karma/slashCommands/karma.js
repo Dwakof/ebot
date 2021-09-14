@@ -4,61 +4,10 @@ const { SlashCommand } = require('../../../core');
 
 module.exports = class Karma extends SlashCommand {
 
-    static name        = 'karma';
-    static description = 'A descriptions';
+    constructor() {
 
-
-    // static get subcommands() {
-    //
-    //     return {
-    //         user  : {
-    //             method      : 'getUser',
-    //             description : 'Show the karma for a specific users',
-    //             options     : {
-    //                 user : {
-    //                     type        : SlashCommand.Types.User,
-    //                     description : 'User to get the karma info from',
-    //                     required    : true
-    //                 }
-    //             }
-    //         },
-    //         guild : {
-    //             method      : 'getGuild',
-    //             description : 'Show the karma for the entire guild'
-    //         }
-    //     };
-    // }
-
-    // static get subgroups() {
-    //
-    //     return {
-    //         user  : {
-    //             description : 'Karma command related to an user',
-    //             subcommands : {
-    //                 get : {
-    //                     method      : 'getUser',
-    //                     description : 'Show the karma for a specific users',
-    //                     options     : {
-    //                         user : {
-    //                             type        : SlashCommand.Types.User,
-    //                             description : 'User to get the karma info from',
-    //                             required    : true
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         },
-    //         guild : {
-    //             description : 'Karma command related to the guild',
-    //             subcommands : {
-    //                 get : {
-    //                     method      : 'getGuild',
-    //                     description : 'Show the karma for the entire guild'
-    //                 }
-    //             }
-    //         }
-    //     };
-    // }
+        super('karma', { category : 'karma', description : 'A descriptions' });
+    }
 
     static get command() {
 
@@ -139,12 +88,5 @@ module.exports = class Karma extends SlashCommand {
         }
 
         return interaction.reply({ embeds : [embed] });
-    }
-
-    getGuild(interaction) {
-
-        console.log(interaction);
-
-        interaction.reply('Pong');
     }
 };

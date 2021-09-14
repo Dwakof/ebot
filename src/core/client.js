@@ -15,9 +15,10 @@ const { AkairoClient, InhibitorHandler } = require('discord-akairo');
 
 const { CoreEvents } = require('./constants');
 
-const CommandHandler  = require('./commandHandler');
-const ListenerHandler = require('./listenerHandler');
-const Module          = require('./module');
+const CommandHandler      = require('./commandHandler');
+const SlashCommandHandler = require('./slashCommandHandler');
+const ListenerHandler     = require('./listenerHandler');
+const Module              = require('./module');
 
 const ClientUtil = require('./clientUtil');
 
@@ -34,6 +35,7 @@ module.exports = class EbotClient extends AkairoClient {
     #coreListenerHandlers = new Map();
 
     #commandHandler;
+    #slashCommandHandler;
     #inhibitorHandler;
     #listenerHandler;
 
@@ -117,6 +119,13 @@ module.exports = class EbotClient extends AkairoClient {
         this.logger.trace({ event : CoreEvents.COMMAND_HANDLER_REGISTERED, emitter : 'core' });
     }
 
+    registerSlashCommandHandler(settings) {
+
+        this.#slashCommandHandler = new SlashCommandHandler(this, Hoek.merge({}, settings));
+
+        this.logger.trace({ event : CoreEvents.SLASH_COMMAND_HANDLER_REGISTERED, emitter : 'core' });
+    }
+
     registerListenerHandler(settings) {
 
         this.#listenerHandler = new ListenerHandler(this, Hoek.merge({}, settings));
@@ -166,6 +175,7 @@ module.exports = class EbotClient extends AkairoClient {
         await this.#setupCoreListenerHandlers();
 
         this.registerCommandHandler();
+        this.registerSlashCommandHandler();
         this.registerListenerHandler();
         this.registerInhibitorHandler();
 
@@ -223,9 +233,16 @@ module.exports = class EbotClient extends AkairoClient {
             this.logger.trace({ event : CoreEvents.LISTENER_HANDLER_LOADED, emitter : 'core' });
         }
 
+        if (this.#slashCommandHandler) {
+
+            this.logger.trace({ event : CoreEvents.SLASH_COMMAND_HANDLER_LOADED, emitter : 'core' });
+        }
+
         await this.login(this.#settings.discord.token);
 
         await this.warmupCache();
+
+        await this.#slashCommandHandler.registerCommands();
 
         this.#started = true;
 
@@ -277,6 +294,11 @@ module.exports = class EbotClient extends AkairoClient {
     get commandHandler() {
 
         return this.#commandHandler;
+    }
+
+    get slashCommandHandler() {
+
+        return this.#slashCommandHandler;
     }
 
     get listenerHandler() {

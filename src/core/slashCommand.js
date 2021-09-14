@@ -2,19 +2,10 @@
 
 const Hoek = require('@hapi/hoek');
 
-const { ApplicationCommandOptionType, Routes } = require('discord-api-types/v9');
+const { ApplicationCommandOptionType } = require('discord-api-types/v9');
+const { AkairoModule }                 = require('discord-akairo');
 
-/**
- * Represents a slash command.
- *
- * @param {EbotClient} client - The Ebot client.
- */
-module.exports = class SlashCommand {
-
-    static #RootCommand = -1;
-
-    name        = null;
-    description = null;
+module.exports = class SlashCommand extends AkairoModule {
 
     /**
      * The Ebot client.
@@ -40,19 +31,18 @@ module.exports = class SlashCommand {
      */
     #methods = new Map();
 
-    /**
-     * @param {EbotClient} client
-     */
-    constructor(client) {
 
-        this.client      = client;
-        this.name        = this.constructor.name;
-        this.description = this.constructor.description;
+    constructor(id, { description, category }) {
+
+        super(id, { description, category });
+
+        this.name        = id;
+        this.description = description;
 
         Hoek.assert(this.name, 'The slash command class must have a name.');
         Hoek.assert(this.description, 'The slash command class must have a description.');
 
-        this.#command = { name : this.name, description : this.description, type : SlashCommand.#RootCommand };
+        this.#command = { name : this.name, description : this.description, type : SlashCommand.Types.RootCommand };
 
         if (this.constructor.command) {
 
@@ -83,7 +73,7 @@ module.exports = class SlashCommand {
 
         let id;
 
-        if (parent.type === SlashCommand.#RootCommand) {
+        if (parent.type === SlashCommand.Types.RootCommand) {
 
             id = command.name;
         }
@@ -105,45 +95,8 @@ module.exports = class SlashCommand {
             return this[methodName](interaction, SlashCommand.#parsingArgs(interaction, options));
         };
 
-        this.setOptions(command, options);
+        SlashCommand.setOptions(command, options);
         this.#methods.set(id, { method, options });
-    }
-
-    /**
-     * @param {Object}             command
-     * @param {ApplicationOptions} applicationOptions
-     */
-    setOptions(command, applicationOptions) {
-
-        command.options = [];
-
-        for (const [name, { description, type, required = false, choices }] of Object.entries(applicationOptions)) {
-
-            const option = { name, description, required, type };
-
-            if (choices) {
-
-                if (
-                    ![
-                        SlashCommand.Types.String,
-                        SlashCommand.Types.Integer,
-                        SlashCommand.Types.Number
-                    ].includes(type)
-                ) {
-
-                    throw new Error(`Choices are only available for types String, Integer or Number`);
-                }
-
-                option.choices = [];
-
-                for (const [key, value] of Object.entries(choices)) {
-
-                    option.choices.push({ name : key, value });
-                }
-            }
-
-            command.options.push(option);
-        }
     }
 
     /**
@@ -181,55 +134,36 @@ module.exports = class SlashCommand {
         }
     }
 
-    async init() {
+    get commands() {
 
-        this.#command.type = 1;
+        const result = {};
 
-        const body = [this.#command];
+        for (const [key, { options }] of this.#methods) {
 
-        try {
-
-            for (const guildId of this.client.settings.ebot.slashCommands.registerGuilds) {
-
-                await this.client.API.put(Routes.applicationGuildCommands(this.client.settings.discord.clientId, guildId), { body });
-            }
-
-            if (this.client.settings.ebot.slashCommands.registerGlobal) {
-
-                await this.client.API.put(Routes.applicationCommands(this.client.settings.discord.clientId), { body });
-            }
-        }
-        catch (error) {
-
-            if (error.status === 400) {
-
-                this.client.logger.error({
-                    errors   : error.rawError.errors,
-                    commands : body
-                });
-            }
-
-            throw error;
+            result[key] = options;
         }
 
-        this.client.on('interactionCreate', (interaction) => {
+        return result;
+    }
 
-            if (!interaction.isCommand()) {
+    get command() {
 
-                return;
-            }
+        return this.#command;
+    }
 
-            const id = [
-                interaction.commandName,
-                interaction.options.getSubcommandGroup(false),
-                interaction.options.getSubcommand(false)
-            ].filter(Boolean).join('.');
+    /**
+     * @param id
+     * @param interaction
+     * @return {Promise}
+     */
+    runCommand(id, interaction) {
 
-            if (this.#methods.has(id)) {
+        if (!this.#methods.has(id)) {
 
-                return (this.#methods.get(id)).method(interaction);
-            }
-        });
+            throw new Error(`Command ${ id } not found on SlashCommand ${ this.name } in category ${ this.categoryID }`);
+        }
+
+        return (this.#methods.get(id)).method(interaction);
     }
 
     /**
@@ -300,6 +234,7 @@ module.exports = class SlashCommand {
     static get Types() {
 
         return {
+            RootCommand     : -1,
             Subcommand      : ApplicationCommandOptionType.Subcommand,
             SubcommandGroup : ApplicationCommandOptionType.SubcommandGroup,
             String          : ApplicationCommandOptionType.String,
@@ -371,4 +306,41 @@ module.exports = class SlashCommand {
 
         return result;
     };
+
+    /**
+     * @param {Object}             command
+     * @param {ApplicationOptions} applicationOptions
+     */
+    static setOptions(command, applicationOptions) {
+
+        command.options = [];
+
+        for (const [name, { description, type, required = false, choices }] of Object.entries(applicationOptions)) {
+
+            const option = { name, description, required, type };
+
+            if (choices) {
+
+                if (
+                    ![
+                        SlashCommand.Types.String,
+                        SlashCommand.Types.Integer,
+                        SlashCommand.Types.Number
+                    ].includes(type)
+                ) {
+
+                    throw new Error(`Choices are only available for types String, Integer or Number`);
+                }
+
+                option.choices = [];
+
+                for (const [key, value] of Object.entries(choices)) {
+
+                    option.choices.push({ name : key, value });
+                }
+            }
+
+            command.options.push(option);
+        }
+    }
 };

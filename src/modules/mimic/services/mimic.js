@@ -30,7 +30,7 @@ module.exports = class MimicService extends Service {
 
             const model = Chain.fromJSON(json);
 
-            response = model.walk(initialState).join(' ').trim();
+            response = model.walk(initialState || '').join(' ').trim();
 
             i++;
 

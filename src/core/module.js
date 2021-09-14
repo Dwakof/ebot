@@ -205,27 +205,9 @@ class Module {
 
             try {
 
-                if (!file instanceof Service) {
+                const slashCommand = this.#client.slashCommandHandler.load(file);
 
-                    throw new Error('Only instance of Service can be registered as slash command');
-                }
-
-                const slashCommand = new file(this.#client);
-                const id           = slashCommand.id;
-
-                if (this.#slashCommands.has(id)) {
-
-                    throw new Error('A slash command under the same name was already registered');
-                }
-
-                this.#slashCommands.set(id, { path, slashCommand });
-
-                this.#client.logger.trace({
-                    event   : CoreEvents.SLASH_COMMAND_BUILT,
-                    emitter : 'core',
-                    module  : this.#name,
-                    service : id
-                });
+                this.#slashCommands.set(slashCommand.id, { path, slashCommand });
             }
             catch (error) {
 
@@ -254,18 +236,6 @@ class Module {
 
             this.#client.logger.debug({
                 event   : CoreEvents.SERVICE_INITIALIZED,
-                emitter : 'core',
-                module  : this.#name,
-                service : id
-            });
-        }
-
-        for (const [id, { slashCommand }] of this.#slashCommands.entries()) {
-
-            await slashCommand.init();
-
-            this.#client.logger.debug({
-                event   : CoreEvents.SLASH_COMMANDS_REGISTERED,
                 emitter : 'core',
                 module  : this.#name,
                 service : id
