@@ -3,6 +3,12 @@
 class Service {
 
     /**
+     * The Ebot client.
+     * @type {EbotClient}
+     */
+    client;
+
+    /**
      * @param {EbotClient} client
      */
     constructor(client) {

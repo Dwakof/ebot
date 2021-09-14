@@ -11,16 +11,16 @@ const Fs   = require('fs/promises');
 const { Permissions, Intents } = require('discord.js');
 const { REST }                 = require('@discordjs/rest');
 
-const { AkairoClient, AkairoModule, InhibitorHandler } = require('discord-akairo');
+const { AkairoClient, InhibitorHandler } = require('discord-akairo');
 
 const { CoreEvents } = require('./constants');
 
-const CommandHandler  = require('./commandHandler');
-const ListenerHandler = require('./listenerHandler');
-const Module          = require('./module');
+const CommandHandler      = require('./commandHandler');
+const SlashCommandHandler = require('./slashCommandHandler');
+const ListenerHandler     = require('./listenerHandler');
+const Module              = require('./module');
 
 const ClientUtil = require('./clientUtil');
-const CoreUtil   = require('./util');
 
 module.exports = class EbotClient extends AkairoClient {
 
@@ -35,6 +35,7 @@ module.exports = class EbotClient extends AkairoClient {
     #coreListenerHandlers = new Map();
 
     #commandHandler;
+    #slashCommandHandler;
     #inhibitorHandler;
     #listenerHandler;
 
@@ -90,7 +91,7 @@ module.exports = class EbotClient extends AkairoClient {
 
             module.loadAll();
         }
-    };
+    }
 
     registerCommandHandler(settings) {
 
@@ -116,6 +117,13 @@ module.exports = class EbotClient extends AkairoClient {
         }, settings));
 
         this.logger.trace({ event : CoreEvents.COMMAND_HANDLER_REGISTERED, emitter : 'core' });
+    }
+
+    registerSlashCommandHandler(settings) {
+
+        this.#slashCommandHandler = new SlashCommandHandler(this, Hoek.merge({}, settings));
+
+        this.logger.trace({ event : CoreEvents.SLASH_COMMAND_HANDLER_REGISTERED, emitter : 'core' });
     }
 
     registerListenerHandler(settings) {
@@ -167,6 +175,7 @@ module.exports = class EbotClient extends AkairoClient {
         await this.#setupCoreListenerHandlers();
 
         this.registerCommandHandler();
+        this.registerSlashCommandHandler();
         this.registerListenerHandler();
         this.registerInhibitorHandler();
 
@@ -224,9 +233,16 @@ module.exports = class EbotClient extends AkairoClient {
             this.logger.trace({ event : CoreEvents.LISTENER_HANDLER_LOADED, emitter : 'core' });
         }
 
+        if (this.#slashCommandHandler) {
+
+            this.logger.trace({ event : CoreEvents.SLASH_COMMAND_HANDLER_LOADED, emitter : 'core' });
+        }
+
         await this.login(this.#settings.discord.token);
 
         await this.warmupCache();
+
+        await this.#slashCommandHandler.registerCommands();
 
         this.#started = true;
 
@@ -280,6 +296,11 @@ module.exports = class EbotClient extends AkairoClient {
         return this.#commandHandler;
     }
 
+    get slashCommandHandler() {
+
+        return this.#slashCommandHandler;
+    }
+
     get listenerHandler() {
 
         return this.#listenerHandler;
@@ -315,7 +336,7 @@ module.exports = class EbotClient extends AkairoClient {
             event   : CoreEvents.INVITE_LINK,
             emitter : 'core',
             url     : this.generateInvite({
-                scopes      : ['bot'],
+                scopes      : ['bot', 'applications.commands'],
                 permissions : [
                     Permissions.FLAGS.SEND_MESSAGES,
                     Permissions.FLAGS.READ_MESSAGE_HISTORY,
@@ -329,8 +350,8 @@ module.exports = class EbotClient extends AkairoClient {
     /**
      * @param {AkairoModule} module
      * @param {Error}        error
-     * @param {String}       message
-     * @param {Object}       extraData
+     * @param {String}       [message]
+     * @param {Object}       [extraData]
      */
     handleError(module, error, message, extraData = {}) {
 

@@ -12,8 +12,7 @@ DayJS.extend(RelativeTime);
 
 const { default : PQueue } = require('p-queue');
 
-const Service    = require('../../../core/service');
-const { Status } = require('../../../core/util');
+const { Service, Util } = require('../../../core');
 
 module.exports = class SyncService extends Service {
 
@@ -55,7 +54,7 @@ module.exports = class SyncService extends Service {
 
         const { State } = this.client.providers('history');
 
-        const status = new Status({ startAt : new Date(), current : 0, doing : true, done : false });
+        const status = new Util.Status({ startAt : new Date(), current : 0, doing : true, done : false });
 
         try {
 
@@ -150,7 +149,7 @@ module.exports = class SyncService extends Service {
 
         const { State, History } = this.client.providers('history');
 
-        const status = new Status({ startAt : new Date(), messages : 0, doing : true, done : false });
+        const status = new Util.Status({ startAt : new Date(), messages : 0, doing : true, done : false });
 
         if (!channel.isText()) {
 

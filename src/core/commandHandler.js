@@ -4,7 +4,31 @@ const { CommandHandler : AkairoCommandHandler } = require('discord-akairo');
 
 const CoreUtil = require('./util');
 
+/**
+ * Loads commands and handles messages.
+ *
+ * @param {EbotClient} client - The Ebot client.
+ * @param {CommandHandlerOptions} options - Options.
+ *
+ * @extends {AkairoCommandHandler}
+ */
 module.exports = class CommandHandler extends AkairoCommandHandler {
+
+    /**
+     * @type {EbotClient}
+     */
+    client;
+
+    /**
+     * @param {EbotClient} client
+     * @param {CommandHandlerOptions} options
+     */
+    constructor(client, options) {
+
+        super(client, options);
+
+        this.client = client;
+    }
 
     async runCommand(message, command, args) {
 

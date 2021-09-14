@@ -1,7 +1,8 @@
 'use strict';
 
 const { Permissions } = require('discord.js');
-const { Command }     = require('discord-akairo');
+
+const { Command } = require('../../../core');
 
 module.exports = class ClapCommand extends Command {
 

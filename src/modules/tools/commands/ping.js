@@ -1,7 +1,8 @@
 'use strict';
 
-const { Command }   = require('discord-akairo');
 const { Constants } = require('discord.js');
+
+const { Command } = require('../../../core');
 
 class PingCommand extends Command {
 

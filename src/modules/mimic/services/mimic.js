@@ -10,8 +10,7 @@ const RelativeTime = require('dayjs/plugin/relativeTime');
 DayJS.extend(Duration);
 DayJS.extend(RelativeTime);
 
-const Service  = require('../../../core/service');
-const CoreUtil = require('../../../core/util');
+const { Service, Util } = require('../../../core');
 
 module.exports = class MimicService extends Service {
 
@@ -31,7 +30,7 @@ module.exports = class MimicService extends Service {
 
             const model = Chain.fromJSON(json);
 
-            response = model.walk(initialState).join(' ').trim();
+            response = model.walk(initialState || '').join(' ').trim();
 
             i++;
 
@@ -51,7 +50,7 @@ module.exports = class MimicService extends Service {
 
         const { State } = this.client.providers('mimic');
 
-        const status = new CoreUtil.Status({
+        const status = new Util.Status({
             startAt     : new Date(),
             messages    : 0,
             totalUser   : 0,
@@ -137,7 +136,7 @@ module.exports = class MimicService extends Service {
         const stateKey = `${ guild.id }_${ member.id }`;
         const query    = { guildId : guild.id, userId : member.id };
 
-        const status = new CoreUtil.Status({ startAt : new Date(), messages : 0, doing : true, done : false });
+        const status = new Util.Status({ startAt : new Date(), messages : 0, doing : true, done : false });
 
         try {
 
@@ -727,8 +726,8 @@ class Chain {
             for (const sentence of corpus) {
 
                 const words = sentence
-                    .replace(new RegExp(CoreUtil.REGEX_URL), ' ')
-                    .replace(new RegExp(CoreUtil.REGEX_CODE_BLOCK), ' ')
+                    .replace(new RegExp(Util.REGEX_URL), ' ')
+                    .replace(new RegExp(Util.REGEX_CODE_BLOCK), ' ')
                     .replace(/["_~\\()|,.\[\-$%`{}=+*\]]+/g, ' ')
                     .split(/\s+/)
                     .map((word) => word.trim())
@@ -944,6 +943,6 @@ class Chain {
         return low;
     }
 
-    static operand = CoreUtil.memoize((v) => (Math.round(10 * Math.log(v) / Math.LN10) || 1));
+    static operand = Util.memoize((v) => (Math.round(10 * Math.log(v) / Math.LN10) || 1));
 }
 

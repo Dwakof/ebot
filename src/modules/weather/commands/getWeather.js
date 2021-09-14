@@ -1,8 +1,8 @@
 'use strict';
 
-const { Command }   = require('discord-akairo');
-
 const Got = require('got');
+
+const { Command } = require('../../../core');
 
 module.exports = class WeatherCommand extends Command {
 

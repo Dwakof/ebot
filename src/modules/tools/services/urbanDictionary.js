@@ -5,7 +5,7 @@ const Got = require('got');
 // eslint-disable-next-line no-unused-vars
 const { MessageEmbed } = require('discord.js');
 
-const Service = require('../../../core/service');
+const { Service } = require('../../../core');
 
 module.exports = class UrbanDictionaryService extends Service {
 

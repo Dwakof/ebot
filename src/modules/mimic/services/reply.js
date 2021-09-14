@@ -1,6 +1,6 @@
 'use strict';
 
-const Service = require('../../../core/service');
+const { Service } = require('../../../core');
 
 module.exports = class ReplyService extends Service {
 

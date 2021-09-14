@@ -1,7 +1,6 @@
 'use strict';
 
-const { Command }             = require('discord-akairo');
-const { CanvasRenderService } = require('chartjs-node-canvas');
+const { Command } = require('../../../core');
 
 module.exports = class GetKarmaCommand extends Command {
 
@@ -21,26 +20,6 @@ module.exports = class GetKarmaCommand extends Command {
                     }
                 }
             ]
-        });
-
-        this.canvas = new CanvasRenderService(1200, 600, (ChartJS) => {
-
-            ChartJS.plugins.register({
-                beforeRender : function ({ chart, data, scales, height, ctx }, options) {
-
-                    const dataset = data.datasets[0];
-                    const yPos    = scales['y-axis-0'].getPixelForValue(0);
-
-                    const gradientFill = ctx.createLinearGradient(0, 0, 0, height);
-
-                    gradientFill.addColorStop(0, 'rgba(78, 246, 23, 1)');
-                    gradientFill.addColorStop(yPos / height, 'rgba(94, 154, 19, 0.7)');
-                    gradientFill.addColorStop(yPos / height, 'rgba(153, 9, 9, 0.7)');
-                    gradientFill.addColorStop(1, 'rgba(198, 15, 15, 1)');
-
-                    chart.data.datasets[0]._meta[Object.keys(dataset._meta)[0]].dataset._model.backgroundColor = gradientFill;
-                }
-            });
         });
     }
 
@@ -103,64 +82,7 @@ module.exports = class GetKarmaCommand extends Command {
 
             if (stats) {
 
-                /**
-                 * @type Array<Date>
-                 */
-                const labels = stats.map(({ time }) => (new Date(time)));
-
-                const attachment = this.client.util.attachment(this.canvas.renderToStream({
-                    type    : 'line',
-                    data    : {
-                        labels,
-                        datasets : [
-                            {
-                                label       : 'karma',
-                                steppedLine : false,
-                                data        : stats.reduce((acc, { value }) => {
-
-                                    acc.push(parseInt(value));
-
-                                    return acc;
-                                }, [])
-                            }
-                        ]
-                    },
-                    options : {
-                        legend   : { display : false },
-                        elements : {
-                            point : {
-                                radius : 0
-                            }
-                        },
-                        scales   : {
-                            xAxes : [
-                                {
-                                    time      : { round : true },
-                                    type      : 'time',
-                                    gridLines : { display : false },
-                                    ticks     : {
-                                        source    : 'auto',
-                                        fontColor : 'rgba(142, 146, 151, 1)',
-                                        fontSize  : 20
-                                    }
-                                }
-                            ],
-                            yAxes : [
-                                {
-                                    gridLines : { display : false },
-                                    ticks     : {
-                                        precision    : 0,
-                                        suggestedMin : 0,
-                                        suggestedMax : 0,
-                                        fontColor    : 'rgba(142, 146, 151, 1)',
-                                        fontSize     : 20
-                                    }
-                                }
-                            ]
-                        }
-                    }
-
-                }), 'chart.png');
+                const attachment = this.client.util.attachment(KarmaService.renderGraph(stats), 'chart.png');
 
                 embed.setImage('attachment://chart.png');
 

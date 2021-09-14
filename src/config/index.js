@@ -18,9 +18,13 @@ const knexDefault = new Confidence.Store({
 const store = new Confidence.Store({
     version : Pkg.version,
     ebot    : {
-        cacheWarmup : {
+        cacheWarmup   : {
             guilds : { $env : 'EBOT_CACHE_WARMUP_GUILDS', $coerce : 'array', $default : [] },
             users  : { $env : 'EBOT_CACHE_WARMUP_USERS', $coerce : 'array', $default : [] }
+        },
+        slashCommands : {
+            registerGlobal : { $env : 'EBOT_SLASH_COMMAND_REGISTER_GLOBAL', $coerce : 'boolean', $default : true },
+            registerGuilds : { $env : 'EBOT_SLASH_COMMAND_REGISTER_GUILDS', $coerce : 'array', $default : [] }
         }
     },
     discord : {
@@ -28,6 +32,7 @@ const store = new Confidence.Store({
         $base       : {
             partials : { $env : 'DISCORD_PARTIALS', $coerce : 'array' },
             ownerID  : { $env : 'DISCORD_OWNER_IDS', $coerce : 'array' },
+            clientId : { $env : 'DISCORD_CLIENT_ID' },
             token    : { $env : 'DISCORD_TOKEN' },
             prefix   : { $env : 'DISCORD_COMMAND_PREFIX', $default : '!' },
             intends  : {}

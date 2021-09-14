@@ -11,18 +11,22 @@ exports.CoreEvents = {
     SERVICE_REGISTERED  : 'serviceRegistered',
     SERVICE_INITIALIZED : 'serviceInitialized',
 
-    COMMAND_HANDLER_REGISTERED   : 'commandHandlerRegistered',
-    INHIBITOR_HANDLER_REGISTERED : 'inhibitorHandlerRegistered',
+    COMMAND_HANDLER_REGISTERED       : 'commandHandlerRegistered',
+    SLASH_COMMAND_HANDLER_REGISTERED : 'slashCommandHandlerRegistered',
+    INHIBITOR_HANDLER_REGISTERED     : 'inhibitorHandlerRegistered',
+    LISTENER_HANDLER_REGISTERED      : 'listenerHandlerRegistered',
 
-    LISTENER_HANDLER_REGISTERED : 'listenerHandlerRegistered',
-    COMMAND_HANDLER_LOADED      : 'commandHandlerLoaded',
-
-    INHIBITOR_HANDLER_LOADED : 'inhibitorHandlerLoaded',
-    LISTENER_HANDLER_LOADED  : 'listenerHandlerLoaded',
+    COMMAND_HANDLER_LOADED       : 'commandHandlerLoaded',
+    SLASH_COMMAND_HANDLER_LOADED : 'slashCommandHandlerLoaded',
+    INHIBITOR_HANDLER_LOADED     : 'inhibitorHandlerLoaded',
+    LISTENER_HANDLER_LOADED      : 'listenerHandlerLoaded',
 
     MODULE_ERROR  : 'moduleError',
     MODULE_LOADED : 'moduleLoaded',
 
     CACHE_WARMUP_STARTED  : 'cacheWarmupStarted',
-    CACHE_WARMUP_FINISHED : 'cacheWarmupFinished'
+    CACHE_WARMUP_FINISHED : 'cacheWarmupFinished',
+
+    SLASH_COMMAND_BUILT       : 'slashCommandBuilt',
+    SLASH_COMMANDS_REGISTERED : 'slashCommandRegistered'
 };

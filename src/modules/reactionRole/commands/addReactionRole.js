@@ -1,7 +1,8 @@
 'use strict';
 
-const { Command }     = require('discord-akairo');
 const { Permissions } = require('discord.js');
+
+const { Command } = require('../../../core');
 
 module.exports = class AddReactionRoleCommand extends Command {
 

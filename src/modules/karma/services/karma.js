@@ -1,6 +1,8 @@
 'use strict';
 
-const Service = require('../../../core/service');
+const { CanvasRenderService } = require('chartjs-node-canvas');
+
+const { Service } = require('../../../core');
 
 module.exports = class KarmaService extends Service {
 
@@ -95,7 +97,7 @@ module.exports = class KarmaService extends Service {
             .limit(1).first();
     }
 
-    getStatsUser(guildId, userId) {
+    async getStatsUser(guildId, userId) {
 
         const { Karma } = this.client.providers('karma');
 
@@ -103,7 +105,7 @@ module.exports = class KarmaService extends Service {
 
         const { fn, raw, ref } = Member;
 
-        return Member.query()
+        const stats = await Member.query()
             .with('info',
                 Member.query().select({
                     min      : fn.min(ref('createdAt')),
@@ -134,6 +136,11 @@ module.exports = class KarmaService extends Service {
                     .where({ guildId, userId })
                     .where('createdAt', '<', ref('period').from('periods'))
             }).from('periods');
+
+        return stats.map(({ time, value }) => {
+
+            return { time : new Date(time), value : parseFloat(value) };
+        });
     }
 
     /**
@@ -234,5 +241,86 @@ module.exports = class KarmaService extends Service {
         const { Member } = Karma.models;
 
         return Member.query().deleteById([guildId, userId, messageId, giverId, type, value]);
+    }
+
+
+    canvasService = new CanvasRenderService(1200, 600, (ChartJS) => {
+
+        ChartJS.plugins.register({
+            beforeRender : function ({ chart, data, scales, height, ctx }, options) {
+
+                const dataset = data.datasets[0];
+                const yPos    = scales['y-axis-0'].getPixelForValue(0);
+
+                const gradientFill = ctx.createLinearGradient(0, 0, 0, height);
+
+                gradientFill.addColorStop(0, 'rgba(78, 246, 23, 1)');
+                gradientFill.addColorStop(yPos / height, 'rgba(94, 154, 19, 0.7)');
+                gradientFill.addColorStop(yPos / height, 'rgba(153, 9, 9, 0.7)');
+                gradientFill.addColorStop(1, 'rgba(198, 15, 15, 1)');
+
+                chart.data.datasets[0]._meta[Object.keys(dataset._meta)[0]].dataset._model.backgroundColor = gradientFill;
+            }
+        });
+    });
+
+    /**
+     * @param {Array<Object>} stats
+     *
+     * @return {Readable}
+     */
+    renderGraph(stats) {
+
+        const labels = stats.map(({ time }) => time);
+        const values = stats.map(({ value }) => value);
+
+        return this.canvasService.renderToStream({
+            type    : 'line',
+            data    : {
+                labels,
+                datasets : [
+                    {
+                        label       : 'karma',
+                        steppedLine : false,
+                        data        : values
+                    }
+                ]
+            },
+            options : {
+                legend   : { display : false },
+                elements : {
+                    point : {
+                        radius : 0
+                    }
+                },
+                scales   : {
+                    xAxes : [
+                        {
+                            time      : { round : true },
+                            type      : 'time',
+                            gridLines : { display : false },
+                            ticks     : {
+                                source    : 'auto',
+                                fontColor : 'rgba(142, 146, 151, 1)',
+                                fontSize  : 20
+                            }
+                        }
+                    ],
+                    yAxes : [
+                        {
+                            gridLines : { display : false },
+                            ticks     : {
+                                precision    : 0,
+                                suggestedMin : 0,
+                                suggestedMax : 0,
+                                fontColor    : 'rgba(142, 146, 151, 1)',
+                                fontSize     : 20
+                            }
+                        }
+                    ]
+                }
+            }
+
+        });
     }
 };
