@@ -1,3 +1,10 @@
+# [0.6.0](https://github.com/Dwakof/ebot/compare/v0.5.0...v0.6.0) (2021-09-14)
+
+
+### Features
+
+* SlashCommand support ([748a1e0](https://github.com/Dwakof/ebot/commit/748a1e021bd5d8386e4580a26d6b57eab1766c14))
+
 # [0.5.0](https://github.com/Dwakof/ebot/compare/v0.4.5...v0.5.0) (2021-09-11)
 
 
