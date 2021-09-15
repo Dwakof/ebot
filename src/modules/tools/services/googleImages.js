@@ -35,7 +35,6 @@ module.exports = class GoogleImagesService extends Service {
     init() {
         this.#api = Got.extend({
             prefixUrl: 'https://www.googleapis.com',
-            // responseType : 'json'
         });
     }
     /**
@@ -47,8 +46,8 @@ module.exports = class GoogleImagesService extends Service {
 
         const { body, statusCode } = await this.#api.get('customsearch/v1', {
             searchParams : { 
-                key: this.client.settings.plugins.googleCse.apiKey,
-                cx: this.client.settings.plugins.googleCse.engineId,
+                key: this.client.settings.plugins.googleImages.apiKey,
+                cx: this.client.settings.plugins.googleImages.engineId,
                 q: query,
                 searchType: 'image',
                 filter: 1,
