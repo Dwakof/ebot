@@ -39,8 +39,9 @@ class GoogleImagesCommand extends SlashCommand {
 
             return this.client.util.replyPaginatedEmbeds(
                 interaction,
-                results.map((result) => GoogleImagesService.toEmbed(result))
-            );
+                results.map((result) => GoogleImagesService.toEmbed(result)), {
+                footerBuilder: (_, index, total) => `Result ${ index + 1 } / ${total}`,
+            });
         }
         catch (error) {
             console.log(error);
