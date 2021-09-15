@@ -39,7 +39,7 @@ class GoogleImagesCommand extends SlashCommand {
 
             return this.client.util.replyPaginatedEmbeds(
                 interaction,
-                results.map((result) => GoogleImagesService.toEmbed(query, result))
+                results.map((result) => GoogleImagesService.toEmbed(result))
             );
         }
         catch (error) {

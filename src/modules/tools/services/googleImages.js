@@ -73,10 +73,10 @@ module.exports = class GoogleImagesService extends Service {
      *
      * @return {MessageEmbed}
      */
-    toEmbed(query, result) {
+    toEmbed(result) {
         return this.embed()
             .setURL(result.image.contextLink)
-            .setTitle(query)
+            .setTitle(result.title)
             .setImage(result.link);
     }
 
