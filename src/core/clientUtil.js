@@ -177,7 +177,7 @@ module.exports = class ClientUtil extends Base {
                 fetchReply : true
             };
         };
-        
+
         const reply = await originalMessage.reply(await getPage(index));
 
         const collector = await reply.createMessageComponentCollector({ filter, time : timeout });
