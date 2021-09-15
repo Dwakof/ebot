@@ -172,9 +172,9 @@ module.exports = class ClientUtil extends Base {
             }
 
             return { 
-                embeds : [embed],
+                embeds     : [embed],
                 components : [new MessageActionRow({ components : [previous, next] })],
-                fetchReply: true
+                fetchReply : true
             };
         };
         
