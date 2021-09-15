@@ -171,9 +171,13 @@ module.exports = class ClientUtil extends Base {
                 embed.setFooter(footerBuilder(embed, i, pages.length));
             }
 
-            return { embeds : [embed], components : [new MessageActionRow({ components : [previous, next] })] };
+            return { 
+                embeds : [embed],
+                components : [new MessageActionRow({ components : [previous, next] })],
+                fetchReply: true
+            };
         };
-
+        
         const reply = await originalMessage.reply(await getPage(index));
 
         const collector = await reply.createMessageComponentCollector({ filter, time : timeout });
