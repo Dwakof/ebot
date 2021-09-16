@@ -146,11 +146,11 @@ const store = new Confidence.Store({
         },
         tool           : {
             googleImages    : {
-                  apiKey   : { $env : 'GOOGLE_CSE_API_KEY' },
-                  engineId : { $env : 'GOOGLE_CSE_ENGINE_ID' }
+                apiKey   : { $env : 'GOOGLE_CSE_API_KEY' },
+                engineId : { $env : 'GOOGLE_CSE_ENGINE_ID' }
             },
             isthereanydeal  : {
-                  apiKey : { $env : 'ISTHEREANYDEAL_API_KEY' }
+                apiKey : { $env : 'ISTHEREANYDEAL_API_KEY' }
             }
         }
     }
