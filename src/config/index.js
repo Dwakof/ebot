@@ -144,8 +144,12 @@ const store = new Confidence.Store({
             openWeatherApiKey : { $env : 'OPEN_WEATHER_API_KEY' },
             LocationIQApiKey  : { $env : 'LOCATION_IQ_API_KEY' }
         },
-        tool : {
-            isthereanydeal : {
+        tool           : {
+            googleImages    : {
+                apiKey   : { $env : 'GOOGLE_CSE_API_KEY' },
+                engineId : { $env : 'GOOGLE_CSE_ENGINE_ID' }
+            },
+            isthereanydeal  : {
                 apiKey : { $env : 'ISTHEREANYDEAL_API_KEY' }
             }
         }
