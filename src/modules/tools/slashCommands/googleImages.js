@@ -44,7 +44,6 @@ class GoogleImagesCommand extends SlashCommand {
             });
         }
         catch (error) {
-            console.log(error);
 
             await interaction.reply({
                 embeds : [GoogleImagesService.embed().setTitle(query).setDescription('Something went wrong')]
