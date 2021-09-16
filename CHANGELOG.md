@@ -1,3 +1,10 @@
+# [0.8.0](https://github.com/Dwakof/ebot/compare/v0.7.0...v0.8.0) (2021-09-16)
+
+
+### Features
+
+* image search command ([3f0cc93](https://github.com/Dwakof/ebot/commit/3f0cc93f9320798a01fff20f80155b5188a6d782))
+
 # [0.7.0](https://github.com/Dwakof/ebot/compare/v0.6.0...v0.7.0) (2021-09-16)
 
 
