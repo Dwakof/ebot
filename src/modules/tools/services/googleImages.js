@@ -46,8 +46,8 @@ module.exports = class GoogleImagesService extends Service {
 
         const { body, statusCode } = await this.#api.get('customsearch/v1', {
             searchParams : { 
-                key: this.client.settings.plugins.googleImages.apiKey,
-                cx: this.client.settings.plugins.googleImages.engineId,
+                key: this.client.settings.plugins.tool.googleImages.apiKey,
+                cx: this.client.settings.plugins.tool.googleImages.engineId,
                 q: query,
                 searchType: 'image',
                 filter: 1,
