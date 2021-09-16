@@ -1,34 +1,32 @@
 'use strict';
 
-const { Permissions } = require('discord.js');
-
 const DayJS = require('dayjs');
 
 const Duration     = require('dayjs/plugin/duration');
 const RelativeTime = require('dayjs/plugin/relativeTime');
+
+const { SlashCommand } = require('../../../core');
 
 DayJS.extend(Duration);
 DayJS.extend(RelativeTime);
 
 const { Command } = require('../../../core');
 
-class InfoCommand extends Command {
+class InfoCommand extends SlashCommand {
 
     constructor() {
 
         super('info', {
-            aliases           : ['statistics', 'stats', 'stat', 'info'],
-            description       : {
-                content : 'Get informations on the bot',
-                usage   : 'info'
-            },
             category          : 'tools',
-            clientPermissions : [Permissions.FLAGS.EMBED_LINKS, Permissions.FLAGS.SEND_MESSAGES],
-            ratelimit         : 2
+            description       : 'Get informations on the bot'
         });
     }
 
-    exec(message, args) {
+    static get command() {
+        return { method  : 'info', options : {} };
+    }
+
+    async info(interaction, args) {
 
         const totalCommands = (Array.from(this.handler.categories.values())
             .flatMap((cat) => (Array.from(cat.values()).length)))
@@ -41,10 +39,10 @@ class InfoCommand extends Command {
             .addField('Uptime', DayJS.duration(this.client.uptime).humanize(false), true)
             .addField('Commands', totalCommands.toString(), true)
             .addField('Admins', this.client.util.ownerIds(), true)
-            .setFooter(`Asked by ${ message.author.username }`)
+            .setFooter(`Asked by ${ interaction.user.username }`)
             .setTimestamp();
 
-        return message.util.send({ embeds : [embed] });
+        return interaction.reply({ embeds : [embed] });
     }
 }
 
