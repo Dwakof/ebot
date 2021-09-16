@@ -1,3 +1,10 @@
+# [0.7.0](https://github.com/Dwakof/ebot/compare/v0.6.0...v0.7.0) (2021-09-16)
+
+
+### Features
+
+* isthereanydeal command ([cadaa8d](https://github.com/Dwakof/ebot/commit/cadaa8d42d589c5291f86534159873812abc1812))
+
 # [0.6.0](https://github.com/Dwakof/ebot/compare/v0.5.0...v0.6.0) (2021-09-14)
 
 
