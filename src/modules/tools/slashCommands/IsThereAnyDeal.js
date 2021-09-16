@@ -49,7 +49,6 @@ class IsThereAnyDealCommand extends SlashCommand {
                 },   
             });
         } catch (error) {
-            console.log(error);
             const embed = IsThereAnyDealService.messageEmbed(title, 'Something went wrong');
             await interaction.reply({ embeds: [ embed ] });
             this.client.handleError(this, error, interaction);
