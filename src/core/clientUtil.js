@@ -171,7 +171,7 @@ module.exports = class ClientUtil extends Base {
                 embed.setFooter(footerBuilder(embed, i, pages.length));
             }
 
-            return { 
+            return {
                 embeds     : [embed],
                 components : [new MessageActionRow({ components : [previous, next] })],
                 fetchReply : true

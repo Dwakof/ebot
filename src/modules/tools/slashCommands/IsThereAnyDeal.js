@@ -2,18 +2,18 @@
 
 const { SlashCommand } = require('../../../core');
 
-const Got = require('got');
-
 class IsThereAnyDealCommand extends SlashCommand {
 
     constructor() {
+
         super('deal', {
             category    : 'tools',
-            description : 'Displays current price overview' 
+            description : 'Displays current price overview'
         });
     }
 
     static get command() {
+
         return {
             method  : 'getDeals',
             options : {
@@ -27,6 +27,7 @@ class IsThereAnyDealCommand extends SlashCommand {
     }
 
     async getDeals(interaction, { title }) {
+
         const { IsThereAnyDealService } = this.client.services('tools');
 
         try {
@@ -38,22 +39,23 @@ class IsThereAnyDealCommand extends SlashCommand {
                 );
             }
 
-            return this.client.util.replyPaginatedEmbeds(
-                interaction,
-                searchResults.map(async (searchResult) => {
-                    const info = await IsThereAnyDealService.getInfo(searchResult); 
-                    return IsThereAnyDealService.resultEmbed(info);
-                }), {
-                footerBuilder: (_, index, total) => {
-                    return `Result ${index + 1} / ${total}`;
-                },   
+            const search = async (searchResult) => {
+
+                const info = await IsThereAnyDealService.getInfo(searchResult);
+                return IsThereAnyDealService.resultEmbed(info);
+            };
+
+            return this.client.util.replyPaginatedEmbeds(interaction, searchResults.map(search), {
+                footerBuilder : (_, index, total) => `Result ${ index + 1 } / ${ total }`
             });
-        } catch (error) {
+        }
+        catch (error) {
+
             const embed = IsThereAnyDealService.messageEmbed(title, 'Something went wrong');
-            await interaction.reply({ embeds: [ embed ] });
+            await interaction.reply({ embeds : [embed] });
             this.client.handleError(this, error, interaction);
         }
     }
-};
+}
 
 module.exports = IsThereAnyDealCommand;

@@ -10,27 +10,26 @@ const { SlashCommand } = require('../../../core');
 DayJS.extend(Duration);
 DayJS.extend(RelativeTime);
 
-const { Command } = require('../../../core');
-
 class InfoCommand extends SlashCommand {
 
     constructor() {
 
         super('info', {
-            category          : 'tools',
-            description       : 'Get informations on the bot'
+            category    : 'tools',
+            description : 'Get informations on the bot'
         });
     }
 
     static get command() {
-        return { method  : 'info', options : {} };
+
+        return { method : 'info', options : {} };
     }
 
-    async info(interaction, args) {
+    info(interaction) {
 
         const totalCommands = (Array.from(this.handler.categories.values())
             .flatMap((cat) => (Array.from(cat.values()).length)))
-            .reduce((acc, x) => (acc += x), 0);
+            .reduce((acc, x) => (acc + x), 0);
 
         const embed = this.client.util.embed()
             .setAuthor('Statistics of Ebot', this.client.user.avatarURL({ dynamic : true }))

@@ -39,7 +39,7 @@ module.exports = class RebuildCommand extends Command {
 
     async exec(message, { guild, member }) {
 
-        const { State }       = this.client.providers('mimic');
+        const { State }        = this.client.providers('mimic');
         const { MimicService } = this.client.services('mimic');
 
         const guildStatus = await State.get('guild_rebuild', guild.id, { doing : false });

@@ -73,12 +73,13 @@ module.exports = class IsThereAnyDealService extends Service {
     #api;
 
     init() {
-        this.#api = Got.extend({ 
-            prefixUrl: 'https://api.isthereanydeal.com', 
+
+        this.#api = Got.extend({
+            prefixUrl    : 'https://api.isthereanydeal.com',
             responseType : 'json',
             searchParams : {
-                'key':  this.client.settings.plugins.tool.isthereanydeal.apiKey,
-            },
+                'key' : this.client.settings.plugins.tool.isthereanydeal.apiKey
+            }
         });
     }
 
@@ -88,11 +89,12 @@ module.exports = class IsThereAnyDealService extends Service {
      * @return {Promise<Array<SearchResultObject>|Boolean>}
      */
     async search(query) {
+
         const { body, statusCode } = await this.#api.get('v02/search/search', {
-            searchParams : { 
-                'limit': 100,
-                'q': query,
-            },
+            searchParams : {
+                'limit' : 100,
+                'q'     : query
+            }
         });
 
         if (statusCode !== 200) {
@@ -114,19 +116,20 @@ module.exports = class IsThereAnyDealService extends Service {
      * @return {Promise<Array<GameResultObject>>}
      */
     async getInfo(result) {
+
         const identifier = result.plain;
 
         // Get Game Info (title, image, etc.)
-        const { body: gameInfoBody } = await this.#api.get('v01/game/info', {
-            searchParams : { 'plains': identifier },
+        const { body : gameInfoBody } = await this.#api.get('v01/game/info', {
+            searchParams : { 'plains' : identifier }
         });
-        const info = gameInfoBody.data[identifier];
+        const info                    = gameInfoBody.data[identifier];
 
         // Get price overview
-        const { body: overviewBody } = await this.#api.get('v01/game/overview', {
-            searchParams : { 'plains': identifier },
+        const { body : overviewBody } = await this.#api.get('v01/game/overview', {
+            searchParams : { 'plains' : identifier }
         });
-        const overview = overviewBody.data[identifier];
+        const overview                = overviewBody.data[identifier];
 
         return { info, overview };
     }
@@ -137,16 +140,17 @@ module.exports = class IsThereAnyDealService extends Service {
      * @return {MessageEmbed}
      */
     resultEmbed(game) {
-        const info = game.info;
+
+        const info     = game.info;
         const overview = game.overview;
 
         const current = {
-            store: overview?.price?.store ? `(${overview.price.store})` : '',
-            price: overview?.price?.price_formatted ?? '?',
+            store : overview?.price?.store ? `(${ overview.price.store })` : '',
+            price : overview?.price?.price_formatted ?? '?'
         };
-        const lowest = {
-            store: overview?.lowest?.store ? `(${overview.lowest.store})` : '',
-            price: overview?.lowest?.price_formatted ?? '?',
+        const lowest  = {
+            store : overview?.lowest?.store ? `(${ overview.lowest.store })` : '',
+            price : overview?.lowest?.price_formatted ?? '?'
         };
 
         return this.baseEmbed()
@@ -154,8 +158,8 @@ module.exports = class IsThereAnyDealService extends Service {
             .setTitle(info?.title ?? '?')
             .setImage(info?.image)
             .addFields([
-                { name: 'Price', value: `${current.price} ${current.store}`, inline: true },
-                { name: 'Lowest ever', value: `${lowest.price} ${lowest.store}`, inline: true },
+                { name : 'Price', value : `${ current.price } ${ current.store }`, inline : true },
+                { name : 'Lowest ever', value : `${ lowest.price } ${ lowest.store }`, inline : true }
             ]);
     }
 
@@ -166,10 +170,13 @@ module.exports = class IsThereAnyDealService extends Service {
      * @return {MessageEmbed}
      */
     messageEmbed(title, message) {
-        const embed = this.baseEmbed()
+
+        const embed = this.baseEmbed();
+
         if (title) {
-            embed.setTitle(title)
+            embed.setTitle(title);
         }
+
         return embed.setDescription(message);
     }
 
@@ -177,6 +184,7 @@ module.exports = class IsThereAnyDealService extends Service {
      * @return {MessageEmbed}
      */
     baseEmbed() {
+
         return this.client.util.embed()
             .setColor('#046eb2')
             .setThumbnail('https://i.imgur.com/xx7rLfE.jpg');

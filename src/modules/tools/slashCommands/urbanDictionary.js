@@ -5,17 +5,19 @@ const { SlashCommand } = require('../../../core');
 class UrbanDictionaryCommand extends SlashCommand {
 
     constructor() {
+
         super('ud', {
-            category          : 'tools',
-            description       : 'Search Urban Dictionary for given term',
+            category    : 'tools',
+            description : 'Search Urban Dictionary for given term'
         });
     }
 
 
     static get command() {
+
         return {
-            method   : 'search',
-            options  : {
+            method  : 'search',
+            options : {
                 term : {
                     type        : SlashCommand.Types.String,
                     description : 'The term to look up',

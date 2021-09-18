@@ -4,6 +4,7 @@ const { SlashCommand } = require('../../../core');
 
 class GoogleImagesCommand extends SlashCommand {
     constructor() {
+
         super('image', {
             category    : 'tools',
             description : 'Searches Google Images'
@@ -11,6 +12,7 @@ class GoogleImagesCommand extends SlashCommand {
     }
 
     static get command() {
+
         return {
             method  : 'search',
             options : {
@@ -40,8 +42,8 @@ class GoogleImagesCommand extends SlashCommand {
             return this.client.util.replyPaginatedEmbeds(
                 interaction,
                 results.map((result) => GoogleImagesService.toEmbed(result)), {
-                footerBuilder: (_, index, total) => `Result ${ index + 1 } / ${total}`,
-            });
+                    footerBuilder : (_, index, total) => `Result ${ index + 1 } / ${ total }`
+                });
         }
         catch (error) {
 

@@ -9,12 +9,13 @@ class AvatarCommand extends SlashCommand {
     constructor() {
 
         super('avatar', {
-            category          : 'tools',
-            description       : 'Show avatar of the mentioned user or by default you'
+            category    : 'tools',
+            description : 'Show avatar of the mentioned user or by default you'
         });
     }
 
     static get command() {
+
         return {
             method  : 'getAvatar',
             options : {
@@ -27,7 +28,8 @@ class AvatarCommand extends SlashCommand {
         };
     }
 
-    async getAvatar(interaction, { member }) {
+    getAvatar(interaction, { member }) {
+
         const user = member ?? interaction.user;
 
         const embed = this.client.util.embed()

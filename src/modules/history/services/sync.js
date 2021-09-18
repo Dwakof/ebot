@@ -1,7 +1,7 @@
 'use strict';
 
 const { SnowflakeUtil, Constants } = require('discord.js');
-const { channelMention }                           = require('@discordjs/builders');
+const { channelMention }           = require('@discordjs/builders');
 
 const DayJS        = require('dayjs');
 const Duration     = require('dayjs/plugin/duration');

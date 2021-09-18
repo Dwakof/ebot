@@ -20,15 +20,15 @@ module.exports = class messageDeleteListener extends Listener {
             event   : this.event,
             emitter : this.emitter,
             message : {
-                id                  : message.id,
-                channelType         : message?.channel?.type,
-                channelName         : message?.channel?.name,
-                authorId            : message?.author?.id,
-                authorName          : message?.author?.username,
-                guildId             : message?.guild?.id,
-                guildName           : message?.guild?.name,
-                content             : message?.content,
-                embeds              : message?.embeds
+                id          : message.id,
+                channelType : message?.channel?.type,
+                channelName : message?.channel?.name,
+                authorId    : message?.author?.id,
+                authorName  : message?.author?.username,
+                guildId     : message?.guild?.id,
+                guildName   : message?.guild?.name,
+                content     : message?.content,
+                embeds      : message?.embeds
             }
         });
     }

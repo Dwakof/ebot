@@ -33,10 +33,12 @@ module.exports = class GoogleImagesService extends Service {
     #api;
 
     init() {
+
         this.#api = Got.extend({
-            prefixUrl: 'https://www.googleapis.com',
+            prefixUrl : 'https://www.googleapis.com'
         });
     }
+
     /**
      * @param {String} query
      *
@@ -45,12 +47,12 @@ module.exports = class GoogleImagesService extends Service {
     async search(query) {
 
         const { body, statusCode } = await this.#api.get('customsearch/v1', {
-            searchParams : { 
-                key: this.client.settings.plugins.tool.googleImages.apiKey,
-                cx: this.client.settings.plugins.tool.googleImages.engineId,
-                q: query,
-                searchType: 'image',
-                filter: 1,
+            searchParams : {
+                key        : this.client.settings.plugins.tool.googleImages.apiKey,
+                cx         : this.client.settings.plugins.tool.googleImages.engineId,
+                q          : query,
+                searchType : 'image',
+                filter     : 1
             }
         });
 
@@ -73,6 +75,7 @@ module.exports = class GoogleImagesService extends Service {
      * @return {MessageEmbed}
      */
     toEmbed(result) {
+
         return this.embed()
             .setURL(result.image.contextLink)
             .setTitle(result.title)
@@ -83,6 +86,7 @@ module.exports = class GoogleImagesService extends Service {
      * @return {MessageEmbed}
      */
     embed() {
+
         return this.client.util.embed().setColor('#3A7AF2');
     }
 };

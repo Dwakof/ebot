@@ -5,13 +5,15 @@ const { SlashCommand } = require('../../../core');
 class DecideCommand extends SlashCommand {
 
     constructor() {
-        super('decide', { 
-            category: 'tools',
-            description: 'Makes a random decision on one of the given options',
+
+        super('decide', {
+            category    : 'tools',
+            description : 'Makes a random decision on one of the given options'
         });
     }
 
     static get command() {
+
         return {
             method  : 'decide',
             options : {
@@ -24,8 +26,9 @@ class DecideCommand extends SlashCommand {
         };
     }
 
-    async decide(interaction, { choices }) {
-        const input = choices.trim();
+    decide(interaction, { choices }) {
+
+        const input   = choices.trim();
         const options = input.split(' ');
         const result  = this.client.util.randomValue(options);
 

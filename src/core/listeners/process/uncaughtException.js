@@ -1,6 +1,6 @@
 'use strict';
 
-const { Listener }  = require('../../');
+const { Listener } = require('../../');
 
 module.exports = class processUncaughtExceptionListener extends Listener {
 

@@ -5,13 +5,15 @@ const { SlashCommand } = require('../../../core');
 class RandomNumberCommand extends SlashCommand {
 
     constructor() {
-        super('random', { 
-            category: 'tools',
-            description: 'Generates a random number within given range',
+
+        super('random', {
+            category    : 'tools',
+            description : 'Generates a random number within given range'
         });
     }
 
     static get command() {
+
         return {
             method  : 'random',
             options : {
@@ -29,8 +31,9 @@ class RandomNumberCommand extends SlashCommand {
         };
     }
 
-    async random(interaction, { min, max }) {
-        return interaction.reply(`${this.client.util.randomInt(min, max)}`);
+    random(interaction, { min, max }) {
+
+        return interaction.reply(`${ this.client.util.randomInt(min, max) }`);
     }
 }
 
