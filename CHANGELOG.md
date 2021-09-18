@@ -1,3 +1,10 @@
+## [0.8.1](https://github.com/Dwakof/ebot/compare/v0.8.0...v0.8.1) (2021-09-18)
+
+
+### Bug Fixes
+
+* Bug with duplicated command because global and perGuilds command could be registered at the same time ([fc0b93e](https://github.com/Dwakof/ebot/commit/fc0b93e96c6ca54f19a0ec2c3b9a9284586df6dc))
+
 # [0.8.0](https://github.com/Dwakof/ebot/compare/v0.7.0...v0.8.0) (2021-09-16)
 
 
