@@ -1,3 +1,11 @@
+## [0.8.2](https://github.com/Dwakof/ebot/compare/v0.8.1...v0.8.2) (2021-09-18)
+
+
+### Bug Fixes
+
+* avoid ping on mimic ([5d07d86](https://github.com/Dwakof/ebot/commit/5d07d86127b3a5a84cd04bb763be3020e0d0b595)), closes [#209](https://github.com/Dwakof/ebot/issues/209)
+* Retry if mimic generation == given string or empty string ([094dc3e](https://github.com/Dwakof/ebot/commit/094dc3ec4534d954214e67abc8c3f8e036d22bce)), closes [#220](https://github.com/Dwakof/ebot/issues/220)
+
 ## [0.8.1](https://github.com/Dwakof/ebot/compare/v0.8.0...v0.8.1) (2021-09-18)
 
 
