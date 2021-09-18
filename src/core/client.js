@@ -15,10 +15,10 @@ const { AkairoClient, InhibitorHandler } = require('discord-akairo');
 
 const { CoreEvents } = require('./constants');
 
-const CommandHandler      = require('./commandHandler');
-const SlashCommandHandler = require('./slashCommandHandler');
-const ListenerHandler     = require('./listenerHandler');
-const Module              = require('./module');
+const CommandHandler      = require('./struct/command/commandHandler');
+const SlashCommandHandler = require('./struct/slashCommand/slashCommandHandler');
+const ListenerHandler     = require('./struct/listener/listenerHandler');
+const Module              = require('./struct/module');
 
 const ClientUtil = require('./clientUtil');
 

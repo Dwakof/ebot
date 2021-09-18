@@ -17,6 +17,9 @@ class Service {
         this.id     = new.target.name;
     }
 
+    /**
+     * Method to override that is called when the client is started.
+     */
     init() {
 
     }

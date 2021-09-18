@@ -3,8 +3,8 @@
 const Fs   = require('fs/promises');
 const Path = require('path');
 
-const CoreUtil       = require('./util');
-const { CoreEvents } = require('./constants');
+const CoreUtil       = require('../util');
+const { CoreEvents } = require('../constants');
 
 const Service = require('./service');
 

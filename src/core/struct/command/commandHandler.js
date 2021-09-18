@@ -2,7 +2,7 @@
 
 const { CommandHandler : AkairoCommandHandler } = require('discord-akairo');
 
-const CoreUtil = require('./util');
+const CoreUtil = require('../../util');
 
 /**
  * Loads commands and handles messages.

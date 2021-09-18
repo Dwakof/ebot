@@ -118,11 +118,15 @@ class Status extends EventEmitter {
 
             this.#values.set(key, value);
         }
+
+        return this;
     }
 
     update() {
 
         this.emit('update', this.getAll());
+
+        return this;
     }
 
     get(key) {

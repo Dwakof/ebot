@@ -3,7 +3,7 @@
 const { Routes }        = require('discord-api-types/v9');
 const { AkairoHandler } = require('discord-akairo');
 
-const { CoreEvents } = require('./constants');
+const { CoreEvents } = require('../../constants');
 
 const SlashCommand = require('./slashCommand');
 

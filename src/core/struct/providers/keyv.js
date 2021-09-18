@@ -4,7 +4,7 @@ const { Provider } = require('discord-akairo');
 const Keyv         = require('keyv');
 const { KeyvFile } = require('keyv-file');
 
-const CoreUtil = require('../util');
+const CoreUtil = require('../../util');
 
 /**
  * Provider using the `keyv` interface library.

@@ -2,7 +2,7 @@
 
 const { ListenerHandler : AkairoListenerHandler } = require('discord-akairo');
 
-const CoreUtil = require('./util');
+const CoreUtil = require('../../util');
 
 
 /**

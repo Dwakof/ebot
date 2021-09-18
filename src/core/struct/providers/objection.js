@@ -3,7 +3,7 @@
 const Knex           = require('knex');
 const { initialize } = require('objection');
 
-const { KnexAsyncIterator } = require('../util');
+const { KnexAsyncIterator } = require('../../util');
 
 Knex.QueryBuilder.extend('asyncIterator', function () {
 
