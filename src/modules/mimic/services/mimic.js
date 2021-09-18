@@ -14,34 +14,38 @@ const { Service, Util } = require('../../../core');
 
 module.exports = class MimicService extends Service {
 
+    mimic(model, { retry = 5, initialState = '' }) {
+
+        let i        = 0;
+        let response = '';
+
+        do {
+
+            response = model.walk(initialState || '').join(' ').trim();
+
+            i++;
+
+        } while ([initialState, ''].includes(response) && i < retry);
+
+        if (response === '') {
+
+            throw new Error(`Could not generate a non empty sentence after ${ i } retry`);
+        }
+
+        return response;
+    }
+
     async mimicUser(guildId, userId, initialState) {
 
         const { Mimic } = this.client.providers('mimic');
 
         const { Model } = Mimic.models;
 
-        let i        = 0;
-        let response = '';
+        const { model : json } = await Model.query().findById([guildId, userId]).throwIfNotFound();
 
+        const model = Chain.fromJSON(json);
 
-        do {
-
-            const { model : json } = await Model.query().findById([guildId, userId]).throwIfNotFound();
-
-            const model = Chain.fromJSON(json);
-
-            response = model.walk(initialState || '').join(' ').trim();
-
-            i++;
-
-        } while (response === '' && i < 5);
-
-        if (response !== '') {
-
-            return response;
-        }
-
-        throw new Error(`Could not generate a non empty sentence after ${ i } retry`);
+        return this.mimic(model, { initialState });
     }
 
     async rebuildGuild(guild, message) {
