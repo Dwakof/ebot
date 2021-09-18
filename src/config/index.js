@@ -23,7 +23,7 @@ const store = new Confidence.Store({
             users  : { $env : 'EBOT_CACHE_WARMUP_USERS', $coerce : 'array', $default : [] }
         },
         slashCommands : {
-            registerGlobal : { $env : 'EBOT_SLASH_COMMAND_REGISTER_GLOBAL', $coerce : 'boolean', $default : true },
+            register       : { $env : 'EBOT_SLASH_COMMAND_REGISTER', $coerce : 'boolean', $default : true },
             registerGuilds : { $env : 'EBOT_SLASH_COMMAND_REGISTER_GUILDS', $coerce : 'array', $default : [] }
         }
     },
@@ -92,7 +92,7 @@ const store = new Confidence.Store({
         }
     },
     plugins : {
-        karma          : {
+        karma        : {
             knex : {
                 client     : 'pg',
                 connection : {
@@ -104,7 +104,7 @@ const store = new Confidence.Store({
                 }
             }
         },
-        mimic          : {
+        mimic        : {
             knex : {
                 client     : 'pg',
                 connection : {
@@ -116,7 +116,7 @@ const store = new Confidence.Store({
                 }
             }
         },
-        history        : {
+        history      : {
             knex : {
                 client     : 'pg',
                 connection : {
@@ -128,7 +128,7 @@ const store = new Confidence.Store({
                 }
             }
         },
-        reactionRole   : {
+        reactionRole : {
             knex : {
                 client     : 'pg',
                 connection : {
@@ -140,16 +140,16 @@ const store = new Confidence.Store({
                 }
             }
         },
-        weather        : {
+        weather      : {
             openWeatherApiKey : { $env : 'OPEN_WEATHER_API_KEY' },
             LocationIQApiKey  : { $env : 'LOCATION_IQ_API_KEY' }
         },
-        tool           : {
-            googleImages    : {
+        tool         : {
+            googleImages   : {
                 apiKey   : { $env : 'GOOGLE_CSE_API_KEY' },
                 engineId : { $env : 'GOOGLE_CSE_ENGINE_ID' }
             },
-            isthereanydeal  : {
+            isthereanydeal : {
                 apiKey : { $env : 'ISTHEREANYDEAL_API_KEY' }
             }
         }

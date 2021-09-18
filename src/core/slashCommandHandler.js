@@ -55,30 +55,54 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
 
     async registerCommands() {
 
+        if (!this.client.settings.ebot.slashCommands.register) {
+
+            return false;
+        }
+
         const body = [];
 
-        for (const [, command] of this.modules) {
+        for (const [, { command }] of this.modules) {
 
-            body.push({ ...command.command, type : 1 });
+            body.push({ ...command, type : 1 });
         }
 
         try {
 
-            for (const guildId of this.client.settings.ebot.slashCommands.registerGuilds) {
+            if (this.client.settings.ebot.slashCommands.registerGuilds.length > 0) {
 
-                await this.client.API.put(Routes.applicationGuildCommands(this.client.settings.discord.clientId, guildId), { body });
+                for (const guildId of this.client.settings.ebot.slashCommands.registerGuilds) {
+
+                    await this.client.API.put(Routes.applicationGuildCommands(this.client.settings.discord.clientId, guildId), { body });
+                }
+
+                this.client.logger.info({
+                    event    : CoreEvents.SLASH_COMMANDS_REGISTERED,
+                    emitter  : 'core',
+                    global   : false,
+                    module   : 'SlashCommandHandler',
+                    commands : body.map(({ name }) => name)
+                });
+
+                return true;
             }
 
-            if (this.client.settings.ebot.slashCommands.registerGlobal) {
+            await this.client.API.put(Routes.applicationCommands(this.client.settings.discord.clientId), { body });
 
-                await this.client.API.put(Routes.applicationCommands(this.client.settings.discord.clientId), { body });
+            for (const guildId of this.client.guilds.cache.map(({ id }) => id)) {
+
+                await this.client.API.put(Routes.applicationGuildCommands(this.client.settings.discord.clientId, guildId), { body : [] });
             }
 
-            this.client.logger.debug({
-                event   : CoreEvents.SLASH_COMMANDS_REGISTERED,
-                emitter : 'core',
-                module  : 'SlashCommandHandler'
+            this.client.logger.info({
+                event    : CoreEvents.SLASH_COMMANDS_REGISTERED,
+                emitter  : 'core',
+                global   : true,
+                module   : 'SlashCommandHandler',
+                commands : body.map(({ name }) => name)
             });
+
+            return true;
         }
         catch (error) {
 
