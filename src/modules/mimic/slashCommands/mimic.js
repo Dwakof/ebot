@@ -46,7 +46,7 @@ module.exports = class Mimic extends SlashCommand {
 
             const reply = await MimicService.mimicUser(interaction.guildId, userId, start);
 
-            const msg = await interaction.editReply(reply);
+            const msg = await interaction.editReply({ content: reply, allowedMentions : { users : [] } });
 
             await ReplyService.saveReply(msg, userId);
         }

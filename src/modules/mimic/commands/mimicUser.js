@@ -46,7 +46,7 @@ module.exports = class MimicUserCommand extends Command {
 
                 const reply = await MimicService.mimicUser(message.guild.id, userId, initialState);
 
-                const [, msg] = await Promise.all([temp.delete(), message.channel.send(reply)]);
+                const [, msg] = await Promise.all([temp.delete(), message.channel.send({ content: reply, allowedMentions : { users : [] } })]);
 
                 await ReplyService.saveReply(msg, userId);
             }
