@@ -7,7 +7,7 @@ const Util = require('util');
 
 // eslint-disable-next-line no-unused-vars
 const { Embed, MessageActionRow, MessageButton, Constants } = require('discord.js');
-const { memberNicknameMention, blockQuote, inlineCode }     = require('@discordjs/builders');
+const { memberNicknameMention, codeBlock, inlineCode }     = require('@discordjs/builders');
 
 const CoreUtil = require('./util');
 
@@ -48,7 +48,7 @@ module.exports = class ClientUtil extends Base {
     memoize = CoreUtil.memoize;
 
     code      = inlineCode;
-    codeBlock = blockQuote;
+    codeBlock = codeBlock;
 
     capitalize(string) {
 
