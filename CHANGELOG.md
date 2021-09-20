@@ -1,3 +1,15 @@
+# [0.9.0](https://github.com/Dwakof/ebot/compare/v0.8.2...v0.9.0) (2021-09-20)
+
+
+### Bug Fixes
+
+* codeBlock were not doing actual code block but quote block ([73eacab](https://github.com/Dwakof/ebot/commit/73eacabd53172aaae2a421348b5932c3c62737b8))
+
+
+### Features
+
+* slash applications permissions and global support ([83b4ebd](https://github.com/Dwakof/ebot/commit/83b4ebd4b2a2c4979658168979952ae38e041c1a))
+
 ## [0.8.2](https://github.com/Dwakof/ebot/compare/v0.8.1...v0.8.2) (2021-09-18)
 
 
