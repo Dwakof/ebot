@@ -8,7 +8,8 @@ class IsThereAnyDealCommand extends SlashCommand {
 
         super('deal', {
             category    : 'tools',
-            description : 'Displays current price overview'
+            description : 'Displays current price overview',
+            global      : true
         });
     }
 

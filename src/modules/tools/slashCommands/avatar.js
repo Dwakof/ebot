@@ -10,7 +10,8 @@ class AvatarCommand extends SlashCommand {
 
         super('avatar', {
             category    : 'tools',
-            description : 'Show avatar of the mentioned user or by default you'
+            description : 'Show avatar of the mentioned user or by default you',
+            global      : true
         });
     }
 

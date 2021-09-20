@@ -8,7 +8,8 @@ class DecideCommand extends SlashCommand {
 
         super('decide', {
             category    : 'tools',
-            description : 'Makes a random decision on one of the given options'
+            description : 'Makes a random decision on one of the given options',
+            global      : true
         });
     }
 

@@ -16,7 +16,8 @@ class InfoCommand extends SlashCommand {
 
         super('info', {
             category    : 'tools',
-            description : 'Get informations on the bot'
+            description : 'Get informations on the bot',
+            global      : true
         });
     }
 

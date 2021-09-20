@@ -2,8 +2,8 @@
 
 const Hoek = require('@hapi/hoek');
 
-const { ApplicationCommandOptionType } = require('discord-api-types/v9');
-const { AkairoModule }                 = require('discord-akairo');
+const { ApplicationCommandOptionType, ApplicationCommandPermissionType } = require('discord-api-types/v9');
+const { AkairoModule }                                                   = require('discord-akairo');
 
 module.exports = class SlashCommand extends AkairoModule {
 
@@ -32,17 +32,29 @@ module.exports = class SlashCommand extends AkairoModule {
     #methods = new Map();
 
 
-    constructor(id, { description, category }) {
+    constructor(id, { description, category, global = false, defaultPermission = true }) {
 
         super(id, { description, category });
 
-        this.name        = id;
-        this.description = description;
+        this.name              = id;
+        this.description       = description;
+        this.global            = global;
+        this.defaultPermission = defaultPermission;
 
         Hoek.assert(this.name, 'The slash command class must have a name.');
         Hoek.assert(this.description, 'The slash command class must have a description.');
 
-        this.#command = { name : this.name, description : this.description, type : SlashCommand.Types.RootCommand };
+        if (global) {
+
+            Hoek.assert(!this.permissions, 'permissions() can not be implemented on a global slash command');
+        }
+
+        this.#command = {
+            name               : this.name,
+            description        : this.description,
+            type               : SlashCommand.Types.RootCommand,
+            default_permission : defaultPermission
+        };
 
         if (this.constructor.command) {
 
@@ -69,7 +81,7 @@ module.exports = class SlashCommand extends AkairoModule {
         }
     }
 
-    setMethod(parent, command, { method : methodName, options }) {
+    setMethod(parent, command, { method : methodName, options = {} }) {
 
         let id;
 
@@ -107,7 +119,9 @@ module.exports = class SlashCommand extends AkairoModule {
 
         command.options = [];
 
-        for (const [name, { description, method, options = {} }] of Object.entries(subcommands)) {
+        for (const [name, subcmd] of Object.entries(subcommands)) {
+
+            const { description, method, options } = subcmd;
 
             const subcommand = { name, description, type : SlashCommand.Types.Subcommand };
 
@@ -218,6 +232,7 @@ module.exports = class SlashCommand extends AkairoModule {
      *
      * @property {String}                   method
      * @property {ApplicationOptions}       [options]
+     * @property {Boolean}                  [defaultPermission=true]
      */
     static command;
 
@@ -246,6 +261,23 @@ module.exports = class SlashCommand extends AkairoModule {
             Role            : ApplicationCommandOptionType.Role,
             Mentionable     : ApplicationCommandOptionType.Mentionable,
             Number          : ApplicationCommandOptionType.Number
+        };
+    }
+
+    static get Permission() {
+
+        return {
+            OWNERS       : 'owners',
+            GUILD_OWNERS : 'guild_owners'
+        };
+    }
+
+    static get PermissionTypes() {
+
+        return {
+
+            User : ApplicationCommandPermissionType.User,
+            Role : ApplicationCommandPermissionType.Role
         };
     }
 
@@ -342,5 +374,39 @@ module.exports = class SlashCommand extends AkairoModule {
 
             command.options.push(option);
         }
+    }
+
+    async buildPermissions(guild) {
+
+        if (!this.permissions) {
+
+            return [];
+        }
+
+        const permissions = [];
+
+        for (const permission of await this.permissions(guild)) {
+
+            if (permission === SlashCommand.Permission.OWNERS) {
+
+                for (const ownerId of this.client.ownerID) {
+
+                    permissions.push({ type : SlashCommand.PermissionTypes.User, id : ownerId, permission : true });
+                }
+
+                continue;
+            }
+
+            if (permission === SlashCommand.Permission.GUILD_OWNERS) {
+
+                permissions.push({ type : SlashCommand.PermissionTypes.User, id : guild.ownerId, permission : true });
+
+                continue;
+            }
+
+            permissions.push(permission);
+        }
+
+        return permissions.flat();
     }
 };

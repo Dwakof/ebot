@@ -60,62 +60,85 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
             return false;
         }
 
-        const body = [];
+        const guildCommands  = [];
+        const globalCommands = [];
 
-        for (const [, { command }] of this.modules) {
+        for (const [, { command, global }] of this.modules) {
 
-            body.push({ ...command, type : 1 });
+            if (global) {
+
+                globalCommands.push({ ...command, type : 1 });
+
+                continue;
+            }
+
+            guildCommands.push({ ...command, type : 1, default_permission : command.default_permission ?? true });
         }
 
         try {
 
-            if (this.client.settings.ebot.slashCommands.registerGuilds.length > 0) {
+            for (const [guildId, guild] of this.client.guilds.cache) {
 
-                for (const guildId of this.client.settings.ebot.slashCommands.registerGuilds) {
+                const commands = await this.client.API.put(Routes.applicationGuildCommands(this.client.settings.discord.clientId, guildId), { body : guildCommands });
 
-                    await this.client.API.put(Routes.applicationGuildCommands(this.client.settings.discord.clientId, guildId), { body });
+                const bulkPermissions = [];
+
+                for (const command of commands) {
+
+                    const commandPermission = { id : command.id, permissions : [] };
+
+                    for (const perm of await this.modules.get(command.name).buildPermissions(guild)) {
+
+                        commandPermission.permissions.push(perm);
+                    }
+
+                    bulkPermissions.push(commandPermission);
                 }
 
-                this.client.logger.info({
-                    event    : CoreEvents.SLASH_COMMANDS_REGISTERED,
-                    emitter  : 'core',
-                    global   : false,
-                    module   : 'SlashCommandHandler',
-                    commands : body.map(({ name }) => name)
-                });
-
-                return true;
-            }
-
-            await this.client.API.put(Routes.applicationCommands(this.client.settings.discord.clientId), { body });
-
-            for (const guildId of this.client.guilds.cache.map(({ id }) => id)) {
-
-                await this.client.API.put(Routes.applicationGuildCommands(this.client.settings.discord.clientId, guildId), { body : [] });
+                await this.client.API.put(Routes.guildApplicationCommandsPermissions(this.client.settings.discord.clientId, guildId), { body : bulkPermissions });
             }
 
             this.client.logger.info({
-                event    : CoreEvents.SLASH_COMMANDS_REGISTERED,
+                event    : CoreEvents.GUILD_SLASH_COMMANDS_REGISTERED,
                 emitter  : 'core',
-                global   : true,
+                global   : false,
                 module   : 'SlashCommandHandler',
-                commands : body.map(({ name }) => name)
+                commands : guildCommands.map(({ name }) => name)
             });
-
-            return true;
         }
         catch (error) {
 
             if (error.status === 400) {
 
-                this.client.logger.error({
-                    errors   : error.rawError.errors,
-                    commands : body
-                });
+                this.client.logger.error({ errors : error.rawError.errors, commands : guildCommands, global : false });
             }
 
             throw error;
         }
+
+        try {
+
+            await this.client.API.put(Routes.applicationCommands(this.client.settings.discord.clientId), { body : globalCommands });
+
+            this.client.logger.info({
+                event    : CoreEvents.GLOBAL_SLASH_COMMANDS_REGISTERED,
+                emitter  : 'core',
+                global   : true,
+                module   : 'SlashCommandHandler',
+                commands : globalCommands.map(({ name }) => name)
+            });
+        }
+        catch (error) {
+
+            if (error.status === 400) {
+
+                this.client.logger.error({ errors : error.rawError.errors, commands : globalCommands, global : true });
+            }
+
+            throw error;
+        }
+
+        return true;
     }
 
     /**

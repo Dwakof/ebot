@@ -8,7 +8,8 @@ class UrbanDictionaryCommand extends SlashCommand {
 
         super('ud', {
             category    : 'tools',
-            description : 'Search Urban Dictionary for given term'
+            description : 'Search Urban Dictionary for given term',
+            global      : true
         });
     }
 

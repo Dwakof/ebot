@@ -7,7 +7,8 @@ class GoogleImagesCommand extends SlashCommand {
 
         super('image', {
             category    : 'tools',
-            description : 'Searches Google Images'
+            description : 'Searches Google Images',
+            global      : true
         });
     }
 

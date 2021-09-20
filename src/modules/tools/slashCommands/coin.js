@@ -6,7 +6,11 @@ class CoinFlipCommand extends SlashCommand {
 
     constructor() {
 
-        super('coin', { category : 'tools', description : 'Flips a coin' });
+        super('coin', {
+            category    : 'tools',
+            description : 'Flips a coin',
+            global      : true
+        });
     }
 
     static get command() {

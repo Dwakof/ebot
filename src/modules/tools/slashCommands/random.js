@@ -8,7 +8,8 @@ class RandomNumberCommand extends SlashCommand {
 
         super('random', {
             category    : 'tools',
-            description : 'Generates a random number within given range'
+            description : 'Generates a random number within given range',
+            global      : true
         });
     }
 

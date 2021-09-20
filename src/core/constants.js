@@ -27,6 +27,9 @@ exports.CoreEvents = {
     CACHE_WARMUP_STARTED  : 'cacheWarmupStarted',
     CACHE_WARMUP_FINISHED : 'cacheWarmupFinished',
 
-    SLASH_COMMAND_BUILT       : 'slashCommandBuilt',
-    SLASH_COMMANDS_REGISTERED : 'slashCommandRegistered'
+    GUILD_SLASH_COMMAND_BUILT       : 'guildSlashCommandBuilt',
+    GUILD_SLASH_COMMANDS_REGISTERED : 'guildSlashCommandRegistered',
+
+    GLOBAL_SLASH_COMMAND_BUILT       : 'globalSlashCommandBuilt',
+    GLOBAL_SLASH_COMMANDS_REGISTERED : 'globalSlashCommandRegistered'
 };
