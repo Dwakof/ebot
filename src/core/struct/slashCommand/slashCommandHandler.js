@@ -235,6 +235,8 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
             }
 
             this.client.handleError(slashCommand, error, interaction);
+
+            await this.client.util.send(interaction, 'Whoopsy, something went wrong with the command');
         }
         finally {
 

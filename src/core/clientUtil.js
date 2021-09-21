@@ -6,8 +6,8 @@ const Hoek = require('@hapi/hoek');
 const Util = require('util');
 
 // eslint-disable-next-line no-unused-vars
-const { Embed, MessageActionRow, MessageButton, Constants } = require('discord.js');
-const { memberNicknameMention, codeBlock, inlineCode }     = require('@discordjs/builders');
+const { Embed, MessageActionRow, MessageButton, Constants, Message, Interaction } = require('discord.js');
+const { memberNicknameMention, codeBlock, inlineCode }                            = require('@discordjs/builders');
 
 const CoreUtil = require('./util');
 
@@ -221,5 +221,35 @@ module.exports = class ClientUtil extends Base {
         });
 
         return reply;
+    }
+
+    /**
+     *
+     * @param {Message|Interaction} obj
+     * @param {*}                   payload
+     */
+    send(obj, payload) {
+
+        if (obj instanceof Interaction) {
+
+            if (obj.deferred || obj.replied) {
+
+                return obj.editReply(payload);
+            }
+
+            return obj.reply(payload);
+        }
+
+        if (obj instanceof Message) {
+
+            if (obj.util) {
+
+                return obj.util.send(payload);
+            }
+
+            return obj.channel.send(payload);
+        }
+
+        throw new Error(`Could not send a message using object ${ typeof obj }`);
     }
 };
