@@ -1,3 +1,15 @@
+# [0.10.0](https://github.com/Dwakof/ebot/compare/v0.9.0...v0.10.0) (2021-09-21)
+
+
+### Bug Fixes
+
+* send a error message in a slash command failure to avoid slash command hanging ([73dcbc7](https://github.com/Dwakof/ebot/commit/73dcbc7d67f185b1c2d955a688671bfd49b91bb9))
+
+
+### Features
+
+* Karma command and slashCommand default to giving you your karma stats unless you specify a user ([faa9c04](https://github.com/Dwakof/ebot/commit/faa9c04adde5f515644a654dbfc6d94b1df48719)), closes [#222](https://github.com/Dwakof/ebot/issues/222)
+
 # [0.9.0](https://github.com/Dwakof/ebot/compare/v0.8.2...v0.9.0) (2021-09-20)
 
 
