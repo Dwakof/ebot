@@ -6,7 +6,7 @@ module.exports = class Karma extends SlashCommand {
 
     constructor() {
 
-        super('karma', { category : 'karma', description : 'A descriptions' });
+        super('karma', { category : 'karma', description : 'Get karma stats for a user, by default you' });
     }
 
     static get command() {
@@ -16,14 +16,19 @@ module.exports = class Karma extends SlashCommand {
             options : {
                 user : {
                     type        : SlashCommand.Types.Member,
-                    description : 'User to get the karma info from',
-                    required    : true
+                    description : 'User to get the karma stats from',
+                    required    : false
                 }
             }
         };
     }
 
     async getUser(interaction, { user }) {
+
+        if (!user) {
+
+            user = interaction.user;
+        }
 
         const { KarmaService } = this.client.services('karma');
 
