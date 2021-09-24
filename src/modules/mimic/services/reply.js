@@ -24,4 +24,40 @@ module.exports = class ReplyService extends Service {
             userId
         });
     }
+
+    #baseQuery({ guildId, after, before }) {
+
+        const { Mimic } = this.client.providers('mimic');
+
+        const { Reply } = Mimic.models;
+
+        const query = Reply.query();
+
+        if (guildId) {
+
+            query.where({ guildId });
+        }
+
+        if (after) {
+
+            query.where('createdAt', '>', after);
+        }
+
+        if (before) {
+
+            query.where('createdAt', '<', before);
+        }
+
+        return query;
+    }
+
+    async countReplies(conditions) {
+
+        return (await this.#baseQuery(conditions).resultSize()) || 0;
+    }
+
+    getReplies(conditions) {
+
+        return this.#baseQuery(conditions).toKnexQuery().asyncIterator();
+    }
 };

@@ -28,7 +28,7 @@ module.exports = class MimicUserCommand extends Command {
         });
     }
 
-    async exec(message, { guild, member, initialState }) {
+    async exec(message, { member, initialState }) {
 
         if (member) {
 
@@ -44,24 +44,24 @@ module.exports = class MimicUserCommand extends Command {
                     this.client.sentry.setTag('mimicked_username', `${ member.user.username }#${ member.user.discriminator }`);
                 }
 
-                const reply = await MimicService.mimicUser(message.guild.id, userId, initialState);
+                const reply = await MimicService.mimic(message.guild.id, userId, initialState);
 
                 const [, msg] = await Promise.all([temp.delete(), message.channel.send({ content: reply, allowedMentions : { users : [] } })]);
 
                 await ReplyService.saveReply(msg, userId);
             }
-            catch (error) {
+            catch (err) {
 
-                if (error.statusCode === 404) {
+                if (err.statusCode === 404) {
 
                     return message.util.send(`Hey <@${ message.author.id }>, I'm sorry but this user cannot be mimicked yet.`);
                 }
 
-                this.client.logger.error({ error, message : error.toString() });
+                this.client.logger.error(err, err.toString());
 
                 await message.util.send(`Woopsy, something went wrong when trying to mimic this user.`);
 
-                this.client.handleError(this, error, message);
+                this.client.handleError(this, err, message);
             }
         }
     }

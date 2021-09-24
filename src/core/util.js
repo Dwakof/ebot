@@ -3,8 +3,8 @@
 const Fs   = require('fs/promises');
 const Path = require('path');
 
-const { GuildMember, User, Guild, Channel, Message, Role } = require('discord.js');
-const { EventEmitter }                                     = require('events');
+const { GuildMember, User, Guild, Channel, Message, Role, Snowflake } = require('discord.js');
+const { EventEmitter }                                                = require('events');
 
 class KnexAsyncIterator {
 
@@ -93,38 +93,79 @@ class KnexAsyncIterator {
     }
 }
 
-class Status extends EventEmitter {
+class Task extends EventEmitter {
 
     #values = new Map();
+    #executor;
 
-    constructor(values) {
+    constructor(executor) {
 
         super();
 
-        if (values) {
+        this.set({
+            doing   : false,
+            done    : false,
+            failed  : false,
+            startAt : null,
+            endAt   : null
+        });
 
-            this.set(values);
-        }
+        this.#executor = executor;
     }
 
     increase(key, value = 1) {
 
-        this.set({ [key] : (this.#values.get(key) || 0) + value });
+        return this.set({ [key] : (this.#values.get(key) || 0) + value });
     }
 
     set(values = {}) {
 
+        const previous = {};
+
         for (const [key, value] of Object.entries(values)) {
 
+            previous[key] = this.get(key);
             this.#values.set(key, value);
         }
+
+        this.emit('update', this, values, previous);
 
         return this;
     }
 
-    update() {
+    start() {
 
-        this.emit('update', this.getAll());
+        this.set({ doing : true, startAt : new Date() });
+
+        this.emit('start', this);
+
+        return this;
+    }
+
+    done() {
+
+        this.set({ doing : false, done : true, endAt : new Date() });
+
+        this.emit('done', this);
+        this.emit('resolve', this);
+
+        return this;
+    }
+
+    enforceStop() {
+
+        this.set({ doing : false, endAt : this.get('endAt') ?? new Date() });
+        this.emit('resolve', this);
+
+        return this;
+    }
+
+    failed(error) {
+
+        this.set({ doing : false, done : false, failed : true, endAt : new Date(), error });
+
+        this.emit('failed', this);
+        this.emit('reject', this);
 
         return this;
     }
@@ -143,6 +184,23 @@ class Status extends EventEmitter {
 
         return this.getAll();
     }
+
+    then(fulfil, reject) {
+
+        this.start();
+
+        this.once('failed', () => {
+
+            reject(this.get('error'));
+        });
+
+        this.#executor(this)
+            .then(() => fulfil(this.getAll()))
+            .catch((error) => {
+
+                this.failed(error);
+            });
+    }
 }
 
 module.exports = class CoreUtil {
@@ -153,6 +211,13 @@ module.exports = class CoreUtil {
     static isString(string) {
 
         return typeof string === 'string' || string instanceof String;
+    }
+
+    static isPromise(value) {
+
+        return value
+            && typeof value.then === 'function'
+            && typeof value.catch === 'function';
     }
 
     static async requireDir(rootPath, info = false) {
@@ -291,7 +356,7 @@ module.exports = class CoreUtil {
 
     static KnexAsyncIterator = KnexAsyncIterator;
 
-    static Status = Status;
+    static Task = Task;
 
     static memoize(fn) {
 
@@ -330,5 +395,25 @@ module.exports = class CoreUtil {
     static randomValue(array = []) {
 
         return array[CoreUtil.randomInt(0, array.length - 1)] || undefined;
+    }
+
+    /**
+     * @param {String|Snowflake} guildId
+     * @param {String|Snowflake} channelId
+     * @param {String|Snowflake} messageId
+     * @param {Message}          message
+     *
+     * @return {String}
+     */
+    static linkUrl({ guildId = '@me', channelId, messageId, message }) {
+
+        const base = `https://discordapp.com/channels`;
+
+        if (message) {
+
+            return [base, message.guildId || '@me', message.channelId, message.id].filter(Boolean).join('/');
+        }
+
+        return [base, guildId, channelId, messageId].filter(Boolean).join('/');
     }
 };
