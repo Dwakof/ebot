@@ -2,6 +2,8 @@
 
 const { Command } = require('../../../core');
 
+const { Argument } = require('discord-akairo');
+
 module.exports = class MimicUserCommand extends Command {
 
     constructor() {
@@ -13,11 +15,9 @@ module.exports = class MimicUserCommand extends Command {
             editable : false,
             args     : [
                 {
-                    id     : 'member',
-                    type   : 'member',
-                    prompt : {
-                        start : 'which member do you me to mimic ?'
-                    }
+                    id      : 'member',
+                    type    : Argument.union('member', 'string'),
+                    default : 'guild'
                 },
                 {
                     id      : 'initialState',
@@ -35,8 +35,31 @@ module.exports = class MimicUserCommand extends Command {
             const { MimicService, ReplyService } = this.client.services('mimic');
 
             try {
-                const temp   = await message.util.send('thinking...');
-                const userId = member.user.id;
+                const temp = await message.util.send('thinking...');
+
+                let userId;
+
+                if (!this.client.util.isString(member)) {
+
+                    userId = member.user.id;
+                }
+                else {
+
+                    if (member.toLowerCase() === 'ebot') {
+
+                        userId = 'ebot';
+                    }
+                }
+
+                if (userId === message.guild.me.id) {
+
+                    userId = 'ebot';
+                }
+
+                if (!userId) {
+
+                    userId = 'guild';
+                }
 
                 if (this.client.sentry) {
 
@@ -44,9 +67,12 @@ module.exports = class MimicUserCommand extends Command {
                     this.client.sentry.setTag('mimicked_username', `${ member.user.username }#${ member.user.discriminator }`);
                 }
 
-                const reply = await MimicService.mimic(message.guild.id, userId, initialState);
+                const reply = await MimicService.mimic(message.guildId, userId, initialState);
 
-                const [, msg] = await Promise.all([temp.delete(), message.channel.send({ content: reply, allowedMentions : { users : [] } })]);
+                const [, msg] = await Promise.all([
+                    temp.delete(),
+                    message.channel.send({ content : reply, allowedMentions : { users : [] } })
+                ]);
 
                 await ReplyService.saveReply(msg, userId);
             }
