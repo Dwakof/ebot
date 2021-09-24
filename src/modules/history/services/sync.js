@@ -1,7 +1,7 @@
 'use strict';
 
-const { SnowflakeUtil, Constants } = require('discord.js');
-const { channelMention }           = require('@discordjs/builders');
+const { SnowflakeUtil, Constants, Permissions } = require('discord.js');
+const { channelMention }                        = require('@discordjs/builders');
 
 const DayJS        = require('dayjs');
 const Duration     = require('dayjs/plugin/duration');
@@ -17,6 +17,9 @@ const { Service, Util } = require('../../../core');
 module.exports = class SyncService extends Service {
 
     static FIRST_MESSAGE_ID = SnowflakeUtil.generate(SnowflakeUtil.EPOCH);
+    static CHANNEL_STATE    = 'channel_import';
+    static GUILD_STATE      = 'guild_import';
+    static REQUIRED_PERMS   = [Permissions.FLAGS.READ_MESSAGE_HISTORY, Permissions.FLAGS.VIEW_CHANNEL];
 
     async * fetchAllMessages(channel, limit = 100) {
 
@@ -44,232 +47,228 @@ module.exports = class SyncService extends Service {
         }
     }
 
-    /**
-     * @param {Guild}   guild
-     * @param {Message} message
-     *
-     * @return {Promise<void>}
-     */
-    async syncGuild(guild, message) {
-
-        const { State } = this.client.providers('history');
-
-        const status = new Util.Status({ startAt : new Date(), current : 0, doing : true, done : false });
-
-        try {
-
-            const currentChannels = new Map();
-
-            status.on('update', (data) => {
-
-                return this.progressGuild(guild, data, currentChannels, message);
-            });
-
-            const { doing } = await State.get('guild_import', guild.id, { doing : false });
-
-            if (doing) {
-
-                return;
-            }
-
-            status.set({ current : 1, total : guild.channels.cache.size, messages : 0 });
-
-            await State.set('guild_import', guild.id, status);
-
-            const msg = await this.progressGuild(guild, status, currentChannels, message);
-
-            status.set({ url : `https://discordapp.com/channels/${ msg.guild.id }/${ msg.channel.id }/${ msg.id }` });
-
-            await State.set('guild_import', guild.id, status);
-
-            this.client.logger.info({ message : `Started guild ${ guild.id } (${ guild.name }) import`, status });
-
-            let interval;
-
-            if (message) {
-
-                interval = setInterval(() => status.update(), 1200);
-            }
-
-            const queue = new PQueue({ concurrency : 7 });
-
-            for (const [, channel] of guild.channels.cache) {
-
-                queue.add(async () => {
-
-                    currentChannels.set(channel.id, channel);
-
-                    await this.syncChannel(guild, channel, null, status);
-
-                    status.increase('current');
-
-                    await State.set('guild_import', guild.id, status);
-
-                    currentChannels.delete(channel.id);
-                });
-            }
-
-            await queue.onIdle();
-
-            status.set({ done : true, doing : false });
-
-            this.client.logger.info({
-                message : `Finished guild ${ guild.id } (${ guild.name }) import with ${ status.get('messages') } messages imported`,
-                status
-            });
-
-            clearInterval(interval);
-        }
-        catch (error) {
-
-            status.set({ failed : true });
-
-            this.client.logger.error({ message : `Could not sync message for guild ${ guild.id }`, error, status });
-            this.client.logger.error(error);
-        }
-        finally {
-
-            status.set({ doing : false, endAt : new Date() });
-
-            status.update();
-
-            await State.set('guild_import', guild.id, status);
-        }
-    }
-
-    /**
-     * @param {Guild}   guild
-     * @param {Channel} channel
-     * @param {Message} [message]
-     * @param {Status}  [parentStatus]
-     *
-     * @return {Promise<boolean|number|*>}
-     */
-    async syncChannel(guild, channel, message, parentStatus) {
+    syncChannel(guildId, channelId) {
 
         const { State, History } = this.client.providers('history');
 
-        const status = new Util.Status({ startAt : new Date(), messages : 0, doing : true, done : false });
+        const stateKey = `${ guildId }_${ channelId }`;
 
-        if (!channel.isText()) {
+        return new Util.Task(async (task) => {
 
-            return false;
-        }
+            try {
 
-        if (channel.nsfw) {
+                task.set({ guildId, channelId, messages : 0 });
 
-            return false;
-        }
+                const { doing } = await State.get(SyncService.CHANNEL_STATE, stateKey, { doing : false });
 
-        try {
+                if (doing) {
 
-            if (message) {
-
-                status.on('update', (data) => {
-
-                    return this.progressChannel(guild, channel, data, message);
-                });
-            }
-
-            const { doing } = await State.get('channel_import', channel.id, { doing : false });
-
-            if (doing) {
-
-                return false;
-            }
-
-            await State.set('channel_import', channel.id, status);
-
-            if (message) {
-
-                const msg = await this.progressChannel(guild, channel, status, message);
-
-                status.set({ url : `https://discordapp.com/channels/${ msg.guild.id }/${ msg.channel.id }/${ msg.id }` });
-            }
-
-            this.client.logger.info({ message : `Started channel ${ channel.id } (${ channel.name }) import`, status });
-
-            const { Message } = History.models;
-
-            let interval;
-
-            if (message) {
-
-                interval = setInterval(() => status.update(), 1200);
-            }
-
-            for await (const messages of this.fetchAllMessages(channel)) {
-
-                await Message.query().insert(this.toMessage(messages)).onConflict('id').merge();
-
-                status.increase('messages', messages.length);
-
-                await State.set('channel_import', channel.id, status);
-
-                if (parentStatus) {
-
-                    parentStatus.increase('messages', messages.length);
+                    return false;
                 }
+
+                await State.set(SyncService.CHANNEL_STATE, stateKey, task);
+
+                const channel = this.client.channels.cache.get(channelId);
+
+                if (!SyncService.filterChannel(channel)) {
+
+                    return false;
+                }
+
+                const { Message } = History.models;
+
+                for await (const messages of this.fetchAllMessages(channel)) {
+
+                    await Message.query().insert(SyncService.toMessage(messages)).onConflict('id').merge();
+
+                    task.increase('messages', messages.length);
+
+                    await State.set(SyncService.CHANNEL_STATE, stateKey, task);
+                }
+
+                task.done();
             }
+            catch (err) {
 
-            status.set({ done : true, doing : false });
+                task.failed(err);
 
-            await State.set('channel_import', channel.id, status);
-
-            this.client.logger.info({
-                message : `Finished channel ${ channel.id } (${ channel.name }) import with ${ status.get('messages') } messages imported`,
-                status
-            });
-
-            if (message) {
-
-                clearInterval(interval);
+                this.client.logger.error(err, `Could not sync message for channel ${ channelId }`);
             }
+            finally {
 
-            return status.messages;
-        }
-        catch (error) {
+                task.enforceStop();
 
-            status.set({ failed : true });
-
-            this.client.logger.error({ message : `Could not sync message for channel ${ channel.id }`, error });
-            this.client.logger.error(error);
-        }
-        finally {
-
-            status.set({ doing : false, endAt : new Date() });
-
-            status.update();
-
-            await State.set('channel_import', channel.id, status);
-        }
-    }
-
-    toMessage(messages = []) {
-
-        return messages.map((message) => {
-
-            return {
-                id        : message.id,
-                guildId   : message.guild.id,
-                authorId  : message.author.id,
-                content   : message.content || '',
-                createdAt : message.createdAt,
-                updatedAt : message.editedAt || message.createdAt
-            };
+                await State.set(SyncService.CHANNEL_STATE, stateKey, task);
+            }
         });
     }
 
-    progressGuild(guild, status, channels, message) {
+    syncGuild(guildId) {
 
-        if (!message) {
+        const { State } = this.client.providers('history');
 
-            return;
+        const stateKey = guildId;
+
+        return new Util.Task(async (task) => {
+
+            try {
+
+                task.set({ guildId, messages : 0, current : 0, total : 0, channels : new Set() });
+
+                const { doing } = await State.get(SyncService.GUILD_STATE, stateKey, { doing : false });
+
+                if (doing) {
+
+                    return false;
+                }
+
+                await State.set(SyncService.GUILD_STATE, stateKey, task);
+
+                const guild    = this.client.guilds.cache.get(guildId);
+                const channels = Array.from(guild.channels.cache.values()).filter(SyncService.filterChannel);
+
+                task.set({ total : channels.length });
+
+                const queue = new PQueue({ concurrency : 7 });
+
+                for (const channel of channels) {
+
+                    queue.add(async () => {
+
+                        task.get('channels').add(channel.id);
+
+                        const channelTask = this.syncChannel(guildId, channel.id);
+
+                        channelTask.on('update', (t, values, previous) => {
+
+                            if (values.messages) {
+
+                                task.increase('messages', values.messages - previous.messages);
+                            }
+                        });
+
+                        await channelTask;
+
+                        task.increase('current');
+
+                        task.get('channels').delete(channel.id);
+
+                        await State.set(SyncService.GUILD_STATE, guild.id, task);
+                    });
+                }
+
+                await queue.onIdle();
+
+                task.done();
+            }
+            catch (err) {
+
+                task.failed(err);
+
+                this.client.logger.error(err, `Could not sync message for guild ${ guildId }`);
+            }
+            finally {
+
+                task.enforceStop();
+
+                await State.set(SyncService.GUILD_STATE, stateKey, task);
+            }
+        });
+    }
+
+    async syncGuildFromMessage(guildId, interaction) {
+
+        let task = new Util.Task();
+        let message;
+
+        const send = () => {
+
+            const payload = { embeds : [this.progressGuild(guildId, task)] };
+
+            if (message) {
+
+                return message.edit(payload);
+            }
+
+            return this.client.util.send(interaction, payload);
+        };
+
+        const interval = setInterval(() => send(), 1500);
+
+        try {
+
+            task = this.syncGuild(guildId);
+
+            message = await send();
+
+            task.set({ url : Util.linkUrl({ message }) });
+
+            await task;
+
+            return task.getAll();
         }
+        catch (err) {
 
-        const { messages, current, total, doing, startAt, endAt, done, failed } = status;
+            this.client.logger.error({ msg : `Could not sync guild ${ guildId }`, err });
+        }
+        finally {
+
+            clearInterval(interval);
+
+            await send();
+        }
+    }
+
+    async syncChannelFromMessage(guildId, channelId, interaction) {
+
+        let message;
+        let task = new Util.Task();
+
+        const send = () => {
+
+            const payload = { embeds : [this.progressChannel(guildId, channelId, task)] };
+
+            if (message) {
+
+                return message.edit(payload);
+            }
+
+            return this.client.util.send(interaction, payload);
+        };
+
+        const interval = setInterval(() => send(), 1500);
+
+        try {
+
+            task = this.syncChannel(guildId, channelId);
+
+            message = await send();
+
+            task.set({ url : Util.linkUrl({ message }) });
+
+            await task;
+
+            return task.getAll();
+        }
+        catch (err) {
+
+            this.client.logger.error({ msg : `Could not sync channel ${ channelId }`, err });
+        }
+        finally {
+
+            clearInterval(interval);
+
+            await send();
+        }
+    }
+
+    progressGuild(guildId, task) {
+
+        const { messages, current, total, channels, doing, startAt, endAt, done, failed } = task.getAll();
 
         const embed = this.client.util.embed();
+
+        const guild = this.client.guilds.cache.get(guildId);
 
         embed.setTitle(`Syncing guild`)
             .setAuthor(guild.name, guild.iconURL({ dynamic : false, size : 32 }))
@@ -279,24 +278,27 @@ module.exports = class SyncService extends Service {
 
         if (doing && channels) {
 
-            embed.addField('Channels', this.client.util.chunk(Array.from(channels.keys()).map(channelMention), 3).map((ids) => ids.join(' ')).flat().join('\n'), true);
+            embed.addField('Channels', this.client.util.chunk(Array.from(channels).map(channelMention), 3).map((ids) => ids.join(' ')).flat().join('\n'), true);
         }
 
         if (doing) {
 
-            embed.addField('Messages', `${ messages || 0 }`, true);
+            embed.addField('Messages', `${ messages }`, true);
         }
 
-        embed.addField('Progress', this.client.util.progressBar(current, total));
+        if (doing && current) {
+
+            embed.addField('Progress', this.client.util.progressBar(current, total));
+        }
 
         if (doing) {
 
-            embed.setFooter(`running for ${ DayJS.duration(DayJS(startAt).diff(DayJS())).humanize() }`);
+            embed.setFooter(`Running for ${ DayJS.duration(DayJS(startAt).diff(DayJS())).humanize() }`);
         }
 
         if (!doing) {
 
-            embed.setFooter(`took ${ DayJS.duration(DayJS(startAt).diff(DayJS(endAt))).humanize() }`);
+            embed.setFooter(`Took ${ DayJS.duration(DayJS(startAt).diff(DayJS(endAt))).humanize() }`);
         }
 
         if (done) {
@@ -311,19 +313,17 @@ module.exports = class SyncService extends Service {
                 .setColor(Constants.Colors.RED);
         }
 
-        return message.util.send({ embeds : [embed] });
+        return embed;
     }
 
-    progressChannel(guild, channel, status, message) {
+    progressChannel(guildId, channelId, task) {
 
-        if (!message) {
-
-            return;
-        }
-
-        const { messages, doing, startAt, endAt, done, failed } = status;
+        const { messages, doing, startAt, endAt, done, failed } = task.getAll();
 
         const embed = this.client.util.embed();
+
+        const guild   = this.client.guilds.cache.get(guildId);
+        const channel = guild.channels.cache.get(channelId);
 
         embed.setTitle(`Syncing channel ${ channel.name }`)
             .setAuthor(guild.name, guild.iconURL({ dynamic : false, size : 32 }))
@@ -355,6 +355,41 @@ module.exports = class SyncService extends Service {
                 .setColor(Constants.Colors.RED);
         }
 
-        return message.util.send({ embeds : [embed] });
+        return embed;
+    }
+
+    static toMessage(messages = []) {
+
+        return messages.map((message) => {
+
+            return {
+                id        : message.id,
+                guildId   : message.guild.id,
+                authorId  : message.author.id,
+                content   : message.content || '',
+                createdAt : message.createdAt,
+                updatedAt : message.editedAt || message.createdAt
+            };
+        });
+    }
+
+    static filterChannel(channel) {
+
+        if (!channel.guild) {
+
+            return false;
+        }
+
+        if (!channel.isText()) {
+
+            return false;
+        }
+
+        if (channel.nsfw) {
+
+            return false;
+        }
+
+        return channel.guild.me.permissionsIn(channel).has(SyncService.REQUIRED_PERMS);
     }
 };

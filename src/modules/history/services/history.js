@@ -26,7 +26,7 @@ module.exports = class HistoryService extends Service {
             }).onConflict('id').merge();
     }
 
-    async countMessage({ userId, guildId, channelId, after, before }) {
+    baseQuery({ userId, guildId, channelId, after, before }) {
 
         const { History } = this.client.providers('history');
 
@@ -59,42 +59,16 @@ module.exports = class HistoryService extends Service {
             query.where('createdAt', '<', before);
         }
 
-        return (await query.resultSize()) || 0;
+        return query;
     }
 
-    getMessages({ userId, guildId, channelId, after, before }) {
+    async countMessages(conditions) {
 
-        const { History } = this.client.providers('history');
+        return (await this.baseQuery(conditions).resultSize()) || 0;
+    }
 
-        const { Message } = History.models;
+    getMessages(conditions) {
 
-        const query = Message.query();
-
-        if (userId) {
-
-            query.where({ authorId : userId });
-        }
-
-        if (guildId) {
-
-            query.where({ guildId });
-        }
-
-        if (channelId) {
-
-            query.where({ channelId });
-        }
-
-        if (after) {
-
-            query.where('createdAt', '>', after);
-        }
-
-        if (before) {
-
-            query.where('createdAt', '<', before);
-        }
-
-        return query.toKnexQuery().asyncIterator();
+        return this.baseQuery(conditions).toKnexQuery().asyncIterator();
     }
 };

@@ -7,8 +7,8 @@ const Model = require('./model');
 
 module.exports = class Chain {
 
-    static BEGIN = '___BEGIN___';
-    static END   = '___END___';
+    static BEGIN = '¶BEGIN¶';
+    static END   = '¶END¶';
 
     /**
      * @type {Number}
@@ -60,7 +60,7 @@ module.exports = class Chain {
                 const words = sentence
                     .replace(new RegExp(Util.REGEX_URL), ' ')
                     .replace(new RegExp(Util.REGEX_CODE_BLOCK), ' ')
-                    .replace(/["_~\\()|,.\[\-$%`{}=+*\]]+/g, ' ')
+                    .replace(/["_~\\()¶|,.\[\-$%`{}=+*\]]/g, ' ')
                     .split(/\s+/)
                     .map((word) => word.trim())
                     .filter((word) => ![Chain.END, Chain.BEGIN].includes(word))
