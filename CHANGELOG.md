@@ -1,3 +1,16 @@
+# [0.11.0](https://github.com/Dwakof/ebot/compare/v0.10.0...v0.11.0) (2021-09-24)
+
+
+### Bug Fixes
+
+* rebuild not working ([f2070b4](https://github.com/Dwakof/ebot/commit/f2070b42846573dec645fde49a9f9b8b9673377b))
+
+
+### Features
+
+* Rework mimic ([922626f](https://github.com/Dwakof/ebot/commit/922626f426412aa2204ffc063e7df0057578e324)), closes [#189](https://github.com/Dwakof/ebot/issues/189) [#194](https://github.com/Dwakof/ebot/issues/194) [#189](https://github.com/Dwakof/ebot/issues/189) [#194](https://github.com/Dwakof/ebot/issues/194)
+* update mimic command to be able to use ebot or guild version ([fc6d368](https://github.com/Dwakof/ebot/commit/fc6d368e3b9044a2bdaf3356a2fc8d5b56567bd5))
+
 # [0.10.0](https://github.com/Dwakof/ebot/compare/v0.9.0...v0.10.0) (2021-09-21)
 
 
