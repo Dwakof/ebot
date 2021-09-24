@@ -304,7 +304,7 @@ module.exports = class BuildService extends Service {
 
         const send = () => {
 
-            const payload = { embeds : [this.progressGuild(guildId, task)] };
+            const payload = { embeds : [this.progressBuild(guildId, task)] };
 
             if (message) {
 
@@ -314,7 +314,7 @@ module.exports = class BuildService extends Service {
             return this.client.util.send(interaction, payload);
         };
 
-        const interval = setInterval(() => send(), 4500);
+        const interval = setInterval(() => send(), 1500);
 
         try {
 
