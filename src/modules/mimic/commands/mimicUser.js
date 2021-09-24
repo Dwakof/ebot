@@ -42,6 +42,11 @@ module.exports = class MimicUserCommand extends Command {
                 if (!this.client.util.isString(member)) {
 
                     userId = member.user.id;
+
+                    if (this.client.sentry) {
+
+                        this.client.sentry.setTag('mimicked_username', `${ member.user.username }#${ member.user.discriminator }`);
+                    }
                 }
                 else {
 
@@ -64,7 +69,6 @@ module.exports = class MimicUserCommand extends Command {
                 if (this.client.sentry) {
 
                     this.client.sentry.setTag('mimicked_user_id', userId);
-                    this.client.sentry.setTag('mimicked_username', `${ member.user.username }#${ member.user.discriminator }`);
                 }
 
                 const reply = await MimicService.mimic(message.guildId, userId, initialState);
