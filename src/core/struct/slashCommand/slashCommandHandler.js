@@ -106,14 +106,14 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
                 commands : guildCommands.map(({ name }) => name)
             });
         }
-        catch (error) {
+        catch (err) {
 
-            if (error.status === 400) {
+            if (err.status === 400) {
 
-                this.client.logger.error({ errors : error.rawError.errors, commands : guildCommands, global : false });
+                this.client.logger.error({ err, errors : err.rawError.errors, commands : guildCommands, global : false });
             }
 
-            throw error;
+            throw err;
         }
 
         try {
@@ -128,14 +128,14 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
                 commands : globalCommands.map(({ name }) => name)
             });
         }
-        catch (error) {
+        catch (err) {
 
-            if (error.status === 400) {
+            if (err.status === 400) {
 
-                this.client.logger.error({ errors : error.rawError.errors, commands : globalCommands, global : true });
+                this.client.logger.error({ err, errors : err.rawError.errors, commands : globalCommands, global : true });
             }
 
-            throw error;
+            throw err;
         }
 
         return true;

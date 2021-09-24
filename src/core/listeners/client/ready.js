@@ -16,6 +16,6 @@ module.exports = class clientReadyListener extends Listener {
 
     exec(none) {
 
-        this.client.logger.info({ event : this.event, emitter : this.emitter, message : 'Bot is ready' });
+        this.client.logger.info({ event : this.event, emitter : this.emitter, msg : 'Bot is ready' });
     }
 };

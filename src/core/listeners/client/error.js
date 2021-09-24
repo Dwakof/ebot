@@ -14,13 +14,13 @@ module.exports = class clientErrorListener extends Listener {
         });
     }
 
-    exec(error) {
+    exec(err) {
 
-        this.client.logger.error({ event : this.event, emitter : this.emitter, error, message : error.toString() });
+        this.client.logger.error({ event : this.event, emitter : this.emitter, err, msg : err.toString() });
 
         if (this.client.sentry) {
 
-            this.client.sentry.captureException(error);
+            this.client.sentry.captureException(err);
         }
     }
 };

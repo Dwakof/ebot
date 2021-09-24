@@ -19,7 +19,7 @@ module.exports = class shardResumeListener extends Listener {
         this.client.logger.info({
             event   : this.event,
             emitter : this.emitter,
-            message : 'Shard resumed',
+            msg : 'Shard resumed',
             shardId
         });
     }

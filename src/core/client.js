@@ -165,7 +165,7 @@ module.exports = class EbotClient extends AkairoClient {
             this.logger.debug({
                 event   : CoreEvents.MODULE_LOADED,
                 emitter : 'core',
-                message : `Module ${ name } loaded from ${ path }`
+                msg : `Module ${ name } loaded from ${ path }`
             });
         }
     }
@@ -355,14 +355,12 @@ module.exports = class EbotClient extends AkairoClient {
      */
     handleError(module, error, message, extraData = {}) {
 
-        console.error(error);
-
         this.logger.error({
             event        : CoreEvents.MODULE_ERROR,
             emitter      : module.id,
             errorMessage : error.toString(),
-            error,
-            message
+            err          : error,
+            msg          : message
         });
 
         if (this.sentry) {

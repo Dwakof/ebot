@@ -19,8 +19,9 @@ module.exports = class shardErrorListener extends Listener {
         this.client.logger.error({
             event   : this.event,
             emitter : this.emitter,
-            message : 'Shard errored',
-            shardId, error
+            msg : 'Shard errored',
+            err     : error,
+            shardId
         });
 
         if (this.client.sentry) {
