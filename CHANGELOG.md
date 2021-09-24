@@ -1,3 +1,10 @@
+## [0.11.1](https://github.com/Dwakof/ebot/compare/v0.11.0...v0.11.1) (2021-09-24)
+
+
+### Bug Fixes
+
+* mimic command not working ([a554deb](https://github.com/Dwakof/ebot/commit/a554debf14421cc85200292abce77c6ff776d150))
+
 # [0.11.0](https://github.com/Dwakof/ebot/compare/v0.10.0...v0.11.0) (2021-09-24)
 
 
