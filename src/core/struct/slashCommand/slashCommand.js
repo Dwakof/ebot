@@ -2,8 +2,13 @@
 
 const Hoek = require('@hapi/hoek');
 
-const { ApplicationCommandOptionType, ApplicationCommandPermissionType } = require('discord-api-types/v9');
-const { AkairoModule }                                                   = require('discord-akairo');
+const {
+    ApplicationCommandOptionType,
+    ApplicationCommandPermissionType,
+    ApplicationCommandType
+} = require('discord-api-types/v9');
+
+const { AkairoModule } = require('discord-akairo');
 
 module.exports = class SlashCommand extends AkairoModule {
 
@@ -32,17 +37,18 @@ module.exports = class SlashCommand extends AkairoModule {
     #methods = new Map();
 
 
-    constructor(id, { description, category, global = false, defaultPermission = true }) {
+    constructor(id, { description, category, global, defaultPermission, type }) {
 
         super(id, { description, category });
 
         this.name              = id;
         this.description       = description;
-        this.global            = global;
-        this.defaultPermission = defaultPermission;
+        this.global            = global ?? false;
+        this.defaultPermission = defaultPermission ?? true;
+        this.type              = type ?? SlashCommand.Types.RootCommand;
 
         Hoek.assert(this.name, 'The slash command class must have a name.');
-        Hoek.assert(this.description, 'The slash command class must have a description.');
+        // Hoek.assert(this.description, 'The slash command class must have a description.');
 
         if (global) {
 
@@ -52,7 +58,7 @@ module.exports = class SlashCommand extends AkairoModule {
         this.#command = {
             name               : this.name,
             description        : this.description,
-            type               : SlashCommand.Types.RootCommand,
+            type               : this.type,
             default_permission : defaultPermission
         };
 
@@ -85,7 +91,7 @@ module.exports = class SlashCommand extends AkairoModule {
 
         let id;
 
-        if (parent.type === SlashCommand.Types.RootCommand) {
+        if ([SlashCommand.Types.RootCommand, SlashCommand.Types.MessageCommand, SlashCommand.Types.UserCommand].includes(parent.type)) {
 
             id = command.name;
         }
@@ -250,6 +256,8 @@ module.exports = class SlashCommand extends AkairoModule {
 
         return {
             RootCommand     : -1,
+            UserCommand     : ApplicationCommandType.User,
+            MessageCommand  : ApplicationCommandType.Message,
             Subcommand      : ApplicationCommandOptionType.Subcommand,
             SubcommandGroup : ApplicationCommandOptionType.SubcommandGroup,
             String          : ApplicationCommandOptionType.String,

@@ -43,11 +43,6 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
 
             this.client.on('interactionCreate', (interaction) => {
 
-                if (!interaction.isCommand()) {
-
-                    return;
-                }
-
                 return this.handle(interaction);
             });
         });
@@ -67,12 +62,12 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
 
             if (global) {
 
-                globalCommands.push({ ...command, type : 1 });
+                globalCommands.push({ ...command, type : Math.max(1, command.type) });
 
                 continue;
             }
 
-            guildCommands.push({ ...command, type : 1, default_permission : command.default_permission ?? true });
+            guildCommands.push({ ...command, type : Math.max(1, command.type), default_permission : command.default_permission ?? true });
         }
 
         try {
@@ -175,7 +170,12 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
         const id = [commandName, options.getSubcommandGroup(false), options.getSubcommand(false)]
             .filter(Boolean).join('.');
 
+        console.log(id);
+
         if (!this.commands.has(id)) {
+
+            console.log('early return');
+            console.log(this.commands.keys());
 
             return;
         }

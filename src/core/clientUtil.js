@@ -5,20 +5,10 @@ const { ClientUtil : Base } = require('discord-akairo');
 const Hoek = require('@hapi/hoek');
 const Util = require('util');
 
-/* eslint-disable no-unused-vars */
-const {
-    Embed,
-    MessageActionRow,
-    MessageButton,
-    Constants,
-    Message,
-    Interaction,
-    MessagePayload,
-    MessageOptions,
-    WebhookEditMessageOptions
-} = require('discord.js');
-/* eslint-enable no-unused-vars */
+const { MessageActionRow, MessageButton, Constants, Message, Interaction } = require('discord.js');
 
+// eslint-disable-next-line no-unused-vars
+const { Embed, MessagePayload, MessageOptions, WebhookEditMessageOptions } = require('discord.js');
 
 const { memberNicknameMention, codeBlock, inlineCode } = require('@discordjs/builders');
 
@@ -62,6 +52,8 @@ module.exports = class ClientUtil extends Base {
 
     code      = inlineCode;
     codeBlock = codeBlock;
+
+    emojiURL = CoreUtil.emojiURL;
 
     capitalize(string) {
 
@@ -250,7 +242,7 @@ module.exports = class ClientUtil extends Base {
                 return obj.editReply(payload);
             }
 
-            return obj.reply(payload, { fetchReply: true });
+            return obj.reply(payload, { fetchReply : true });
         }
 
         if (obj instanceof Message) {
