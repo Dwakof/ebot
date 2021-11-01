@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.15.5",
-    "@babel/eslint-parser": "7.15.7",
+    "@babel/eslint-parser": "7.16.0",
     "@babel/preset-env": "7.15.6",
     "@hapi/eslint-config-hapi": "13.0.2",
     "@hapi/eslint-plugin-hapi": "4.3.6",
