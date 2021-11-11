@@ -2,11 +2,11 @@
 
 const { SlashCommand } = require('../../../core');
 
-module.exports = class Mimic extends SlashCommand {
+module.exports = class CuteMimic extends SlashCommand {
 
     constructor() {
 
-        super('mimic', { category : 'mimic', description : 'Mimic an user, ebot, or the whole guild' });
+        super('cute-mimic', { category : 'mimic', description : 'Mimic an uswer, uwu, ebot, or te whwole guild' });
     }
 
     static get subcommands() {
@@ -14,7 +14,7 @@ module.exports = class Mimic extends SlashCommand {
         return {
             user  : {
                 method      : 'mimicUser',
-                description : 'Mimic an user',
+                description : 'Cute Mimic an user',
                 options     : {
                     user  : {
                         type        : SlashCommand.Types.Member,
@@ -23,29 +23,29 @@ module.exports = class Mimic extends SlashCommand {
                     },
                     start : {
                         type        : SlashCommand.Types.String,
-                        description : 'Start of a sentence to build the mimic from',
+                        description : 'Stawrwt of a swentwence to build te mimic frwom',
                         required    : false
                     }
                 }
             },
             guild : {
                 method      : 'mimicGuild',
-                description : 'Mimic the whole guild',
+                description : 'Cute Mimic the whole guild',
                 options     : {
                     start : {
                         type        : SlashCommand.Types.String,
-                        description : 'Start of a sentence to build the mimic from',
+                        description : 'Stawrwt of a swentwence to build te mimic frwom',
                         required    : false
                     }
                 }
             },
             ebot  : {
                 method      : 'mimicEbot',
-                description : 'Mimic Ebot',
+                description : 'Cute Mimic Ebot',
                 options     : {
                     start : {
                         type        : SlashCommand.Types.String,
-                        description : 'Start of a sentence to build the mimic from',
+                        description : 'Stawrwt of a swentwence to build te mimic frwom',
                         required    : false
                     }
                 }
@@ -56,6 +56,7 @@ module.exports = class Mimic extends SlashCommand {
     async mimic(interaction, userId, start = '') {
 
         const { MimicService, ReplyService } = this.client.services('mimic');
+        const { UwuService } = this.client.services('meme');
 
         try {
 
@@ -63,7 +64,9 @@ module.exports = class Mimic extends SlashCommand {
 
             const reply = await MimicService.mimic(interaction.guildId, userId, start);
 
-            const msg = await interaction.editReply({ content : reply, allowedMentions : { users : [] } });
+            const uwuified = UwuService.uwuify(reply);
+
+            const msg = await interaction.editReply({ content : uwuified, allowedMentions : { users : [] } });
 
             await ReplyService.saveReply(msg, userId);
         }
@@ -71,12 +74,12 @@ module.exports = class Mimic extends SlashCommand {
 
             if (err.statusCode === 404) {
 
-                return this.client.util.send(interaction, `Hey <@${ interaction.user.id }>, I'm sorry but this user cannot be mimicked yet.`);
+                return this.client.util.send(interaction, UwuService.uwuify(`Hey <@${ interaction.user.id }>, I'm sorry but this user cannot be mimicked yet.`));
             }
 
             this.client.logger.error(err, err.toString());
 
-            await this.client.util.send(interaction, `Whoopsy, something went wrong when trying to mimic this user.`);
+            await this.client.util.send(interaction, UwuService.uwuify(`Whoopsy, something went wrong when trying to mimic this user.`));
 
             this.client.handleError(this, err, interaction);
         }
