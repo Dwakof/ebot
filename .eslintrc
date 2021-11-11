@@ -1,7 +1,7 @@
 {
   "extends"      : [
     "plugin:node/recommended",
-    "@hapi/hapi"
+    "plugin:@hapi/module"
   ],
   "env": {
     "node": true,
