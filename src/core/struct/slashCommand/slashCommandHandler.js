@@ -170,12 +170,7 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
         const id = [commandName, options.getSubcommandGroup(false), options.getSubcommand(false)]
             .filter(Boolean).join('.');
 
-        console.log(id);
-
         if (!this.commands.has(id)) {
-
-            console.log('early return');
-            console.log(this.commands.keys());
 
             return;
         }
