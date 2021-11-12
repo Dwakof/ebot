@@ -1,3 +1,10 @@
+## [0.13.2](https://github.com/Dwakof/ebot/compare/v0.13.1...v0.13.2) (2021-11-12)
+
+
+### Bug Fixes
+
+* some bad handling for creating discord api schema ([477e0c4](https://github.com/Dwakof/ebot/commit/477e0c4b153e5e6b385ea838b187fec946e7fe5e))
+
 ## [0.13.1](https://github.com/Dwakof/ebot/compare/v0.13.0...v0.13.1) (2021-11-12)
 
 
