@@ -57,7 +57,7 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-security": "1.4.0",
     "pino-pretty": "7.2.0",
-    "semantic-release": "17.4.7"
+    "semantic-release": "18.0.0"
   },
   "optionalDependencies": {
     "bufferutil": "4.0.5",
