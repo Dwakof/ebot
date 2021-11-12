@@ -1,8 +1,8 @@
 'use strict';
 
-const { SlashCommand } = require('../../../core');
+const { ApplicationCommand } = require('../../../core');
 
-module.exports = class Miwic extends SlashCommand {
+module.exports = class Miwic extends ApplicationCommand {
 
     constructor() {
 
@@ -17,12 +17,12 @@ module.exports = class Miwic extends SlashCommand {
                 description : 'Cute Mimic an user',
                 options     : {
                     user  : {
-                        type        : SlashCommand.Types.Member,
+                        type        : ApplicationCommand.Types.Member,
                         description : 'User to miwic',
                         required    : true
                     },
                     start : {
-                        type        : SlashCommand.Types.String,
+                        type        : ApplicationCommand.Types.String,
                         description : 'Stawrwt of a swentwence to build te miwic frwom',
                         required    : false
                     }
@@ -33,7 +33,7 @@ module.exports = class Miwic extends SlashCommand {
                 description : 'Cute Mimic the whole guild',
                 options     : {
                     start : {
-                        type        : SlashCommand.Types.String,
+                        type        : ApplicationCommand.Types.String,
                         description : 'Stawrwt of a swentwence to build te miwic frwom',
                         required    : false
                     }
@@ -44,7 +44,7 @@ module.exports = class Miwic extends SlashCommand {
                 description : 'Cute Mimic Ebot',
                 options     : {
                     start : {
-                        type        : SlashCommand.Types.String,
+                        type        : ApplicationCommand.Types.String,
                         description : 'Stawrwt of a swentwence to build te miwic frwom',
                         required    : false
                     }
