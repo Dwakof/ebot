@@ -75,9 +75,9 @@ module.exports = class UwuService extends Service {
      */
     uwuify(text) {
 
-        return replacements.reduce((text, { trigger, replacement }) => {
+        return replacements.reduce((string, { trigger, replacement }) => {
 
-            return text.replaceAll(trigger, replacement);
+            return string.replaceAll(trigger, replacement);
 
         }, text);
     }
