@@ -69,6 +69,8 @@ module.exports = class ApplicationCommand extends AkairoModule {
 
             Hoek.assert(!this.constructor.subgroups, `A Non-Slash application command cannot have a subgroup`);
             Hoek.assert(!this.constructor.subcommands, `A Non-Slash application command cannot have a subcommands`);
+
+            this.setMethod(this.#command, this.#command, this.constructor.command);
         }
 
         if (this.type === ApplicationCommand.Types.SlashCommand) {
