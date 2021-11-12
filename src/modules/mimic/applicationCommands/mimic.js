@@ -71,7 +71,7 @@ module.exports = class Mimic extends ApplicationCommand {
 
             if (err.statusCode === 404) {
 
-                return this.client.util.send(interaction, `Hey <@${ userId }>, I'm sorry but this user cannot be mimicked yet.`);
+                return this.client.util.send(interaction, `Hey <@${ interaction.user.id }>, I'm sorry but this user cannot be mimicked yet.`);
             }
 
             this.client.logger.error(err, err.toString());
