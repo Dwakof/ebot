@@ -1,3 +1,11 @@
+## [0.13.4](https://github.com/Dwakof/ebot/compare/v0.13.3...v0.13.4) (2021-11-12)
+
+
+### Bug Fixes
+
+* remove add/remove karma notification ([a8777aa](https://github.com/Dwakof/ebot/commit/a8777aa7f96a85c3122c68c18d592bd110beee27)), closes [#231](https://github.com/Dwakof/ebot/issues/231)
+* remove console.log ([e5e9486](https://github.com/Dwakof/ebot/commit/e5e94863f923bc0aab27548c76c09f7adb9f101f))
+
 ## [0.13.3](https://github.com/Dwakof/ebot/compare/v0.13.2...v0.13.3) (2021-11-12)
 
 
