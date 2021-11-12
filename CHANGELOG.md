@@ -1,3 +1,10 @@
+## [0.13.3](https://github.com/Dwakof/ebot/compare/v0.13.2...v0.13.3) (2021-11-12)
+
+
+### Bug Fixes
+
+* bad command ID were generated making some applicationCommand not work at all ([31604d3](https://github.com/Dwakof/ebot/commit/31604d34dec89ad9f85ec5f7f3085eff3be796e9))
+
 ## [0.13.2](https://github.com/Dwakof/ebot/compare/v0.13.1...v0.13.2) (2021-11-12)
 
 
