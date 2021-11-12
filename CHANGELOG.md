@@ -1,3 +1,10 @@
+# [0.12.0](https://github.com/Dwakof/ebot/compare/v0.11.2...v0.12.0) (2021-11-12)
+
+
+### Features
+
+* Rename SlashCommand into ApplicationCommand and support other types of ApplicationCommand ([ee4f74f](https://github.com/Dwakof/ebot/commit/ee4f74f2abeb43f6c00291bbf14a62bc67de5194))
+
 ## [0.11.2](https://github.com/Dwakof/ebot/compare/v0.11.1...v0.11.2) (2021-11-12)
 
 
