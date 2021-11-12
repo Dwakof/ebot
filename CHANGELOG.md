@@ -1,3 +1,10 @@
+## [0.13.1](https://github.com/Dwakof/ebot/compare/v0.13.0...v0.13.1) (2021-11-12)
+
+
+### Bug Fixes
+
+* missing miwic applicationCommand ([7f44671](https://github.com/Dwakof/ebot/commit/7f446719199f290d54a6da1c3fa5b06cdbcde4f6))
+
 # [0.13.0](https://github.com/Dwakof/ebot/compare/v0.12.0...v0.13.0) (2021-11-12)
 
 
