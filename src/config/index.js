@@ -64,13 +64,12 @@ const store = new Confidence.Store({
     logger  : {
         $filter     : { $env : 'NODE_ENV' },
         $base       : {
-            name        : 'ebot',
-            level       : { $env : 'LOG_LEVEL', $default : 'info' },
-            prettyPrint : false
+            name      : 'ebot',
+            level     : { $env : 'LOG_LEVEL', $default : 'info' }
         },
         development : {
-            level       : { $env : 'LOG_LEVEL', $default : 'debug' },
-            prettyPrint : true
+            level     : { $env : 'LOG_LEVEL', $default : 'debug' },
+            transport : { target : 'pino-pretty' }
         },
         production  : {}
     },
