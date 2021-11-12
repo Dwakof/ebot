@@ -3,7 +3,7 @@
 const { Constants } = require('discord.js');
 const { Listener }  = require('../../');
 
-module.exports = class messageSentListener extends Listener {
+module.exports = class SessageSentListener extends Listener {
 
     constructor() {
 

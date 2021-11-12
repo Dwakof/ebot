@@ -1,8 +1,8 @@
 'use strict';
 
-const { SlashCommand } = require('../../../core');
+const { ApplicationCommand } = require('../../../core');
 
-class GoogleImagesCommand extends SlashCommand {
+class GoogleImagesCommand extends ApplicationCommand {
     constructor() {
 
         super('image', {
@@ -18,7 +18,7 @@ class GoogleImagesCommand extends SlashCommand {
             method  : 'search',
             options : {
                 query : {
-                    type        : SlashCommand.Types.String,
+                    type        : ApplicationCommand.SubTypes.String,
                     description : 'Query to search for',
                     required    : true
                 }

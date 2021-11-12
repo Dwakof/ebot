@@ -15,10 +15,10 @@ const { AkairoClient, InhibitorHandler } = require('discord-akairo');
 
 const { CoreEvents } = require('./constants');
 
-const CommandHandler      = require('./struct/command/commandHandler');
-const SlashCommandHandler = require('./struct/slashCommand/slashCommandHandler');
-const ListenerHandler     = require('./struct/listener/listenerHandler');
-const Module              = require('./struct/module');
+const CommandHandler            = require('./struct/command/commandHandler');
+const ApplicationCommandHandler = require('./struct/applicationCommand/applicationCommandHandler');
+const ListenerHandler           = require('./struct/listener/listenerHandler');
+const Module                    = require('./struct/module');
 
 const ClientUtil = require('./clientUtil');
 
@@ -35,7 +35,7 @@ module.exports = class EbotClient extends AkairoClient {
     #coreListenerHandlers = new Map();
 
     #commandHandler;
-    #slashCommandHandler;
+    #applicationCommandHandler;
     #inhibitorHandler;
     #listenerHandler;
 
@@ -86,11 +86,6 @@ module.exports = class EbotClient extends AkairoClient {
         }
 
         this.#coreListenerHandlers.get('process').setEmitters({ process });
-
-        for (const module of this.#coreListenerHandlers.values()) {
-
-            module.loadAll();
-        }
     }
 
     registerCommandHandler(settings) {
@@ -116,14 +111,18 @@ module.exports = class EbotClient extends AkairoClient {
 
         }, settings));
 
+        this.#coreListenerHandlers.get('command').setEmitters({ handler : this.#commandHandler });
+
         this.logger.trace({ event : CoreEvents.COMMAND_HANDLER_REGISTERED, emitter : 'core' });
     }
 
-    registerSlashCommandHandler(settings) {
+    registerApplicationCommandHandler(settings) {
 
-        this.#slashCommandHandler = new SlashCommandHandler(this, Hoek.merge({}, settings));
+        this.#applicationCommandHandler = new ApplicationCommandHandler(this, Hoek.merge({}, settings));
 
-        this.logger.trace({ event : CoreEvents.SLASH_COMMAND_HANDLER_REGISTERED, emitter : 'core' });
+        this.#coreListenerHandlers.get('applicationCommand').setEmitters({ handler : this.#applicationCommandHandler });
+
+        this.logger.trace({ event : CoreEvents.APPLICATION_COMMAND_HANDLER_REGISTERED, emitter : 'core' });
     }
 
     registerListenerHandler(settings) {
@@ -165,7 +164,7 @@ module.exports = class EbotClient extends AkairoClient {
             this.logger.debug({
                 event   : CoreEvents.MODULE_LOADED,
                 emitter : 'core',
-                msg : `Module ${ name } loaded from ${ path }`
+                msg     : `Module ${ name } loaded from ${ path }`
             });
         }
     }
@@ -175,9 +174,14 @@ module.exports = class EbotClient extends AkairoClient {
         await this.#setupCoreListenerHandlers();
 
         this.registerCommandHandler();
-        this.registerSlashCommandHandler();
+        this.registerApplicationCommandHandler();
         this.registerListenerHandler();
         this.registerInhibitorHandler();
+
+        for (const module of this.#coreListenerHandlers.values()) {
+
+            module.loadAll();
+        }
 
         this.#initialized = true;
 
@@ -226,23 +230,19 @@ module.exports = class EbotClient extends AkairoClient {
                 this.#commandHandler.useListenerHandler(this.#listenerHandler);
             }
 
-            this.#coreListenerHandlers.set('command', new ListenerHandler(this, { directory : Path.join(__dirname, './listeners/command/') }));
-
-            this.#coreListenerHandlers.get('command').setEmitters({ commandHandler : this.#commandHandler });
-
             this.logger.trace({ event : CoreEvents.LISTENER_HANDLER_LOADED, emitter : 'core' });
         }
 
-        if (this.#slashCommandHandler) {
+        if (this.#applicationCommandHandler) {
 
-            this.logger.trace({ event : CoreEvents.SLASH_COMMAND_HANDLER_LOADED, emitter : 'core' });
+            this.logger.trace({ event : CoreEvents.APPLICATION_COMMAND_HANDLER_LOADED, emitter : 'core' });
         }
 
         await this.login(this.#settings.discord.token);
 
         await this.warmupCache();
 
-        await this.#slashCommandHandler.registerCommands();
+        await this.#applicationCommandHandler.registerCommands();
 
         this.#started = true;
 
@@ -296,9 +296,9 @@ module.exports = class EbotClient extends AkairoClient {
         return this.#commandHandler;
     }
 
-    get slashCommandHandler() {
+    get applicationCommandHandler() {
 
-        return this.#slashCommandHandler;
+        return this.#applicationCommandHandler;
     }
 
     get listenerHandler() {

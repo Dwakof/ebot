@@ -22,8 +22,8 @@ const store = new Confidence.Store({
             guilds : { $env : 'EBOT_CACHE_WARMUP_GUILDS', $coerce : 'array', $default : [] },
             users  : { $env : 'EBOT_CACHE_WARMUP_USERS', $coerce : 'array', $default : [] }
         },
-        slashCommands : {
-            register : { $env : 'EBOT_SLASH_COMMAND_REGISTER', $coerce : 'boolean', $default : true }
+        applicationCommands : {
+            register : { $env : 'EBOT_APPLICATION_COMMAND_REGISTER', $coerce : 'boolean', $default : true }
         }
     },
     discord : {

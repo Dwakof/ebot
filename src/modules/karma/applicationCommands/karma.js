@@ -1,8 +1,8 @@
 'use strict';
 
-const { SlashCommand } = require('../../../core');
+const { ApplicationCommand } = require('../../../core');
 
-module.exports = class Karma extends SlashCommand {
+module.exports = class Karma extends ApplicationCommand {
 
     constructor() {
 
@@ -15,7 +15,7 @@ module.exports = class Karma extends SlashCommand {
             method  : 'getUser',
             options : {
                 user : {
-                    type        : SlashCommand.Types.Member,
+                    type        : ApplicationCommand.SubTypes.Member,
                     description : 'User to get the karma stats from',
                     required    : false
                 }

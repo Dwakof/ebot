@@ -1,8 +1,8 @@
 'use strict';
 
-const { SlashCommand } = require('../../../core');
+const { ApplicationCommand } = require('../../../core');
 
-class UrbanDictionaryCommand extends SlashCommand {
+class UrbanDictionaryCommand extends ApplicationCommand {
 
     constructor() {
 
@@ -20,7 +20,7 @@ class UrbanDictionaryCommand extends SlashCommand {
             method  : 'search',
             options : {
                 term : {
-                    type        : SlashCommand.Types.String,
+                    type        : ApplicationCommand.SubTypes.String,
                     description : 'The term to look up',
                     required    : true
                 }

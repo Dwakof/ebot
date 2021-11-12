@@ -2,9 +2,9 @@
 
 const { Constants } = require('discord.js');
 
-const { SlashCommand } = require('../../../core');
+const { ApplicationCommand } = require('../../../core');
 
-class AvatarCommand extends SlashCommand {
+class AvatarCommand extends ApplicationCommand {
 
     constructor() {
 
@@ -21,7 +21,7 @@ class AvatarCommand extends SlashCommand {
             method  : 'getAvatar',
             options : {
                 member : {
-                    type        : SlashCommand.Types.Member,
+                    type        : ApplicationCommand.SubTypes.Member,
                     description : 'The user whose avatar you want',
                     required    : false
                 }

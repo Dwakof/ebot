@@ -1,6 +1,6 @@
 'use strict';
 
-const { CommandHandler : AkairoCommandHandler } = require('discord-akairo');
+const { CommandHandler : AkairoCommandHandler, Constants } = require('discord-akairo');
 
 const CoreUtil = require('../../util');
 
@@ -97,5 +97,10 @@ module.exports = class CommandHandler extends AkairoCommandHandler {
                 transaction.finish();
             }
         }
+    }
+
+    static get Events() {
+
+        return Constants.CommandHandlerEvents;
     }
 };

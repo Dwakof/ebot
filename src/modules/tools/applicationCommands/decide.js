@@ -1,8 +1,8 @@
 'use strict';
 
-const { SlashCommand } = require('../../../core');
+const { ApplicationCommand } = require('../../../core');
 
-class DecideCommand extends SlashCommand {
+class DecideCommand extends ApplicationCommand {
 
     constructor() {
 
@@ -19,7 +19,7 @@ class DecideCommand extends SlashCommand {
             method  : 'decide',
             options : {
                 choices : {
-                    type        : SlashCommand.Types.String,
+                    type        : ApplicationCommand.SubTypes.String,
                     description : 'The options to choose from',
                     required    : true
                 }

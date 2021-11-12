@@ -1,8 +1,8 @@
 'use strict';
 
-const { SlashCommand } = require('../../../core');
+const { ApplicationCommand } = require('../../../core');
 
-class RandomNumberCommand extends SlashCommand {
+class RandomNumberCommand extends ApplicationCommand {
 
     constructor() {
 
@@ -19,12 +19,12 @@ class RandomNumberCommand extends SlashCommand {
             method  : 'random',
             options : {
                 min : {
-                    type        : SlashCommand.Types.Number,
+                    type        : ApplicationCommand.SubTypes.Number,
                     description : 'Minimum',
                     required    : true
                 },
                 max : {
-                    type        : SlashCommand.Types.Number,
+                    type        : ApplicationCommand.SubTypes.Number,
                     description : 'Maximum',
                     required    : true
                 }

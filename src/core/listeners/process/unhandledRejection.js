@@ -2,7 +2,7 @@
 
 const { Listener } = require('../../');
 
-module.exports = class processUnhandledRejectionListener extends Listener {
+module.exports = class ProcessUnhandledRejectionListener extends Listener {
 
     constructor() {
 

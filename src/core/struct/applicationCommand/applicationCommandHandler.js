@@ -5,9 +5,9 @@ const { AkairoHandler } = require('discord-akairo');
 
 const { CoreEvents } = require('../../constants');
 
-const SlashCommand = require('./slashCommand');
+const ApplicationCommand = require('./applicationCommand');
 
-module.exports = class SlashCommandHandler extends AkairoHandler {
+module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
     /**
      * The Ebot client.
@@ -16,20 +16,20 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
     client;
 
     /**
-     * @typedef SlashCommandHandler.Command
+     * @typedef ApplicationCommandHandler.Command
      *
-     * @property {SlashCommand}  slashCommand
-     * @property {Array<String>} args
+     * @property {ApplicationCommand}  applicationCommand
+     * @property {Array<String>}       args
      */
 
     /**
-     * @type {Map<String, SlashCommandHandler.Command>}
+     * @type {Map<String, ApplicationCommandHandler.Command>}
      */
     commands;
 
     constructor(client, {}) {
 
-        super(client, { classToHandle : SlashCommand });
+        super(client, { classToHandle : ApplicationCommand });
 
         this.client   = client;
         this.commands = new Map();
@@ -43,11 +43,6 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
 
             this.client.on('interactionCreate', (interaction) => {
 
-                if (!interaction.isCommand()) {
-
-                    return;
-                }
-
                 return this.handle(interaction);
             });
         });
@@ -55,7 +50,7 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
 
     async registerCommands() {
 
-        if (!this.client.settings.ebot.slashCommands.register) {
+        if (!this.client.settings.ebot.applicationCommands.register) {
 
             return false;
         }
@@ -67,12 +62,12 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
 
             if (global) {
 
-                globalCommands.push({ ...command, type : 1 });
+                globalCommands.push(command);
 
                 continue;
             }
 
-            guildCommands.push({ ...command, type : 1, default_permission : command.default_permission ?? true });
+            guildCommands.push({ ...command, default_permission : command.default_permission ?? true });
         }
 
         try {
@@ -99,10 +94,10 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
             }
 
             this.client.logger.info({
-                event    : CoreEvents.GUILD_SLASH_COMMANDS_REGISTERED,
+                event    : CoreEvents.GUILD_APPLICATION_COMMANDS_REGISTERED,
                 emitter  : 'core',
                 global   : false,
-                module   : 'SlashCommandHandler',
+                module   : 'ApplicationCommandHandler',
                 commands : guildCommands.map(({ name }) => name)
             });
         }
@@ -121,10 +116,10 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
             await this.client.API.put(Routes.applicationCommands(this.client.settings.discord.clientId), { body : globalCommands });
 
             this.client.logger.info({
-                event    : CoreEvents.GLOBAL_SLASH_COMMANDS_REGISTERED,
+                event    : CoreEvents.GLOBAL_APPLICATION_COMMANDS_REGISTERED,
                 emitter  : 'core',
                 global   : true,
-                module   : 'SlashCommandHandler',
+                module   : 'ApplicationCommandHandler',
                 commands : globalCommands.map(({ name }) => name)
             });
         }
@@ -143,27 +138,29 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
 
     /**
      * Registers a module.
-     * @param {SlashCommand} slashCommand    - Module to use.
-     * @param {string}       [filepath] - Filepath of module.
+     * @param {ApplicationCommand}  applicationCommand  - Module to use.
+     * @param {string}              [filepath]          - Filepath of module.
+     *
      * @returns {void}
      */
-    register(slashCommand, filepath) {
+    register(applicationCommand, filepath) {
 
-        super.register(slashCommand, filepath);
+        super.register(applicationCommand, filepath);
 
-        for (const [id, commandOptions] of Object.entries(slashCommand.commands)) {
+        for (const [id, commandOptions] of Object.entries(applicationCommand.commands)) {
 
             if (this.commands.has(id)) {
 
                 throw new Error(`A command with the ID ${ id } is already registered`);
             }
 
-            this.commands.set(id, { slashCommand, args : (commandOptions.options || []).map(({ name }) => name) });
+            this.commands.set(id, { applicationCommand, args : (commandOptions.options || []).map(({ name }) => name) });
         }
     }
 
     /**
      * @param {Interaction} interaction
+     *
      * @return {Promise<void>}
      */
     async handle(interaction) {
@@ -180,15 +177,15 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
             return;
         }
 
-        const { slashCommand, args } = this.commands.get(id);
+        const { applicationCommand, args } = this.commands.get(id);
 
         try {
 
             if (this.client.sentry) {
 
                 transaction = this.client.sentry.startTransaction({
-                    op       : `slashCommand`,
-                    name     : `[${ this.client.util.capitalize(slashCommand.categoryID) }] ${ id }`,
+                    op       : `applicationCommand`,
+                    name     : `[${ this.client.util.capitalize(applicationCommand.categoryID) }] ${ id }`,
                     metadata : {
                         method : 'APPLICATION_COMMAND'
                     }
@@ -205,7 +202,7 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
 
                     if (args.length > 0) {
 
-                        scope.setContext('args', SlashCommandHandler.#parsingArgs(interaction, args));
+                        scope.setContext('args', ApplicationCommandHandler.#parsingArgs(interaction, args));
                     }
 
                     scope.setUser({
@@ -220,7 +217,11 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
                 });
             }
 
-            await slashCommand.runCommand(id, interaction);
+            this.emit(ApplicationCommandHandler.Events.COMMAND_STARTED, interaction, applicationCommand);
+
+            await applicationCommand.runCommand(id, interaction);
+
+            this.emit(ApplicationCommandHandler.Events.COMMAND_FINISHED, interaction, applicationCommand);
 
             if (transaction) {
 
@@ -234,7 +235,9 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
                 transaction.status = 'unknown';
             }
 
-            this.client.handleError(slashCommand, error, interaction);
+            this.emit(ApplicationCommandHandler.Events.ERROR, error, interaction, applicationCommand);
+
+            this.client.handleError(applicationCommand, error, interaction);
 
             await this.client.util.send(interaction, 'Whoopsy, something went wrong with the command');
         }
@@ -247,7 +250,7 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
         }
     }
 
-    static #parsingArgs = (interaction, args = []) => {
+    static #parsingArgs(interaction, args = []) {
 
         const result = {};
 
@@ -259,5 +262,15 @@ module.exports = class SlashCommandHandler extends AkairoHandler {
         }
 
         return result;
-    };
+    }
+
+    static get Events() {
+
+        return {
+            COMMAND_STARTED   : 'applicationCommandStarted',
+            COMMAND_FINISHED  : 'applicationCommandFinished',
+            COMMAND_CANCELLED : 'applicationCommandCancelled',
+            ERROR             : 'error'
+        };
+    }
 };

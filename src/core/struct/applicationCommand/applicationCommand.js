@@ -2,10 +2,13 @@
 
 const Hoek = require('@hapi/hoek');
 
-const { ApplicationCommandOptionType, ApplicationCommandPermissionType } = require('discord-api-types/v9');
-const { AkairoModule }                                                   = require('discord-akairo');
+const { ApplicationCommandOptionType, ApplicationCommandPermissionType, ApplicationCommandType } = require('discord-api-types/v9');
 
-module.exports = class SlashCommand extends AkairoModule {
+const { AkairoModule } = require('discord-akairo');
+
+const RootCommand = Symbol('RootCommand');
+
+module.exports = class ApplicationCommand extends AkairoModule {
 
     /**
      * The Ebot client.
@@ -32,52 +35,67 @@ module.exports = class SlashCommand extends AkairoModule {
     #methods = new Map();
 
 
-    constructor(id, { description, category, global = false, defaultPermission = true }) {
+    constructor(id, { description, category, global, defaultPermission, type }) {
 
         super(id, { description, category });
 
         this.name              = id;
         this.description       = description;
-        this.global            = global;
-        this.defaultPermission = defaultPermission;
+        this.global            = global ?? false;
+        this.defaultPermission = defaultPermission ?? true;
+        this.type              = type ?? ApplicationCommand.Types.SlashCommand;
 
-        Hoek.assert(this.name, 'The slash command class must have a name.');
-        Hoek.assert(this.description, 'The slash command class must have a description.');
+        Hoek.assert(this.name, 'The application command class must have a name.');
 
-        if (global) {
+        if (this.type === ApplicationCommand.Types.SlashCommand) {
 
-            Hoek.assert(!this.permissions, 'permissions() can not be implemented on a global slash command');
+            Hoek.assert(this.description, 'The application command class must have a description.');
+        }
+
+        if (this.global) {
+
+            Hoek.assert(!this.permissions, 'permissions() can not be implemented on a global application command');
         }
 
         this.#command = {
             name               : this.name,
             description        : this.description,
-            type               : SlashCommand.Types.RootCommand,
-            default_permission : defaultPermission
+            type               : this.type,
+            default_permission : defaultPermission,
+            root               : RootCommand
         };
 
-        if (this.constructor.command) {
+        if (this.type !== ApplicationCommand.Types.SlashCommand) {
 
-            Hoek.assert(!this.constructor.subcommands, `The slash command class can't have both command and subcommands set`);
-            Hoek.assert(!this.constructor.subgroups, `The slash command class can't have both command and subgroups set`);
-
-            this.setMethod(this.#command, this.#command, this.constructor.command);
+            Hoek.assert(!this.constructor.subgroups, `A Non-Slash application command cannot have a subgroup`);
+            Hoek.assert(!this.constructor.subcommands, `A Non-Slash application command cannot have a subcommands`);
         }
 
-        if (this.constructor.subcommands) {
+        if (this.type === ApplicationCommand.Types.SlashCommand) {
 
-            Hoek.assert(!this.constructor.command, `The slash command class can't have both subcommands and command set`);
-            Hoek.assert(!this.constructor.subgroups, `The slash command class can't have both subcommands and subgroups set`);
+            if (this.constructor.command) {
 
-            this.subcommands(this.#command, this.constructor.subcommands);
-        }
+                Hoek.assert(!this.constructor.subcommands, `The application command class can't have both command and subcommands set`);
+                Hoek.assert(!this.constructor.subgroups, `The application command class can't have both command and subgroups set`);
 
-        if (this.constructor.subgroups) {
+                this.setMethod(this.#command, this.#command, this.constructor.command);
+            }
 
-            Hoek.assert(!this.constructor.command, `The slash command class can't have both subgroups and command set`);
-            Hoek.assert(!this.constructor.subcommands, `The slash command class can't have both subgroups and subcommands set`);
+            if (this.constructor.subcommands) {
 
-            this.subgroups(this.constructor.subgroups);
+                Hoek.assert(!this.constructor.command, `The application command class can't have both subcommands and command set`);
+                Hoek.assert(!this.constructor.subgroups, `The application command class can't have both subcommands and subgroups set`);
+
+                this.subcommands(this.#command, this.constructor.subcommands);
+            }
+
+            if (this.constructor.subgroups) {
+
+                Hoek.assert(!this.constructor.command, `The application command class can't have both subgroups and command set`);
+                Hoek.assert(!this.constructor.subcommands, `The application command class can't have both subgroups and subcommands set`);
+
+                this.subgroups(this.constructor.subgroups);
+            }
         }
     }
 
@@ -85,17 +103,17 @@ module.exports = class SlashCommand extends AkairoModule {
 
         let id;
 
-        if (parent.type === SlashCommand.Types.RootCommand) {
+        if (parent.root === RootCommand) {
 
             id = command.name;
         }
 
-        if (command.type === SlashCommand.Types.Subcommand) {
+        if (command.type === ApplicationCommand.Types.Subcommand) {
 
             id = `${ parent.name }.${ command.name }`;
         }
 
-        if (parent.type === SlashCommand.Types.SubcommandGroup) {
+        if (parent.type === ApplicationCommand.SubTypes.SubcommandGroup) {
 
             id = `${ this.name }.${ parent.name }.${ command.name }`;
         }
@@ -104,10 +122,10 @@ module.exports = class SlashCommand extends AkairoModule {
 
         const method = (interaction) => {
 
-            return this[methodName](interaction, SlashCommand.#parsingArgs(interaction, options));
+            return this[methodName](interaction, ApplicationCommand.#parsingArgs(interaction, options));
         };
 
-        SlashCommand.setOptions(command, options);
+        ApplicationCommand.setOptions(command, options);
         this.#methods.set(id, { method, options });
     }
 
@@ -123,7 +141,7 @@ module.exports = class SlashCommand extends AkairoModule {
 
             const { description, method, options } = subcmd;
 
-            const subcommand = { name, description, type : SlashCommand.Types.Subcommand };
+            const subcommand = { name, description, type : ApplicationCommand.SubTypes.Subcommand };
 
             this.setMethod(command, subcommand, { method, options });
 
@@ -140,7 +158,7 @@ module.exports = class SlashCommand extends AkairoModule {
 
         for (const [name, { description, subcommands }] of Object.entries(this.constructor.subgroups)) {
 
-            const subgroup = { name, description, type : SlashCommand.Types.SubcommandGroup };
+            const subgroup = { name, description, type : ApplicationCommand.SubTypes.SubcommandGroup };
 
             this.subcommands(subgroup, subcommands);
 
@@ -162,7 +180,10 @@ module.exports = class SlashCommand extends AkairoModule {
 
     get command() {
 
-        return this.#command;
+        // eslint-disable-next-line no-unused-vars
+        const { root, ...command } = this.#command;
+
+        return command;
     }
 
     /**
@@ -174,7 +195,7 @@ module.exports = class SlashCommand extends AkairoModule {
 
         if (!this.#methods.has(id)) {
 
-            throw new Error(`Command ${ id } not found on SlashCommand ${ this.name } in category ${ this.categoryID }`);
+            throw new Error(`Command ${ id } not found on ApplicationCommand ${ this.name } in category ${ this.categoryID }`);
         }
 
         return (this.#methods.get(id)).method(interaction);
@@ -249,7 +270,15 @@ module.exports = class SlashCommand extends AkairoModule {
     static get Types() {
 
         return {
-            RootCommand     : -1,
+            SlashCommand   : ApplicationCommandType.ChatInput,
+            UserCommand    : ApplicationCommandType.User,
+            MessageCommand : ApplicationCommandType.Message
+        };
+    }
+
+    static get SubTypes() {
+
+        return {
             Subcommand      : ApplicationCommandOptionType.Subcommand,
             SubcommandGroup : ApplicationCommandOptionType.SubcommandGroup,
             String          : ApplicationCommandOptionType.String,
@@ -275,7 +304,6 @@ module.exports = class SlashCommand extends AkairoModule {
     static get PermissionTypes() {
 
         return {
-
             User : ApplicationCommandPermissionType.User,
             Role : ApplicationCommandPermissionType.Role
         };
@@ -288,47 +316,47 @@ module.exports = class SlashCommand extends AkairoModule {
         for (const [name, { type }] of Object.entries(commandOptions)) {
 
             switch (type) {
-                case SlashCommand.Types.String:
+                case ApplicationCommand.SubTypes.String:
 
                     result[name] = interaction.options.getString(name);
 
                     break;
-                case SlashCommand.Types.Integer:
+                case ApplicationCommand.SubTypes.Integer:
 
                     result[name] = interaction.options.getInteger(name);
 
                     break;
-                case SlashCommand.Types.Number:
+                case ApplicationCommand.SubTypes.Number:
 
                     result[name] = interaction.options.getNumber(name);
 
                     break;
-                case SlashCommand.Types.Boolean:
+                case ApplicationCommand.SubTypes.Boolean:
 
                     result[name] = interaction.options.getBoolean(name);
 
                     break;
-                case SlashCommand.Types.User:
+                case ApplicationCommand.SubTypes.User:
 
                     result[name] = interaction.options.getUser(name);
 
                     break;
-                case SlashCommand.Types.Member:
+                case ApplicationCommand.SubTypes.Member:
 
                     result[name] = interaction.options.getMember(name);
 
                     break;
-                case SlashCommand.Types.Channel:
+                case ApplicationCommand.SubTypes.Channel:
 
                     result[name] = interaction.options.getChannel(name);
 
                     break;
-                case SlashCommand.Types.Role:
+                case ApplicationCommand.SubTypes.Role:
 
                     result[name] = interaction.options.getRole(name);
 
                     break;
-                case SlashCommand.Types.Mentionable:
+                case ApplicationCommand.SubTypes.Mentionable:
 
                     result[name] = interaction.options.getMentionable(name);
 
@@ -353,13 +381,7 @@ module.exports = class SlashCommand extends AkairoModule {
 
             if (choices) {
 
-                if (
-                    ![
-                        SlashCommand.Types.String,
-                        SlashCommand.Types.Integer,
-                        SlashCommand.Types.Number
-                    ].includes(type)
-                ) {
+                if (![ApplicationCommand.SubTypes.String, ApplicationCommand.SubTypes.Integer, ApplicationCommand.SubTypes.Number].includes(type)) {
 
                     throw new Error(`Choices are only available for types String, Integer or Number`);
                 }
@@ -387,19 +409,19 @@ module.exports = class SlashCommand extends AkairoModule {
 
         for (const permission of await this.permissions(guild)) {
 
-            if (permission === SlashCommand.Permission.OWNERS) {
+            if (permission === ApplicationCommand.Permission.OWNERS) {
 
                 for (const ownerId of this.client.ownerID) {
 
-                    permissions.push({ type : SlashCommand.PermissionTypes.User, id : ownerId, permission : true });
+                    permissions.push({ type : ApplicationCommand.PermissionTypes.User, id : ownerId, permission : true });
                 }
 
                 continue;
             }
 
-            if (permission === SlashCommand.Permission.GUILD_OWNERS) {
+            if (permission === ApplicationCommand.Permission.GUILD_OWNERS) {
 
-                permissions.push({ type : SlashCommand.PermissionTypes.User, id : guild.ownerId, permission : true });
+                permissions.push({ type : ApplicationCommand.PermissionTypes.User, id : guild.ownerId, permission : true });
 
                 continue;
             }
