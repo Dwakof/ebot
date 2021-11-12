@@ -17,12 +17,12 @@ module.exports = class Miwic extends ApplicationCommand {
                 description : 'Cute Mimic an user',
                 options     : {
                     user  : {
-                        type        : ApplicationCommand.Types.Member,
+                        type        : ApplicationCommand.SubTypes.Member,
                         description : 'User to miwic',
                         required    : true
                     },
                     start : {
-                        type        : ApplicationCommand.Types.String,
+                        type        : ApplicationCommand.SubTypes.String,
                         description : 'Stawrwt of a swentwence to build te miwic frwom',
                         required    : false
                     }
@@ -33,7 +33,7 @@ module.exports = class Miwic extends ApplicationCommand {
                 description : 'Cute Mimic the whole guild',
                 options     : {
                     start : {
-                        type        : ApplicationCommand.Types.String,
+                        type        : ApplicationCommand.SubTypes.String,
                         description : 'Stawrwt of a swentwence to build te miwic frwom',
                         required    : false
                     }
@@ -44,7 +44,7 @@ module.exports = class Miwic extends ApplicationCommand {
                 description : 'Cute Mimic Ebot',
                 options     : {
                     start : {
-                        type        : ApplicationCommand.Types.String,
+                        type        : ApplicationCommand.SubTypes.String,
                         description : 'Stawrwt of a swentwence to build te miwic frwom',
                         required    : false
                     }
