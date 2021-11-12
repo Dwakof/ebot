@@ -1,3 +1,10 @@
+## [0.11.2](https://github.com/Dwakof/ebot/compare/v0.11.1...v0.11.2) (2021-11-12)
+
+
+### Bug Fixes
+
+* add wind direction and use HTTPS for image url ([9c9a43f](https://github.com/Dwakof/ebot/commit/9c9a43f7e5ec9276178849f15bf8d9d85b41d4e2))
+
 ## [0.11.1](https://github.com/Dwakof/ebot/compare/v0.11.0...v0.11.1) (2021-09-24)
 
 
