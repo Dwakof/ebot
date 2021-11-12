@@ -94,6 +94,8 @@ module.exports = class WeatherCommand extends Command {
                     embed.addField('Temperature', `${ toCelsius(weatherBody.main.temp) }°C (${ toFahrenheit(weatherBody.main.temp) }°F)`, false);
                 }
 
+                const test = 'toto';
+
                 embed.addField('Humidity', `${ weatherBody.main.humidity } %`, false)
                     .addField('Wind', `${ Math.round(weatherBody.wind.speed * 3.6) } Km/h (${ Math.round(weatherBody.wind.speed * 2.23694) } Mph) ${toDirection(weatherBody.wind.deg)}`, false)
                     .setThumbnail(`https://openweathermap.org/img/wn/${ weatherBody.weather[0].icon }@2x.png`);
