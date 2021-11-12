@@ -55,11 +55,11 @@ module.exports = class KarmaReactionAddListener extends Listener {
 
         await KarmaService.addKarma({ guildId, userId, messageId, giverId, type, value });
 
-        if (value > 0) {
-
-            return reaction.message.channel.send(KarmaService.randomResponse(KarmaService.INCREMENT_RESPONSES, user, value));
-        }
-
-        return reaction.message.channel.send(KarmaService.randomResponse(KarmaService.DECREMENT_RESPONSES, user, value));
+        // if (value > 0) {
+        //
+        //     return reaction.message.channel.send(KarmaService.randomResponse(KarmaService.INCREMENT_RESPONSES, user, value));
+        // }
+        //
+        // return reaction.message.channel.send(KarmaService.randomResponse(KarmaService.DECREMENT_RESPONSES, user, value));
     }
 };
