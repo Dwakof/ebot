@@ -174,6 +174,10 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
         if (!this.commands.has(id)) {
 
+            const error = new Error(`This command id "${ id }" was not found`);
+
+            this.emit(ApplicationCommandHandler.Events.ERROR, error, interaction);
+
             return;
         }
 
