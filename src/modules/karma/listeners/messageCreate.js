@@ -62,8 +62,6 @@ module.exports = class KarmaMessageCreatedListener extends Listener {
             return false;
         }));
 
-        console.log(responses.filter(Boolean));
-
         return this.client.util.send(message, responses.filter(Boolean).join('\n'));
     }
 };
