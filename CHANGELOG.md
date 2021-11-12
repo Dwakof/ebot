@@ -1,3 +1,10 @@
+# [0.13.0](https://github.com/Dwakof/ebot/compare/v0.12.0...v0.13.0) (2021-11-12)
+
+
+### Features
+
+* uwu ([059567d](https://github.com/Dwakof/ebot/commit/059567d3c9762d69f29b54518fd852e0978efc50)), closes [#253](https://github.com/Dwakof/ebot/issues/253)
+
 # [0.12.0](https://github.com/Dwakof/ebot/compare/v0.11.2...v0.12.0) (2021-11-12)
 
 
