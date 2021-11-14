@@ -85,7 +85,7 @@ module.exports = class Karma extends ApplicationCommand {
 
         if (stats) {
 
-            const attachment = this.client.util.attachment(KarmaService.renderGraph(stats), 'chart.png');
+            const attachment = this.client.util.attachment(await KarmaService.renderGraph(stats), 'chart.png');
 
             embed.setImage('attachment://chart.png');
 

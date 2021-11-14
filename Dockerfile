@@ -3,7 +3,7 @@ FROM node:16.6
 MAINTAINER Yoann MALLEMANCHE <yoann.mallemanche@gmail.com>
 
 RUN apt-get update \
-    && apt-get install -qq build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+    && apt-get install -qq build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev libfontconfig1
 
 ENV APP_PATH=/app
 

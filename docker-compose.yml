@@ -4,6 +4,10 @@ services:
     build: .
     env_file:
       - .env
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - NODE_ENV=production
     restart: unless-stopped
     depends_on:
       - postgres
