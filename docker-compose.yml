@@ -2,13 +2,19 @@ version: "3.7"
 services:
   ebot:
     build: .
+    init: true
     env_file:
       - .env
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - NODE_ENV=production
     restart: unless-stopped
     depends_on:
       - postgres
   postgres:
     image: "postgres:13-alpine"
+    user: "1000:1000"
     ports:
       - 127.0.0.1:${POSTGRES_PORT}:5432
     volumes:

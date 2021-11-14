@@ -24,7 +24,11 @@ module.exports = class ScreenshotService extends Service {
 
         // TODO mode Puppeteer in his own service so that you can only require page
 
-        this.#browser = await Puppeteer.launch({ args : ['--no-sandbox', '--disable-setuid-sandbox'], headless : true });
+        this.#browser = await Puppeteer.launch({
+            args           : ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
+            executablePath : process.env.CHROMIUM_PATH || undefined,
+            headless       : true
+        });
 
         this.#templates = {
             message : Pug.compileFile(Path.join(__dirname, '../templates/message.pug')),
