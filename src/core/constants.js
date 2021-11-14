@@ -11,15 +11,15 @@ exports.CoreEvents = {
     SERVICE_REGISTERED  : 'serviceRegistered',
     SERVICE_INITIALIZED : 'serviceInitialized',
 
-    COMMAND_HANDLER_REGISTERED       : 'commandHandlerRegistered',
-    SLASH_COMMAND_HANDLER_REGISTERED : 'slashCommandHandlerRegistered',
-    INHIBITOR_HANDLER_REGISTERED     : 'inhibitorHandlerRegistered',
-    LISTENER_HANDLER_REGISTERED      : 'listenerHandlerRegistered',
+    COMMAND_HANDLER_REGISTERED             : 'commandHandlerRegistered',
+    APPLICATION_COMMAND_HANDLER_REGISTERED : 'applicationCommandHandlerRegistered',
+    INHIBITOR_HANDLER_REGISTERED           : 'inhibitorHandlerRegistered',
+    LISTENER_HANDLER_REGISTERED            : 'listenerHandlerRegistered',
 
-    COMMAND_HANDLER_LOADED       : 'commandHandlerLoaded',
-    SLASH_COMMAND_HANDLER_LOADED : 'slashCommandHandlerLoaded',
-    INHIBITOR_HANDLER_LOADED     : 'inhibitorHandlerLoaded',
-    LISTENER_HANDLER_LOADED      : 'listenerHandlerLoaded',
+    COMMAND_HANDLER_LOADED             : 'commandHandlerLoaded',
+    APPLICATION_COMMAND_HANDLER_LOADED : 'applicationCommandHandlerLoaded',
+    INHIBITOR_HANDLER_LOADED           : 'inhibitorHandlerLoaded',
+    LISTENER_HANDLER_LOADED            : 'listenerHandlerLoaded',
 
     MODULE_ERROR  : 'moduleError',
     MODULE_LOADED : 'moduleLoaded',
@@ -27,9 +27,9 @@ exports.CoreEvents = {
     CACHE_WARMUP_STARTED  : 'cacheWarmupStarted',
     CACHE_WARMUP_FINISHED : 'cacheWarmupFinished',
 
-    GUILD_SLASH_COMMAND_BUILT       : 'guildSlashCommandBuilt',
-    GUILD_SLASH_COMMANDS_REGISTERED : 'guildSlashCommandRegistered',
+    GUILD_APPLICATION_COMMAND_BUILT       : 'guildApplicationCommandBuilt',
+    GUILD_APPLICATION_COMMANDS_REGISTERED : 'guildApplicationCommandRegistered',
 
-    GLOBAL_SLASH_COMMAND_BUILT       : 'globalSlashCommandBuilt',
-    GLOBAL_SLASH_COMMANDS_REGISTERED : 'globalSlashCommandRegistered'
+    GLOBAL_APPLICATION_COMMAND_BUILT       : 'globalApplicationCommandBuilt',
+    GLOBAL_APPLICATION_COMMANDS_REGISTERED : 'globalApplicationCommandRegistered'
 };

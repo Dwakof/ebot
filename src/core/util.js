@@ -3,6 +3,7 @@
 const Fs   = require('fs/promises');
 const Path = require('path');
 
+// eslint-disable-next-line no-unused-vars
 const { GuildMember, User, Guild, Channel, Message, Role } = require('discord.js');
 
 // eslint-disable-next-line no-unused-vars

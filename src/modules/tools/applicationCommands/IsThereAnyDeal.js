@@ -1,8 +1,8 @@
 'use strict';
 
-const { SlashCommand } = require('../../../core');
+const { ApplicationCommand } = require('../../../core');
 
-class IsThereAnyDealCommand extends SlashCommand {
+class IsThereAnyDealCommand extends ApplicationCommand {
 
     constructor() {
 
@@ -19,7 +19,7 @@ class IsThereAnyDealCommand extends SlashCommand {
             method  : 'getDeals',
             options : {
                 title : {
-                    type        : SlashCommand.Types.String,
+                    type        : ApplicationCommand.SubTypes.String,
                     description : 'Name of the game',
                     required    : true
                 }

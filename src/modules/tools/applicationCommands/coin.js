@@ -1,8 +1,8 @@
 'use strict';
 
-const { SlashCommand } = require('../../../core');
+const { ApplicationCommand } = require('../../../core');
 
-class CoinFlipCommand extends SlashCommand {
+class CoinFlipCommand extends ApplicationCommand {
 
     constructor() {
 

@@ -24,7 +24,7 @@ class Module {
     #inhibitors    = new Map();
     #providers     = new Map();
     #services      = new Map();
-    #slashCommands = new Map();
+    #applicationCommands = new Map();
 
     constructor(name, path) {
 
@@ -68,9 +68,9 @@ class Module {
             await this.registerInhibitors();
         }
 
-        if (components.includes('slashCommands')) {
+        if (components.includes('applicationCommands')) {
 
-            await this.registerSlashCommands();
+            await this.registerApplicationCommands();
         }
     }
 
@@ -199,19 +199,19 @@ class Module {
         }
     }
 
-    async registerSlashCommands() {
+    async registerApplicationCommands() {
 
-        for (const { name, path, file } of await CoreUtil.requireDir(Path.join(this.#path, 'slashCommands'), true)) {
+        for (const { name, path, file } of await CoreUtil.requireDir(Path.join(this.#path, 'applicationCommands'), true)) {
 
             try {
 
-                const slashCommand = this.#client.slashCommandHandler.load(file);
+                const applicationCommand = this.#client.applicationCommandHandler.load(file);
 
-                this.#slashCommands.set(slashCommand.id, { path, slashCommand });
+                this.#applicationCommands.set(applicationCommand.id, { path, applicationCommand });
             }
             catch (error) {
 
-                throw new Error(`Could not register slash command ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
+                throw new Error(`Could not register application command ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
             }
         }
     }
@@ -261,7 +261,7 @@ class Module {
             }, {});
     }
 
-    slashCommands() {}
+    applicationCommands() {}
 }
 
 module.exports = Module;

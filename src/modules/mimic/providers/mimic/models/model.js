@@ -1,6 +1,8 @@
 'use strict';
 
-const { Model : _Model } = require('objection');
+const { Model : _Model, AjvValidator } = require('objection');
+
+const AjvFormat = require('ajv-formats');
 
 class Model extends _Model {
 
@@ -29,8 +31,8 @@ class Model extends _Model {
                 guildId   : { type : 'string' },
                 userId    : { type : 'string' },
                 model     : { type : 'object' },
-                createdAt : { type : 'date' },
-                updatedAt : { type : 'date' }
+                createdAt : { type : 'object', format : 'date' },
+                updatedAt : { type : 'object', format : 'date' }
             }
         };
     }
@@ -44,6 +46,16 @@ class Model extends _Model {
     $beforeUpdate(opt, queryContext) {
 
         this.updatedAt = new Date();
+    }
+
+    static createValidator() {
+
+        return new AjvValidator({
+            onCreateAjv(ajv) {
+
+                AjvFormat(ajv);
+            }
+        });
     }
 }
 

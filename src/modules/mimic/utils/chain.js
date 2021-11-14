@@ -73,7 +73,7 @@ module.exports = class Chain {
 
                 const items = [...this.beginStateValue, ...words, Chain.END];
 
-                for (let i = 0; i < words.length + 1; i++) {
+                for (let i = 0; i < words.length + 1; ++i) {
 
                     const state  = State.fromValue(items.slice(i, i + this.order));
                     const follow = items[i + this.order];

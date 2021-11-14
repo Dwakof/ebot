@@ -3,7 +3,7 @@
 const { Constants } = require('discord.js');
 const { Listener }  = require('../../');
 
-module.exports = class clientRateLimitListener extends Listener {
+module.exports = class ClientRateLimitListener extends Listener {
 
     constructor() {
 

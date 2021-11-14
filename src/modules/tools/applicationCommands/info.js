@@ -5,12 +5,12 @@ const DayJS = require('dayjs');
 const Duration     = require('dayjs/plugin/duration');
 const RelativeTime = require('dayjs/plugin/relativeTime');
 
-const { SlashCommand } = require('../../../core');
+const { ApplicationCommand } = require('../../../core');
 
 DayJS.extend(Duration);
 DayJS.extend(RelativeTime);
 
-class InfoCommand extends SlashCommand {
+class InfoCommand extends ApplicationCommand {
 
     constructor() {
 

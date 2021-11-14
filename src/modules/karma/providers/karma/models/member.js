@@ -1,6 +1,8 @@
 'use strict';
 
-const { Model } = require('objection');
+const { Model, AjvValidator } = require('objection');
+
+const AjvFormat = require('ajv-formats');
 
 class Member extends Model {
 
@@ -27,9 +29,19 @@ class Member extends Model {
                 giverId   : { type : 'string' },
                 type      : { type : 'string' },
                 value     : { type : 'number' },
-                createdAt : { type : 'date' }
+                createdAt : { type : 'object', format : 'date' }
             }
         };
+    }
+
+    static createValidator() {
+
+        return new AjvValidator({
+            onCreateAjv(ajv) {
+
+                AjvFormat(ajv);
+            }
+        });
     }
 }
 

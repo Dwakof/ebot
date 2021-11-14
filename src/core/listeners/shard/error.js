@@ -3,7 +3,7 @@
 const { Constants } = require('discord.js');
 const { Listener }  = require('../../');
 
-module.exports = class shardErrorListener extends Listener {
+module.exports = class ShardErrorListener extends Listener {
 
     constructor() {
 

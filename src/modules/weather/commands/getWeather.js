@@ -95,8 +95,8 @@ module.exports = class WeatherCommand extends Command {
                 }
 
                 embed.addField('Humidity', `${ weatherBody.main.humidity } %`, false)
-                    .addField('Wind speed', `${ Math.round(weatherBody.wind.speed * 3.6) } Km/h (${ Math.round(weatherBody.wind.speed * 2.23694) } Mph)`, false)
-                    .setThumbnail(`http://openweathermap.org/img/wn/${ weatherBody.weather[0].icon }@2x.png`);
+                    .addField('Wind', `${ Math.round(weatherBody.wind.speed * 3.6) } Km/h (${ Math.round(weatherBody.wind.speed * 2.23694) } Mph) ${toDirection(weatherBody.wind.deg)}`, false)
+                    .setThumbnail(`https://openweathermap.org/img/wn/${ weatherBody.weather[0].icon }@2x.png`);
 
                 return message.util.send({ embeds : [embed] });
             }
@@ -120,54 +120,53 @@ const toDirection = (deg) => {
 
     const d = deg % 360;
 
-    if (11.25 <= d && d < 33.75) {
+    if (d >= 11.25 && d < 33.75) {
         return 'NNE';
     }
-    else if (33.75 <= d && d < 56.25) {
+    else if (d >= 33.75 && d < 56.25) {
         return 'NE';
     }
-    else if (56.25 <= d && d < 78.75) {
+    else if (d >= 56.25 && d < 78.75) {
         return 'ENE';
     }
-    else if (78.75 <= d && d < 101.25) {
+    else if (d >= 78.75 && d < 101.25) {
         return 'E';
     }
-    else if (101.25 <= d && d < 123.75) {
+    else if (d >= 101.25 && d < 123.75) {
         return 'ESE';
     }
-    else if (123.75 <= d && d < 146.25) {
+    else if (d >= 123.75 && d < 146.25) {
         return 'SE';
     }
-    else if (146.25 <= d && d < 168.75) {
+    else if (d >= 146.25 && d < 168.75) {
         return 'SSE';
     }
-    else if (168.75 <= d && d < 191.25) {
+    else if (d >= 168.75 && d < 191.25) {
         return 'S';
     }
-    else if (191.25 <= d && d < 213.75) {
+    else if (d >= 191.25 && d < 213.75) {
         return 'SSW';
     }
-    else if (213.75 <= d && d < 236.25) {
+    else if (d >= 213.75 && d < 236.25) {
         return 'SW';
     }
-    else if (236.25 <= d && d < 258.75) {
+    else if (d >= 236.25 && d < 258.75) {
         return 'WSW';
     }
-    else if (258.75 <= d && d < 281.25) {
+    else if (d >= 258.75 && d < 281.25) {
         return 'W';
     }
-    else if (281.25 <= d && d < 303.75) {
+    else if (d >= 281.25 && d < 303.75) {
         return 'WNW';
     }
-    else if (303.75 <= d && d < 326.25) {
+    else if (d >= 303.75 && d < 326.25) {
         return 'NW';
     }
-    else if (326.25 <= d && d < 348.75) {
+    else if (d >= 326.25 && d < 348.75) {
         return 'NNW';
     }
-    else {
-        return 'N';
-    }
+
+    return 'N';
 };
 
 const toCelsius = (temp) => {

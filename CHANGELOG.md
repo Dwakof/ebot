@@ -1,3 +1,60 @@
+## [0.13.4](https://github.com/Dwakof/ebot/compare/v0.13.3...v0.13.4) (2021-11-12)
+
+
+### Bug Fixes
+
+* remove add/remove karma notification ([a8777aa](https://github.com/Dwakof/ebot/commit/a8777aa7f96a85c3122c68c18d592bd110beee27)), closes [#231](https://github.com/Dwakof/ebot/issues/231)
+* remove console.log ([e5e9486](https://github.com/Dwakof/ebot/commit/e5e94863f923bc0aab27548c76c09f7adb9f101f))
+
+## [0.13.3](https://github.com/Dwakof/ebot/compare/v0.13.2...v0.13.3) (2021-11-12)
+
+
+### Bug Fixes
+
+* bad command ID were generated making some applicationCommand not work at all ([31604d3](https://github.com/Dwakof/ebot/commit/31604d34dec89ad9f85ec5f7f3085eff3be796e9))
+
+## [0.13.2](https://github.com/Dwakof/ebot/compare/v0.13.1...v0.13.2) (2021-11-12)
+
+
+### Bug Fixes
+
+* some bad handling for creating discord api schema ([477e0c4](https://github.com/Dwakof/ebot/commit/477e0c4b153e5e6b385ea838b187fec946e7fe5e))
+
+## [0.13.1](https://github.com/Dwakof/ebot/compare/v0.13.0...v0.13.1) (2021-11-12)
+
+
+### Bug Fixes
+
+* missing miwic applicationCommand ([7f44671](https://github.com/Dwakof/ebot/commit/7f446719199f290d54a6da1c3fa5b06cdbcde4f6))
+
+# [0.13.0](https://github.com/Dwakof/ebot/compare/v0.12.0...v0.13.0) (2021-11-12)
+
+
+### Features
+
+* uwu ([059567d](https://github.com/Dwakof/ebot/commit/059567d3c9762d69f29b54518fd852e0978efc50)), closes [#253](https://github.com/Dwakof/ebot/issues/253)
+
+# [0.12.0](https://github.com/Dwakof/ebot/compare/v0.11.2...v0.12.0) (2021-11-12)
+
+
+### Features
+
+* Rename SlashCommand into ApplicationCommand and support other types of ApplicationCommand ([ee4f74f](https://github.com/Dwakof/ebot/commit/ee4f74f2abeb43f6c00291bbf14a62bc67de5194))
+
+## [0.11.2](https://github.com/Dwakof/ebot/compare/v0.11.1...v0.11.2) (2021-11-12)
+
+
+### Bug Fixes
+
+* add wind direction and use HTTPS for image url ([9c9a43f](https://github.com/Dwakof/ebot/commit/9c9a43f7e5ec9276178849f15bf8d9d85b41d4e2))
+
+## [0.11.1](https://github.com/Dwakof/ebot/compare/v0.11.0...v0.11.1) (2021-09-24)
+
+
+### Bug Fixes
+
+* mimic command not working ([a554deb](https://github.com/Dwakof/ebot/commit/a554debf14421cc85200292abce77c6ff776d150))
+
 # [0.11.0](https://github.com/Dwakof/ebot/compare/v0.10.0...v0.11.0) (2021-09-24)
 
 

@@ -1,8 +1,8 @@
 'use strict';
 
-const { SlashCommand } = require('../../../core');
+const { ApplicationCommand } = require('../../../core');
 
-module.exports = class Mimic extends SlashCommand {
+module.exports = class Mimic extends ApplicationCommand {
 
     constructor() {
 
@@ -17,12 +17,12 @@ module.exports = class Mimic extends SlashCommand {
                 description : 'Mimic an user',
                 options     : {
                     user  : {
-                        type        : SlashCommand.Types.Member,
+                        type        : ApplicationCommand.SubTypes.Member,
                         description : 'User to mimic',
                         required    : true
                     },
                     start : {
-                        type        : SlashCommand.Types.String,
+                        type        : ApplicationCommand.SubTypes.String,
                         description : 'Start of a sentence to build the mimic from',
                         required    : false
                     }
@@ -33,7 +33,7 @@ module.exports = class Mimic extends SlashCommand {
                 description : 'Mimic the whole guild',
                 options     : {
                     start : {
-                        type        : SlashCommand.Types.String,
+                        type        : ApplicationCommand.SubTypes.String,
                         description : 'Start of a sentence to build the mimic from',
                         required    : false
                     }
@@ -44,7 +44,7 @@ module.exports = class Mimic extends SlashCommand {
                 description : 'Mimic Ebot',
                 options     : {
                     start : {
-                        type        : SlashCommand.Types.String,
+                        type        : ApplicationCommand.SubTypes.String,
                         description : 'Start of a sentence to build the mimic from',
                         required    : false
                     }
@@ -71,7 +71,7 @@ module.exports = class Mimic extends SlashCommand {
 
             if (err.statusCode === 404) {
 
-                return this.client.util.send(interaction, `Hey <@${ userId }>, I'm sorry but this user cannot be mimicked yet.`);
+                return this.client.util.send(interaction, `Hey <@${ interaction.user.id }>, I'm sorry but this user cannot be mimicked yet.`);
             }
 
             this.client.logger.error(err, err.toString());

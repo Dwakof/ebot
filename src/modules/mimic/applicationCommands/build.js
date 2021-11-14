@@ -1,8 +1,8 @@
 'use strict';
 
-const { SlashCommand } = require('../../../core');
+const { ApplicationCommand } = require('../../../core');
 
-module.exports = class Rebuild extends SlashCommand {
+module.exports = class Rebuild extends ApplicationCommand {
 
     constructor() {
 
@@ -15,7 +15,7 @@ module.exports = class Rebuild extends SlashCommand {
             method  : 'build',
             options : {
                 guild : {
-                    type        : SlashCommand.Types.String,
+                    type        : ApplicationCommand.SubTypes.String,
                     description : 'Guild ID to build',
                     required    : false
                 }
@@ -25,7 +25,7 @@ module.exports = class Rebuild extends SlashCommand {
 
     permissions() {
 
-        return [SlashCommand.Permission.OWNERS];
+        return [ApplicationCommand.Permission.OWNERS];
     }
 
     async build(interaction, { guild : guildId }) {
