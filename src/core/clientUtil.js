@@ -5,20 +5,10 @@ const { ClientUtil : Base } = require('discord-akairo');
 const Hoek = require('@hapi/hoek');
 const Util = require('util');
 
-/* eslint-disable no-unused-vars */
-const {
-    Embed,
-    MessageActionRow,
-    MessageButton,
-    Constants,
-    Message,
-    Interaction,
-    MessagePayload,
-    MessageOptions,
-    WebhookEditMessageOptions
-} = require('discord.js');
-/* eslint-enable no-unused-vars */
+const { MessageActionRow, MessageButton, Constants, Message, Interaction } = require('discord.js');
 
+// eslint-disable-next-line no-unused-vars
+const { Embed, MessagePayload, MessageOptions, WebhookEditMessageOptions } = require('discord.js');
 
 const { memberNicknameMention, codeBlock, inlineCode } = require('@discordjs/builders');
 
@@ -51,6 +41,8 @@ module.exports = class ClientUtil extends Base {
     REGEX_USER_MENTION    = /^<@![0-9]+>$/gi;
     REGEX_CHANNEL_MENTION = /^<#[0-9]+>$/gi;
     REGEX_URL             = CoreUtil.REGEX_URL;
+    REGEX_EMOJI           = CoreUtil.REGEX_EMOJI;
+    REGEX_UNICODE_EMOJI   = CoreUtil.REGEX_UNICODE_EMOJI;
 
     wait = Util.promisify(setTimeout);
 
@@ -62,6 +54,8 @@ module.exports = class ClientUtil extends Base {
 
     code      = inlineCode;
     codeBlock = codeBlock;
+
+    emojiURL = CoreUtil.emojiURL;
 
     capitalize(string) {
 
@@ -250,7 +244,7 @@ module.exports = class ClientUtil extends Base {
                 return obj.editReply(payload);
             }
 
-            return obj.reply(payload, { fetchReply: true });
+            return obj.reply(payload, { fetchReply : true });
         }
 
         if (obj instanceof Message) {

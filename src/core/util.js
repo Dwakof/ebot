@@ -3,9 +3,15 @@
 const Fs   = require('fs/promises');
 const Path = require('path');
 
+const EmojiRegex = require('emoji-regex');
+
 // eslint-disable-next-line no-unused-vars
-const { GuildMember, User, Guild, Channel, Message, Role, Snowflake } = require('discord.js');
-const { EventEmitter }                                                = require('events');
+const { GuildMember, User, Guild, Channel, Message, Role } = require('discord.js');
+
+// eslint-disable-next-line no-unused-vars
+const { Snowflake, ReactionEmoji, GuildEmoji } = require('discord.js');
+
+const { EventEmitter } = require('events');
 
 class KnexAsyncIterator {
 
@@ -206,8 +212,10 @@ class Task extends EventEmitter {
 
 module.exports = class CoreUtil {
 
-    static REGEX_URL        = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-    static REGEX_CODE_BLOCK = /(?<=[^`]|^)(`(?:``)?)([^`]+)(?=[^`]|$)/ig;
+    static REGEX_URL           = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    static REGEX_CODE_BLOCK    = /(?<=[^`]|^)(`(?:``)?)([^`]+)(?=[^`]|$)/ig;
+    static REGEX_EMOJI         = /<(?<animated>a?):(?<name>.|[^>]+):(?<id>\d+)>/gmi;
+    static REGEX_UNICODE_EMOJI = EmojiRegex();
 
     static isString(string) {
 
@@ -416,5 +424,59 @@ module.exports = class CoreUtil {
         }
 
         return [base, guildId, channelId, messageId].filter(Boolean).join('/');
+    }
+
+    /**
+     * @param {Emoji|GuildEmoji|ReactionEmoji|string} emoji
+     * @param {Object}                                [options]
+     *
+     * @return {string}
+     */
+    static emojiURL(emoji, options = {}) {
+
+        if (CoreUtil.isString(emoji)) {
+
+            const { cdn = 'https://twemoji.maxcdn.com', v = 'latest', sep = '-', size = '72x72', ext = 'png' } = options;
+
+            const surrogates = emoji.indexOf(String.fromCharCode(0x200D)) < 0 ? emoji.replace(/\uFE0F/g, '') : emoji;
+
+            const r = [];
+
+            let c = 0;
+            let p = 0;
+            let i = 0;
+
+            while (i < surrogates.length) {
+
+                c = surrogates.charCodeAt(i++);
+
+                if (p) {
+                    r.push((0x10000 + ((p - 0xD800) << 10) + (c - 0xDC00)).toString(16));
+                    p = 0;
+                }
+                else if (c >= 0xD800 && c <= 0xDBFF) {
+                    p = c;
+                }
+                else {
+                    r.push(c.toString(16));
+                }
+            }
+
+            const code = r.join(sep);
+
+            return [cdn, 'v', v, size, `${ code }.${ ext }`].join('/');
+        }
+
+        if (emoji.url) {
+
+            return emoji.url;
+        }
+
+        if (CoreUtil.isString(emoji.name)) {
+
+            return CoreUtil.emojiURL(emoji.name, options);
+        }
+
+        throw new Error(`Could not get an URL out of this emoji : "${ emoji }"`);
     }
 };

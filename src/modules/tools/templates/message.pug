@@ -1,0 +1,55 @@
+doctype html
+html(lang="en")
+    head
+        style.
+            .discord-message .discord-message-body pre {
+                background-color: #2f3136;
+                padding: 0;
+                max-width: 90%;
+                box-sizing: border-box;
+                border-width: 1px;
+                border-color: rgb(32, 34, 37);
+            }
+
+            .discord-message .discord-message-body pre.inline {
+                border-width: 0;
+            }
+
+            .discord-message .discord-message-body pre code {
+                display: block;
+            }
+
+            .discord-message .discord-message-body code {
+                background-color: #2f3136;
+                width: auto;
+                height: auto;
+                border: none;
+                white-space: pre-wrap;
+                padding: 0.2em;
+                border-radius: 3px;
+                font-size: 85%;
+            }
+    body
+        discord-messages#messages
+            discord-message(
+                bot=message.author.bot
+                avatar=message.author.avatar
+                author=message.author.name
+                role-color=message.author.color
+                edited=message.edited
+                timestamp=message.timestamp
+            ) !{message.content}
+                discord-reactions(slot="reactions")
+                    each reaction in message.reactions
+                        discord-reaction(name=reaction.name emoji=reaction.emoji count=reaction.count)
+                each embed in message.embeds
+                    if embed.type === "article"
+                        discord-embed(slot="embeds" author-name=embed.author.name embed-title=embed.title url=embed.url timestamp=embed.timestamp image=embed.image.url) !{embed.description}
+                discord-attachments(slot="attachments")
+                    each attachment in message.attachments
+                        if attachment.type === "media"
+                            discord-attachment(alt=attachment.name url=attachment.url height=attachment.height width=attachment.width)
+                        else if attachment.type === "invite"
+                            discord-invite(name=attachment.name icon=attachment.icon online=attachment.online members=attachment.members partnered=attachment.partnered verified=attachment.verified)
+                        else
+
