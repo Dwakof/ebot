@@ -5,18 +5,10 @@ const { ClientUtil : Base } = require('discord-akairo');
 const Hoek = require('@hapi/hoek');
 const Util = require('util');
 
+const { Constants, MessageButton, MessageActionRow, Message, Interaction } = require('discord.js');
+
 /* eslint-disable no-unused-vars */
-const {
-    Embed,
-    MessageActionRow,
-    MessageButton,
-    Constants,
-    Message,
-    Interaction,
-    MessagePayload,
-    MessageOptions,
-    WebhookEditMessageOptions
-} = require('discord.js');
+const { Embed, MessagePayload, MessageOptions, WebhookEditMessageOptions } = require('discord.js');
 /* eslint-enable no-unused-vars */
 
 
@@ -221,6 +213,16 @@ module.exports = class ClientUtil extends Base {
                 next.setDisabled(true);
             }
 
+            if (typeof buttons.previous.label === 'function') {
+
+                next.setLabel(await buttons.next.label(index));
+            }
+
+            if (typeof buttons.previous.label === 'function') {
+
+                previous.setLabel(await buttons.previous.label(index));
+            }
+
             await interaction.deferUpdate();
             await reply.edit(await getPage(index));
             return collector.resetTimer();
@@ -250,7 +252,7 @@ module.exports = class ClientUtil extends Base {
                 return obj.editReply(payload);
             }
 
-            return obj.reply(payload, { fetchReply: true });
+            return obj.reply(payload, { fetchReply : true });
         }
 
         if (obj instanceof Message) {
