@@ -10,6 +10,11 @@ const Hoek = require('@hapi/hoek');
 
 const { Service } = require('../../../core');
 
+const Pgk = require('../../../../package.json');
+
+const UIPackage = '@skyra/discord-components-core';
+const UIVersion = Pgk.dependencies[UIPackage];
+
 module.exports = class ScreenshotService extends Service {
 
     #browser;
@@ -17,14 +22,14 @@ module.exports = class ScreenshotService extends Service {
 
     async init() {
 
-        this.#browser = await Puppeteer.launch({
-            args     : ['--no-sandbox', '--disable-setuid-sandbox'],
-            headless : true
-        });
+        // TODO mode Puppeteer in his own service so that you can only require page
+
+        this.#browser = await Puppeteer.launch({ args : ['--no-sandbox', '--disable-setuid-sandbox'], headless : true });
 
         this.#templates = {
             message : Pug.compileFile(Path.join(__dirname, '../templates/message.pug')),
-            mention : Pug.compileFile(Path.join(__dirname, '../templates/mention.pug'))
+            mention : Pug.compileFile(Path.join(__dirname, '../templates/mention.pug')),
+            emoji   : Pug.compileFile(Path.join(__dirname, '../templates/emoji.pug'))
         };
     }
 
@@ -38,7 +43,17 @@ module.exports = class ScreenshotService extends Service {
 
         try {
 
-            await page.setViewport({ width : 800, height : 800, deviceScaleFactor : 2 });
+            // TODO wire log to client.logger
+
+            // page.on('console', (...args) => console.log(...args));
+            // page.on('error', (...args) => console.error(...args));
+            // page.on('pageerror', (...args) => console.error(...args));
+
+            // TODO maybe change viewport size based on attachment ?
+
+            await page.setViewport({ width : 600, height : 600, deviceScaleFactor : 2 });
+
+            await page.addScriptTag({ url : `https://unpkg.com/${ UIPackage }@${ UIVersion }`, type : 'module' });
 
             await this.client.channels.cache.get(message.channelId).messages.fetch(message.id, { force : true });
 
@@ -59,6 +74,10 @@ module.exports = class ScreenshotService extends Service {
                     bot    : member.user.bot
                 },
                 embeds      : Array.from(message.embeds).map((embed) => {
+
+                    // TODO replace emoji with a component in every field
+
+                    // TODO Maybe check how Discord handle embed in his own client
 
                     embed.author = embed.author || {};
                     embed.image  = embed.image || {};
@@ -116,24 +135,56 @@ module.exports = class ScreenshotService extends Service {
                 }
             }
 
+            data.message.content = data.message.content.replace(this.client.util.REGEX_URL, (url) => `<a>${ url }</a>`);
+
             data.message.content = data.message.content.replace(/```([a-z]*\n?[\s\S]*?\n?)```/g, (code) => {
+
+                // TODO named code blocks
 
                 return `<pre><code>${ code.replace(/`/g, '') }</code></pre>`;
             });
 
             data.message.content = data.message.content.replace(/`([a-z]*\n?[\s\S]*?\n?)`/g, (code) => {
 
-                return `<code>${ code.replace(/`/g, '') }</code>`;
+                return `<code class="inline">${ code.replace(/`/g, '') }</code>`;
             });
 
             data.message.content = data.message.content.replace(/\r?\n|\r/g, '</br>');
+
+            // TODO Italic
+            // TODO Bold
+
+            // Replace emoji
+
+            // TODO support Big (Jumboable) emoji (instead of 1.375em it's 3em)
+
+            for (const [string] of data.message.content.matchAll(this.client.util.REGEX_UNICODE_EMOJI)) {
+
+                data.message.content = data.message.content.replace(string, this.#templates.emoji({
+                    url        : this.client.util.emojiURL(string),
+                    name       : 'unicode-emoji', // Putting the actual emoji there could cause issues if there are multiple time the same emoji, an alternative would be the emoji name but I don't have it
+                    embedEmoji : false
+                }));
+            }
+
+            for (const [string, animated, name, id] of data.message.content.matchAll(this.client.util.REGEX_EMOJI)) {
+
+                let url = `https://cdn.discordapp.com/emojis/${ id }.png?size=96`;
+
+                if (!!animated) {
+
+                    url = `https://cdn.discordapp.com/emojis/${ id }.gif?size=96`;
+                }
+
+                data.message.content = data.message.content.replace(string, this.#templates.emoji({ url, name, embedEmoji : false }));
+            }
 
             // Replace mention with mention-component
 
             for (const [id] of message.mentions.users) {
 
                 const regex           = new RegExp(`<@?\!${id}>`);
-                const mentionedMember = await message.guild.members.fetch(id, { force : true }); // To be sure to get updated info of the members
+                const mentionedMember = await message.guild.members.fetch(id, { force : true }); // To be sure to get updated info of the member like `displayHexColor`
                 const string          = this.#templates.mention({
                     color : mentionedMember.displayHexColor,
                     type  : 'user',
@@ -170,8 +221,6 @@ module.exports = class ScreenshotService extends Service {
                 return this.#templates.mention({ type : 'user', name : mention.slice(1) });
             });
 
-            data.message.content = data.message.content.replace(this.client.util.REGEX_URL, (url) => `<a>${ url }</a>`);
-
             await page.setContent(this.#templates.message(data), { waitUntil : 'load' });
 
             // Smart load algorithm,
@@ -181,10 +230,7 @@ module.exports = class ScreenshotService extends Service {
             let done          = false;
             let contentLength = (await page.content()).length;
 
-            setTimeout(() => {
-
-                done = true;
-            }, 5000);
+            setTimeout(() => (done = true), 5000);
 
             do {
 
@@ -214,7 +260,7 @@ module.exports = class ScreenshotService extends Service {
         }
         finally {
 
-            page.close();
+            await page.close();
         }
     }
 };

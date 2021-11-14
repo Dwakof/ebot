@@ -1,13 +1,18 @@
 doctype html
 html(lang="en")
     head
-        script(src="https://unpkg.com/@skyra/discord-components-core@2.11.6" type="module")
         style.
             .discord-message .discord-message-body pre {
                 background-color: #2f3136;
                 padding: 0;
                 max-width: 90%;
                 box-sizing: border-box;
+                border-width: 1px;
+                border-color: rgb(32, 34, 37);
+            }
+
+            .discord-message .discord-message-body pre.inline {
+                border-width: 0;
             }
 
             .discord-message .discord-message-body pre code {
@@ -21,7 +26,6 @@ html(lang="en")
                 border: none;
                 white-space: pre-wrap;
                 padding: 0.2em;
-                margin: -0.2em 0;
                 border-radius: 3px;
                 font-size: 85%;
             }

@@ -1,15 +1,15 @@
 'use strict';
 
-const { SlashCommand } = require('../../../core');
+const { ApplicationCommand } = require('../../../core');
 
-module.exports = class ScreenshotCommand extends SlashCommand {
+module.exports = class ScreenshotCommand extends ApplicationCommand {
 
     constructor() {
 
         super('screenshot', {
             category : 'tools',
             // description : 'Search Urban Dictionary for given term',
-            type : SlashCommand.Types.MessageCommand
+            type : ApplicationCommand.Types.MessageCommand
         });
     }
 
@@ -25,17 +25,20 @@ module.exports = class ScreenshotCommand extends SlashCommand {
 
         try {
 
-            await interaction.deferReply();
+            const message = interaction.options.data[0].message;
 
-            const bufferPromise = ScreenshotService.screenshotMessage(interaction.options.data[0].message);
+            const bufferPromise = ScreenshotService.screenshotMessage(message);
 
-            await this.client.util.send(interaction, '📷');
-            await this.client.util.send(interaction, '📸');
-            await this.client.util.send(interaction, '📷');
+            await this.client.util.send(interaction, { content : 'It has been done sir', ephemeral: true }); // I need to reply to the interaction
+
+            const reply = await message.reply('📷');
+
+            await reply.edit('📸');
+            await reply.edit('📷');
 
             const buffer = await bufferPromise;
 
-            return this.client.util.send(interaction, { files : [buffer], content : '⠀' });
+            await reply.edit({ files : [buffer], content : '⠀' });
         }
         catch (error) {
 

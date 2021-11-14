@@ -41,6 +41,8 @@ module.exports = class ClientUtil extends Base {
     REGEX_USER_MENTION    = /^<@![0-9]+>$/gi;
     REGEX_CHANNEL_MENTION = /^<#[0-9]+>$/gi;
     REGEX_URL             = CoreUtil.REGEX_URL;
+    REGEX_EMOJI           = CoreUtil.REGEX_EMOJI;
+    REGEX_UNICODE_EMOJI   = CoreUtil.REGEX_UNICODE_EMOJI;
 
     wait = Util.promisify(setTimeout);
 
