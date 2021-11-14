@@ -126,15 +126,16 @@ module.exports = class ClientUtil extends Base {
     }
 
     /**
-     * @param {Message}               originalMessage
-     * @param {Array<Embed|Function>} pages
-     * @param {Object}                [options]
+     * @param {Message}                       originalMessage
+     * @param {Array<Embed|Function|Promise>} pages
+     * @param {Object}                        [options]
      */
     async replyPaginatedEmbeds(originalMessage, pages, options = {}) {
 
-        const { timeout, buttons, footerBuilder } = Hoek.applyToDefaults({
+        const { timeout, buttons, footerBuilder, cacheFunction } = Hoek.applyToDefaults({
             timeout       : 120000,
             footerBuilder : (page, index, total) => `Page ${ index + 1 } / ${ total }`,
+            cacheFunction : true,
             buttons       : {
                 previous : {
                     customId : 'previous',
@@ -149,6 +150,8 @@ module.exports = class ClientUtil extends Base {
                 }
             }
         }, options);
+
+        const cache = new Map();
 
         let index = 0;
 
@@ -168,7 +171,19 @@ module.exports = class ClientUtil extends Base {
 
             if (typeof embed === 'function') {
 
-                embed = await embed(i);
+                if (cacheFunction) {
+
+                    if (!cache.has(i)) {
+
+                        cache.set(i, await embed(i));
+                    }
+
+                    embed = cache.get(i);
+                }
+                else {
+
+                    embed = await embed(i);
+                }
             }
 
             if (footerBuilder) {
