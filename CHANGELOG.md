@@ -1,3 +1,10 @@
+# [0.15.0](https://github.com/Dwakof/ebot/compare/v0.14.0...v0.15.0) (2021-11-26)
+
+
+### Features
+
+* add wind gust to weather command ([71081d0](https://github.com/Dwakof/ebot/commit/71081d04c01115518dcb317fcfd059bfd214a6f1))
+
 # [0.14.0](https://github.com/Dwakof/ebot/compare/v0.13.4...v0.14.0) (2021-11-14)
 
 
