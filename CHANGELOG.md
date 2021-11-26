@@ -1,3 +1,10 @@
+## [0.15.1](https://github.com/Dwakof/ebot/compare/v0.15.0...v0.15.1) (2021-11-26)
+
+
+### Bug Fixes
+
+* gust wind can be NaN ([4572749](https://github.com/Dwakof/ebot/commit/45727494a24288af8b41c253d3238e8882845e3f))
+
 # [0.15.0](https://github.com/Dwakof/ebot/compare/v0.14.0...v0.15.0) (2021-11-26)
 
 
