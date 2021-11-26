@@ -96,9 +96,14 @@ module.exports = class WeatherCommand extends Command {
 
                 embed.addField('Humidity', `${ weatherBody.main.humidity } %`, true)
                     .addField('\u200B','\u200B')
-                    .addField('Wind speed', `${ Math.round(weatherBody.wind.speed * 3.6) } Km/h (${ Math.round(weatherBody.wind.speed * 2.23694) } Mph) ${toDirection(weatherBody.wind.deg)}`, true)
-                    .addField('Wind gust', `${ Math.round(weatherBody.wind.gust * 3.6) } Km/h (${ Math.round(weatherBody.wind.gust * 2.23694) } Mph)`, true)
-                    .setThumbnail(`https://openweathermap.org/img/wn/${ weatherBody.weather[0].icon }@4x.png`);
+                    .addField('Wind speed', `${ Math.round(weatherBody.wind.speed * 3.6) } Km/h (${ Math.round(weatherBody.wind.speed * 2.23694) } Mph) ${toDirection(weatherBody.wind.deg)}`, true);
+                
+                if (!isNaN(weatherBody.wind.gust)) {
+                 
+                    embed.addField('Wind gust', `${ Math.round(weatherBody.wind.gust * 3.6) } Km/h (${ Math.round(weatherBody.wind.gust * 2.23694) } Mph)`, true)
+                }
+                
+                embed.setThumbnail(`https://openweathermap.org/img/wn/${ weatherBody.weather[0].icon }@4x.png`);
 
                 return message.util.send({ embeds : [embed] });
             }
