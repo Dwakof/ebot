@@ -18,7 +18,7 @@
     "eslint": "npx eslint ."
   },
   "dependencies": {
-    "@discordjs/builders": "0.8.2",
+    "@discordjs/builders": "0.9.0",
     "@discordjs/rest": "0.1.0-canary.0",
     "@hapi/hoek": "9.2.1",
     "@hapipal/confidence": "6.0.1",
