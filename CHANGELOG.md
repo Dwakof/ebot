@@ -1,3 +1,25 @@
+## [0.15.1](https://github.com/Dwakof/ebot/compare/v0.15.0...v0.15.1) (2021-11-26)
+
+
+### Bug Fixes
+
+* gust wind can be NaN ([4572749](https://github.com/Dwakof/ebot/commit/45727494a24288af8b41c253d3238e8882845e3f))
+
+# [0.15.0](https://github.com/Dwakof/ebot/compare/v0.14.0...v0.15.0) (2021-11-26)
+
+
+### Features
+
+* add wind gust to weather command ([71081d0](https://github.com/Dwakof/ebot/commit/71081d04c01115518dcb317fcfd059bfd214a6f1))
+
+# [0.14.0](https://github.com/Dwakof/ebot/compare/v0.13.4...v0.14.0) (2021-11-14)
+
+
+### Features
+
+* add support for article embed, invites, code block, mention, url and a proper wait time before screenshoting ([4f61e02](https://github.com/Dwakof/ebot/commit/4f61e023eca6a385c06debdc2f18ac16e1f5b0e6))
+* Screenshot message on right click ([c4889ad](https://github.com/Dwakof/ebot/commit/c4889ad785e2a5bc3ad1406fa96f8b9ce2494317))
+
 ## [0.13.4](https://github.com/Dwakof/ebot/compare/v0.13.3...v0.13.4) (2021-11-12)
 
 

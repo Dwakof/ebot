@@ -5,12 +5,10 @@ const { ClientUtil : Base } = require('discord-akairo');
 const Hoek = require('@hapi/hoek');
 const Util = require('util');
 
-const { Constants, MessageButton, MessageActionRow, Message, Interaction } = require('discord.js');
+const { MessageActionRow, MessageButton, Constants, Message, Interaction } = require('discord.js');
 
-/* eslint-disable no-unused-vars */
+// eslint-disable-next-line no-unused-vars
 const { Embed, MessagePayload, MessageOptions, WebhookEditMessageOptions } = require('discord.js');
-/* eslint-enable no-unused-vars */
-
 
 const { memberNicknameMention, codeBlock, inlineCode } = require('@discordjs/builders');
 
@@ -43,6 +41,8 @@ module.exports = class ClientUtil extends Base {
     REGEX_USER_MENTION    = /^<@![0-9]+>$/gi;
     REGEX_CHANNEL_MENTION = /^<#[0-9]+>$/gi;
     REGEX_URL             = CoreUtil.REGEX_URL;
+    REGEX_EMOJI           = CoreUtil.REGEX_EMOJI;
+    REGEX_UNICODE_EMOJI   = CoreUtil.REGEX_UNICODE_EMOJI;
 
     color = CoreUtil.Color;
 
@@ -56,6 +56,8 @@ module.exports = class ClientUtil extends Base {
 
     code      = inlineCode;
     codeBlock = codeBlock;
+
+    emojiURL = CoreUtil.emojiURL;
 
     capitalize(string) {
 
