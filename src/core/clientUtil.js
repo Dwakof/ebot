@@ -44,6 +44,8 @@ module.exports = class ClientUtil extends Base {
     REGEX_CHANNEL_MENTION = /^<#[0-9]+>$/gi;
     REGEX_URL             = CoreUtil.REGEX_URL;
 
+    color = CoreUtil.Color;
+
     wait = Util.promisify(setTimeout);
 
     randomNumber = CoreUtil.randomNumber;

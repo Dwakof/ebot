@@ -7,6 +7,11 @@ const Path = require('path');
 const { GuildMember, User, Guild, Channel, Message, Role, Snowflake } = require('discord.js');
 const { EventEmitter }                                                = require('events');
 
+const Color = require('chroma-js');
+
+Color.brewer.github  = [Color('#2F3136').darken(0.2), '#0e4429', '#006d32', '#26a641', '#39d353'];
+Color.brewer.discord = [Color('#2F3136').darken(0.2), '#404EED'];
+
 class KnexAsyncIterator {
 
     constructor(query) {
@@ -208,6 +213,8 @@ module.exports = class CoreUtil {
 
     static REGEX_URL        = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
     static REGEX_CODE_BLOCK = /(?<=[^`]|^)(`(?:``)?)([^`]+)(?=[^`]|$)/ig;
+
+    static Color = Color;
 
     static isString(string) {
 
