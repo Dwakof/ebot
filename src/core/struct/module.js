@@ -7,6 +7,7 @@ const CoreUtil       = require('../util');
 const { CoreEvents } = require('../constants');
 
 const Service = require('./service');
+const View    = require('./view');
 
 class Module {
 
@@ -19,11 +20,12 @@ class Module {
      */
     #client;
 
-    #commands      = new Map();
-    #listeners     = new Map();
-    #inhibitors    = new Map();
-    #providers     = new Map();
-    #services      = new Map();
+    #commands            = new Map();
+    #listeners           = new Map();
+    #inhibitors          = new Map();
+    #providers           = new Map();
+    #services            = new Map();
+    #views               = new Map();
     #applicationCommands = new Map();
 
     constructor(name, path) {
@@ -51,6 +53,11 @@ class Module {
         if (components.includes('services')) {
 
             await this.registerServices();
+        }
+
+        if (components.includes('views')) {
+
+            await this.registerViews();
         }
 
         if (components.includes('listeners')) {
@@ -199,6 +206,41 @@ class Module {
         }
     }
 
+    async registerViews() {
+
+        for (const { name, path, file } of await CoreUtil.requireDir(Path.join(this.#path, 'views'), true)) {
+
+            try {
+
+                if (!file instanceof View) {
+
+                    throw new Error('Only instance of View can be registered as view');
+                }
+
+                const view = new file(this.#client);
+                const id   = view.id;
+
+                if (this.#views.has(id)) {
+
+                    throw new Error('A view under the same name was already registered');
+                }
+
+                this.#views.set(id, { path, view });
+
+                this.#client.logger.trace({
+                    event   : CoreEvents.VIEW_REGISTERED,
+                    emitter : 'core',
+                    module  : this.#name,
+                    view    : id
+                });
+            }
+            catch (error) {
+
+                throw new Error(`Could not register view ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
+            }
+        }
+    }
+
     async registerApplicationCommands() {
 
         for (const { name, path, file } of await CoreUtil.requireDir(Path.join(this.#path, 'applicationCommands'), true)) {
@@ -241,6 +283,18 @@ class Module {
                 service : id
             });
         }
+
+        for (const [id, { view }] of this.#views.entries()) {
+
+            await view.init();
+
+            this.#client.logger.debug({
+                event   : CoreEvents.VIEW_INITIALIZED,
+                emitter : 'core',
+                module  : this.#name,
+                view    : id
+            });
+        }
     }
 
     providers() {
@@ -258,6 +312,15 @@ class Module {
             .reduce((services, [name, { service }]) => {
 
                 return { ...services, [name] : service };
+            }, {});
+    }
+
+    views() {
+
+        return Array.from(this.#views.entries())
+            .reduce((views, [name, { view }]) => {
+
+                return { ...views, [name] : view };
             }, {});
     }
 
