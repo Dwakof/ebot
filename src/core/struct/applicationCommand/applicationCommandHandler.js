@@ -98,7 +98,15 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
                 emitter  : 'core',
                 global   : false,
                 module   : 'ApplicationCommandHandler',
-                commands : guildCommands.map(({ name }) => name)
+                commands : Array.from(this.commands.entries()).reduce((acc, [key, { applicationCommand : { global } }]) => {
+
+                    if (global) {
+
+                        return acc;
+                    }
+
+                    return [...acc, key];
+                }, [])
             });
         }
         catch (err) {
@@ -120,7 +128,15 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
                 emitter  : 'core',
                 global   : true,
                 module   : 'ApplicationCommandHandler',
-                commands : globalCommands.map(({ name }) => name)
+                commands : Array.from(this.commands.entries()).reduce((acc, [key, { applicationCommand : { global } }]) => {
+
+                    if (!global) {
+
+                        return acc;
+                    }
+
+                    return [...acc, key];
+                }, [])
             });
         }
         catch (err) {
