@@ -1,7 +1,5 @@
 'use strict';
 
-const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
-
 // eslint-disable-next-line no-unused-vars
 const { MessageEmbed, MessageAttachment } = require('discord.js');
 
@@ -9,94 +7,74 @@ const { Service } = require('../../../core');
 
 module.exports = class StatsService extends Service {
 
-    init() {
+    filter(options) {
 
-        this.canvasService = new ChartJSNodeCanvas({ width : 1200, height : 600 });
-    }
+        const { History } = this.client.providers('history');
 
-    /**
-     * @param {Array<{ time : Date, value : Number }>}  stats
-     * @param {Guild} guild
-     * @param {User} user
-     * @param color
-     * @returns {{files : MessageAttachment[], embeds : MessageEmbed[]}}
-     */
-    getCountMessageOverTimeView(stats, { guild, user, color = '#1DAE5C' }) {
+        const { Message } = History.models;
 
-        const embed = this.client.util.embed()
-            .setTitle(`Stats for ${ guild.name }`)
-            .setThumbnail(guild.iconURL({ dynamic : true, size : 128 }))
-            .setColor(color);
+        const { fn, raw } = Message;
 
-        if (user) {
+        const { authorId, guildId, channelId, after = raw('to_timestamp(?)', [0]), before = fn.now() } = options;
 
-            embed.setTitle(`Stats for ${ user.username }`)
-                .setThumbnail(user.avatarURL({ dynamic : true, size : 128 }));
+        const where = {};
 
-            if (user.hexAccentColor) {
+        if (guildId) {
 
-                embed.setColor(user.hexAccentColor);
-            }
+            where.guildId = guildId;
         }
 
-        embed.addField('Messages', `${ stats.reduce((acc, { value }) => acc + value, 0) }`, false);
+        if (authorId) {
 
-        const stream = this.canvasService.renderToStream({
-            type    : 'bar',
-            data    : {
-                labels   : stats.map(({ time }) => time),
-                datasets : [
-                    {
-                        label           : 'messages',
-                        barPercentage   : 1,
-                        backgroundColor : embed.hexColor,
-                        borderRadius    : 5,
-                        data            : stats.map(({ value }) => value)
-                    }
-                ]
-            },
-            options : {
-                legend   : { display : false },
-                elements : {
-                    point : {
-                        radius : 0
-                    }
-                },
-                scales   : {
-                    xAxes : [
-                        {
-                            time      : { round : true },
-                            type      : 'time',
-                            gridLines : { display : false },
-                            ticks     : {
-                                source    : 'auto',
-                                fontColor : 'rgba(142, 146, 151, 1)',
-                                fontSize  : 20
-                            }
+            where.authorId = authorId;
+        }
+
+        if (channelId) {
+
+            where.channelId = channelId;
+        }
+
+        return { where, after, before };
+    }
+
+    _baseQueryActivity(options = {}) {
+
+        const { History } = this.client.providers('history');
+
+        const { Message } = History.models;
+
+        const { fn, raw, ref } = Message;
+
+        const { after, before, period = 'hour', where = {} } = options;
+
+        return Message.query()
+            .with('info', Message.query().select({ min : fn.min(ref('createdAt')), max : fn.max(ref('createdAt')) }).where(where))
+            .with('periods',
+                Message.query().select({
+                    period : raw(`GENERATE_SERIES( DATE_TRUNC(?, GREATEST(?::DATE, ??)), DATE_TRUNC(?, LEAST(?::DATE, ??)), ?::interval )`,
+                        [
+                            period, after, ref('min').from('info'),
+                            period, before, ref('max').from('info'),
+                            `1 ${ period }`
+                        ]
+                    )
+                }).from('info'))
+            .with('stats',
+                Message.query().select({
+                    period : ref('period').from('periods'),
+                    total  : fn.count(ref('id').from(Message.tableName))
+                }).from('periods')
+                    .leftOuterJoin(Message.tableName, function () {
+
+                        this.on(ref('period').from('periods'), '=', raw(`DATE_TRUNC(?, ??)`, [period, ref('createdAt').from(Message.tableName)]));
+
+                        for (const key of Object.keys(where)) {
+
+                            this.andOn(ref(key).from(Message.tableName), '=', raw(`?`, [where[key]]));
                         }
-                    ],
-                    yAxes : [
-                        {
-                            gridLines : {
-                                display    : true,
-                                borderDash : [2, 3]
-                            },
-                            ticks     : {
-                                precision    : 0,
-                                suggestedMin : 0,
-                                suggestedMax : 0,
-                                fontColor    : 'rgba(142, 146, 151, 1)',
-                                fontSize     : 20
-                            }
-                        }
-                    ]
-                }
-            }
-        });
-
-        embed.setImage('attachment://chart.png');
-
-        return { embeds : [embed], files : [this.client.util.attachment(stream, 'chart.png')] };
+                    })
+                    .groupBy('period')
+            );
     }
 
     async getCountMessageOverTime(options) {
@@ -107,28 +85,9 @@ module.exports = class StatsService extends Service {
 
         const { fn, raw, ref } = Message;
 
-        const { authorId, guildId, channelId, after = fn.min(ref('createdAt')), before = fn.now(), datapoint = 100 } = options;
+        const { datapoint = 50 } = options;
 
-        const where   = {};
-        const groupBy = [];
-
-        if (guildId) {
-
-            where.guildId = guildId;
-            groupBy.push('guildId');
-        }
-
-        if (authorId) {
-
-            where.authorId = authorId;
-            groupBy.push('authorId');
-        }
-
-        if (channelId) {
-
-            // where.channelId = channelId;
-            // groupBy.push('channelId');
-        }
+        const { where, after, before } = this.filter(options);
 
         const stats = await Message.query()
             .with('info',
@@ -140,7 +99,7 @@ module.exports = class StatsService extends Service {
             )
             .with('periods',
                 Message.query().select({
-                    interval : raw('FLOOR(?? / ?)::bigint', ['interval', datapoint + 1]),
+                    interval : raw('FLOOR(?? / ?)::bigint', ['interval', datapoint]),
                     after    : raw(`
                         TO_TIMESTAMP(
                             GENERATE_SERIES(
@@ -148,7 +107,7 @@ module.exports = class StatsService extends Service {
                                 EXTRACT(EPOCH FROM ??)::bigint,
                                 FLOOR(?? / ?)::bigint
                             )
-                        )`, ['min', 'max', 'interval', datapoint + 1])
+                        )`, ['min', 'max', 'interval', datapoint])
                 }).from('info')
             )
             .select({
@@ -164,12 +123,85 @@ module.exports = class StatsService extends Service {
                         ref('after').from('periods'),
                         ref('interval').from('periods')
                     ])
-                    .groupBy(...groupBy)
-            }).from('periods');
+            }).from('periods').orderBy('time');
 
         return stats.map(({ time, value }) => {
 
             return { time : new Date(time), value : parseFloat(value) || 0 };
         }).slice(0, datapoint);
+    }
+
+    async getHourlyActivity(options) {
+
+        const { History } = this.client.providers('history');
+
+        const { Message } = History.models;
+
+        const { fn, raw, ref } = Message;
+
+        const { where, before } = this.filter(options);
+
+        const { after = raw('to_timestamp(?)', [0]) } = options;
+
+        const stats = await this._baseQueryActivity({ where, before, after, period : 'hour' })
+            .select({
+                hour  : raw(`DATE_PART('hour', ??)`, [ref('period').from('stats')]),
+                value : fn.avg(ref('total').from('stats'))
+            })
+            .from('stats')
+            .groupBy('hour')
+            .orderBy('hour');
+
+        return stats.map(({ hour, value }) => {
+
+            return { hour : parseInt(hour), value : parseFloat(value) || 0 };
+        });
+    }
+
+    async getWeeklyActivity(options) {
+
+        const { History } = this.client.providers('history');
+
+        const { Message } = History.models;
+
+        const { fn, raw, ref } = Message;
+
+        const { where, before, after } = this.filter(options);
+
+        const { interval = 24 } = options;
+
+        const stats = await this._baseQueryActivity({ where, before, after, period : 'hour' })
+            .select({
+                day   : raw(`DATE_PART('dow', ??)`, [ref('period').from('stats')]),
+                hour  : raw(`FLOOR(DATE_PART('hour', ??) / ?) * ?`, [ref('period').from('stats'), 24 / (interval), 24 / (interval)]),
+                value : fn.avg(ref('total').from('stats'))
+            })
+            .from('stats')
+            .groupBy('day', 'hour')
+            .orderBy(['day', 'hour']);
+
+        return stats.map(({ day, hour, value }) => {
+
+            return { day : parseInt(day), hour : parseInt(hour), value : parseFloat(value) || 0 };
+        });
+    }
+
+    async getAverageMessagePerPeriod(options) {
+
+        const { History } = this.client.providers('history');
+
+        const { Message } = History.models;
+
+        const { fn, ref } = Message;
+
+        const { where, after, before } = this.filter(options);
+
+        const { period = 'hour' } = options;
+
+        const { value } = await this._baseQueryActivity({ where, before, after, period })
+            .select({ value : fn.avg(ref('total').from('stats')) })
+            .from('stats').first();
+
+        return parseInt(value) || 0;
     }
 };

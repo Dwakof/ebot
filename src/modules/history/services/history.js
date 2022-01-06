@@ -18,8 +18,9 @@ module.exports = class HistoryService extends Service {
         return Message.query()
             .insert({
                 id        : message?.id,
-                guildId   : message?.guild?.id,
+                guildId   : message?.guild?.id || message?.guildId,
                 authorId  : message?.author?.id,
+                channelId : message?.channel?.id || message?.channelId,
                 content   : message?.content,
                 createdAt : message?.createdAt,
                 updatedAt : message?.editedAt || new Date()

@@ -366,11 +366,49 @@ module.exports = class SyncService extends Service {
                 id        : message.id,
                 guildId   : message.guild.id,
                 authorId  : message.author.id,
+                channelId : message.channel.id,
                 content   : message.content || '',
                 createdAt : message.createdAt,
                 updatedAt : message.editedAt || message.createdAt
             };
         });
+    }
+
+    /**
+     *
+     * @param {Message[]} messages
+     */
+    static async toEmoji(messages = []) {
+
+        const emojis = [];
+
+        for (const message of messages) {
+
+            if ((message?.reactions?.cache?.size ?? 0) > 0) {
+
+                for (const reaction of message.reactions.cache.values()) {
+
+                    const users = await reaction.users.fetch();
+
+                    for (const user of users) {
+
+                        emojis.push({
+                            guildId   : message.guild.id,
+                            channelId : message.channel.id,
+                            messageId : message.id,
+                            userId    : user.id,
+                            type      : 'reaction',
+                            emoji     : reaction.emoji.identifier,
+                            name      : reaction.emoji.name,
+                            createdAt : message.createdAt,
+                            updatedAt : message.editedAt || message.createdAt
+                        });
+                    }
+                }
+            }
+        }
+
+        return emojis;
     }
 
     static filterChannel(channel) {

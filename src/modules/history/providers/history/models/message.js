@@ -20,12 +20,13 @@ class Message extends Model {
 
         return {
             type     : 'object',
-            required : ['id', 'guildId', 'authorId', 'content', 'createdAt'],
+            required : ['id', 'guildId', 'authorId', 'channelId', 'content', 'createdAt'],
 
             properties : {
                 id        : { type : 'string' },
                 guildId   : { type : 'string' },
                 authorId  : { type : 'string' },
+                channelId : { type : 'string' },
                 content   : { type : 'string' },
                 createdAt : { type : 'object', format : 'date' },
                 updatedAt : { type : 'object', format : 'date' }

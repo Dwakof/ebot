@@ -9,35 +9,73 @@ module.exports = class Stats extends ApplicationCommand {
         super('stats', { category : 'history', description : 'Get stats for an user or the guild' });
     }
 
-    static get subcommands() {
+    static get subgroups() {
 
         return {
-            user  : {
-                method      : 'statsUser',
-                description : 'Stats for an user',
-                options     : {
-                    user : {
-                        type        : ApplicationCommand.SubTypes.Member,
-                        description : 'User to get stats for',
-                        required    : true
+            daily   : {
+                description : 'Get an average hourly activity for an user or the guild',
+                subcommands : {
+                    user  : {
+                        method      : 'hourly',
+                        description : 'Get an average hourly activity for an user, by default yourself',
+                        options     : {
+                            user : {
+                                type        : ApplicationCommand.SubTypes.Member,
+                                description : 'User to get stats for',
+                                required    : false
+                            }
+                        }
+                    },
+                    guild : {
+                        method      : 'hourly',
+                        description : 'Get an average hourly activity for the guild'
                     }
                 }
             },
-            guild : {
-                method      : 'statsGuild',
-                description : 'Stats for the guild',
-                options     : {
+            weekly  : {
+                description : 'Get an average daily activity for an user or the guild',
+                subcommands : {
+                    user  : {
+                        method      : 'weekly',
+                        description : 'Get an average daily activity for an user, by default yourself',
+                        options     : {
+                            user : {
+                                type        : ApplicationCommand.SubTypes.Member,
+                                description : 'User to get stats for',
+                                required    : false
+                            }
+                        }
+                    },
                     guild : {
-                        type        : ApplicationCommand.SubTypes.String,
-                        description : 'Guild to get stats for',
-                        required    : false
+                        method      : 'weekly',
+                        description : 'Get an average daily activity for the guild'
+                    }
+                }
+            },
+            message : {
+                description : 'Get an historical message count for an user or the guild',
+                subcommands : {
+                    user  : {
+                        method      : 'count',
+                        description : 'Get an historical message count for an user, by default yourself',
+                        options     : {
+                            user : {
+                                type        : ApplicationCommand.SubTypes.Member,
+                                description : 'User to get stats for',
+                                required    : false
+                            }
+                        }
+                    },
+                    guild : {
+                        method      : 'count',
+                        description : 'Get an historical message count for the guild'
                     }
                 }
             }
         };
     }
 
-    async getStats(interaction, { guild, user }) {
+    async count(interaction, { user }) {
 
         const { StatsService } = this.client.services('history');
 
@@ -48,20 +86,48 @@ module.exports = class Stats extends ApplicationCommand {
             user = await user.fetch(true);
         }
 
-        const stats = await StatsService.getCountMessageOverTime({ guildId : guild.id, authorId : user?.id });
+        const stats = await StatsService.getCountMessageOverTime({ guildId : interaction.guild.id, authorId : user?.id });
 
-        const message = StatsService.getCountMessageOverTimeView(stats, { guild, user });
+        const message = await StatsService.getCountMessageOverTimeView(stats, { guild : interaction.guild, user });
 
         return this.client.util.send(interaction, message);
     }
 
-    statsUser(interaction, { user }) {
+    async hourly(interaction, { user }) {
 
-        return this.getStats(interaction, { guild : interaction.guild, user : user || interaction.user });
+        const { StatsService } = this.client.services('history');
+
+        await interaction.deferReply();
+
+        if (user) {
+
+            user = await user.fetch(true);
+        }
+
+        const stats = await StatsService.getHourlyActivity({ guildId : interaction.guild.id, authorId : user?.id });
+
+        const message = await StatsService.getHourlyActivityView(stats, { guild : interaction.guild, user });
+
+        return this.client.util.send(interaction, message);
     }
 
-    statsGuild(interaction, { guild }) {
+    async weekly(interaction, { user }) {
 
-        return this.getStats(interaction, { guild : guild || interaction.guild });
+        const { StatsService }       = this.client.services('history');
+        const { WeeklyActivityView } = this.client.views('history');
+
+        await interaction.deferReply();
+
+        if (user) {
+
+            user = await user.fetch(true);
+        }
+
+        const [heatmap, average] = await Promise.all([
+            StatsService.getWeeklyActivity({ guildId : interaction.guild.id, authorId : user?.id }),
+            StatsService.getAverageMessagePerPeriod({ guildId : interaction.guild.id, authorId : user?.id, period : 'week' })
+        ]);
+
+        return this.client.util.send(interaction, await WeeklyActivityView.render(interaction.guild, user, { heatmap, average }));
     }
 };
