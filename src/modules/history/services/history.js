@@ -9,22 +9,27 @@ module.exports = class HistoryService extends Service {
      *
      * @return {Promise}
      */
-    upsertMessage(message) {
+    async upsertMessage(message) {
+
+        const { SyncService } = this.client.services('history');
 
         const { History } = this.client.providers('history');
 
-        const { Message } = History.models;
+        const { Message, Emoji } = History.models;
 
-        return Message.query()
-            .insert({
-                id        : message?.id,
-                guildId   : message?.guild?.id || message?.guildId,
-                authorId  : message?.author?.id,
-                channelId : message?.channel?.id || message?.channelId,
-                content   : message?.content,
-                createdAt : message?.createdAt,
-                updatedAt : message?.editedAt || new Date()
-            }).onConflict('id').merge();
+        const msg = Message.query()
+            .insert(SyncService.toMessage([message])).onConflict(Message.idColumn).merge();
+
+        await Emoji.query().where({ messageId : message.id }).delete();
+
+        const emojis = await SyncService.toEmoji(message);
+
+        if (emojis.length > 0) {
+
+            await Emoji.query().insert(emojis).onConflict(Emoji.idColumn).ignore();
+        }
+
+        return msg;
     }
 
     baseQuery({ userId, guildId, channelId, after, before }) {

@@ -1,5 +1,8 @@
 'use strict';
 
+// eslint-disable-next-line no-unused-vars
+const { Snowflake, GuildMember } = require('discord.js');
+
 const { Service } = require('../../../core');
 
 module.exports = class KarmaService extends Service {
@@ -142,9 +145,9 @@ module.exports = class KarmaService extends Service {
     }
 
     /**
-     * @param {DiscordJS.Message} message
+     * @param {Message} message
      *
-     * @return {Promise<Map<Snowflake, { member : DiscordJS.GuildMember, value : integer }>>}
+     * @return {Promise<Map<Snowflake, { member : GuildMember, value : integer }>>}
      */
     async parseMessage(message) {
 
@@ -248,7 +251,7 @@ module.exports = class KarmaService extends Service {
      */
     renderGraph(stats) {
 
-        const { ChartService } = this.client.services('chart');
+        const { ChartService } = this.client.services('tooling');
 
         const GREEN = '#12d512';
         const RED   = '#cb1111';
@@ -267,16 +270,16 @@ module.exports = class KarmaService extends Service {
                         parsing                : false,
                         normalized             : true,
                         borderColor            : ChartService.linearVerticalSplitAtZeroBackgroundColorGradient(
-                            ChartService.Color(GREEN).darken(0.2).css(),
-                            ChartService.Color(GREEN).darken(0.2).alpha(0.5).css(),
-                            ChartService.Color(RED).darken(0.2).alpha(0.5).css(),
-                            ChartService.Color(RED).darken(0.2).css()
+                            this.client.util.color(GREEN).darken(0.2).css(),
+                            this.client.util.color(GREEN).darken(0.2).alpha(0.5).css(),
+                            this.client.util.color(RED).darken(0.2).alpha(0.5).css(),
+                            this.client.util.color(RED).darken(0.2).css()
                         ),
                         backgroundColor        : ChartService.linearVerticalSplitAtZeroBackgroundColorGradient(
-                            ChartService.Color(GREEN).darken(0.3).css(),
-                            ChartService.Color(GREEN).darken(0.4).alpha(0).css(),
-                            ChartService.Color(RED).darken(0.4).alpha(0).css(),
-                            ChartService.Color(RED).darken(0.3).css()
+                            this.client.util.color(GREEN).darken(0.3).css(),
+                            this.client.util.color(GREEN).darken(0.4).alpha(0).css(),
+                            this.client.util.color(RED).darken(0.4).alpha(0).css(),
+                            this.client.util.color(RED).darken(0.3).css()
                         )
                     }
                 ]

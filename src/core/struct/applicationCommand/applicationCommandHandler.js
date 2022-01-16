@@ -1,5 +1,8 @@
 'use strict';
 
+// eslint-disable-next-line no-unused-vars
+const { Interaction } = require('discord.js');
+
 const { Routes }        = require('discord-api-types/v9');
 const { AkairoHandler } = require('discord-akairo');
 
@@ -184,6 +187,11 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
         let transaction;
 
         const { commandName, options } = interaction;
+
+        if (!commandName) {
+
+            return;
+        }
 
         const id = [commandName, options.getSubcommandGroup(false), options.getSubcommand(false)]
             .filter(Boolean).join('.');

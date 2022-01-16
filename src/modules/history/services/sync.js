@@ -75,11 +75,23 @@ module.exports = class SyncService extends Service {
                     return false;
                 }
 
-                const { Message } = History.models;
+                const { Message, Emoji } = History.models;
 
                 for await (const messages of this.fetchAllMessages(channel)) {
 
-                    await Message.query().insert(SyncService.toMessage(messages)).onConflict('id').merge();
+                    await Message.query().insert(this.toMessage(messages)).onConflict('id').merge();
+
+                    for (const message of messages) {
+
+                        await Emoji.query().where({ messageId : message.id }).delete();
+
+                        const emojis = await this.toEmoji(message);
+
+                        if (emojis.length > 0) {
+
+                            await Emoji.query().insert(emojis).onConflict(Emoji.idColumn).ignore();
+                        }
+                    }
 
                     task.increase('messages', messages.length);
 
@@ -358,54 +370,74 @@ module.exports = class SyncService extends Service {
         return embed;
     }
 
-    static toMessage(messages = []) {
+    toMessage(messages = []) {
 
         return messages.map((message) => {
 
             return {
-                id        : message.id,
-                guildId   : message.guild.id,
-                authorId  : message.author.id,
-                channelId : message.channel.id,
-                content   : message.content || '',
-                createdAt : message.createdAt,
-                updatedAt : message.editedAt || message.createdAt
+                id        : message?.id,
+                guildId   : message?.guild?.id || message?.guildId,
+                authorId  : message?.author?.id,
+                channelId : message?.channel?.id || message?.channelId,
+                content   : message?.content,
+                createdAt : message?.createdAt,
+                updatedAt : message?.editedAt || message?.createdAt
             };
         });
     }
 
     /**
      *
-     * @param {Message[]} messages
+     * @param {Message} message
      */
-    static async toEmoji(messages = []) {
+    async toEmoji(message) {
 
         const emojis = [];
 
-        for (const message of messages) {
+        const base = {
+            guildId   : message.guild.id,
+            channelId : message.channel.id,
+            authorId  : message.author.id,
+            messageId : message.id,
+            createdAt : message.createdAt,
+            updatedAt : message.editedAt || message.createdAt
+        };
 
-            if ((message?.reactions?.cache?.size ?? 0) > 0) {
+        if ((message?.reactions?.cache?.size ?? 0) > 0) {
 
-                for (const reaction of message.reactions.cache.values()) {
+            for (const reaction of message.reactions.cache.values()) {
 
-                    const users = await reaction.users.fetch();
+                const emoji = { ...base, type : 'reaction', name : reaction.emoji.name, emoji : reaction.emoji.name, unicode : true, index : 0 };
 
-                    for (const user of users) {
+                if (reaction.emoji.identifier.indexOf(':') !== -1) {
 
-                        emojis.push({
-                            guildId   : message.guild.id,
-                            channelId : message.channel.id,
-                            messageId : message.id,
-                            userId    : user.id,
-                            type      : 'reaction',
-                            emoji     : reaction.emoji.identifier,
-                            name      : reaction.emoji.name,
-                            createdAt : message.createdAt,
-                            updatedAt : message.editedAt || message.createdAt
-                        });
-                    }
+                    emoji.emoji   = reaction.emoji.identifier.indexOf('a:') === 0 ? reaction.emoji.identifier : `:${ reaction.emoji.identifier }`;
+                    emoji.unicode = false;
+                }
+
+                const users = await reaction.users.fetch();
+
+                for (const [id] of users) {
+
+                    emojis.push({ ...emoji, authorId : id });
                 }
             }
+        }
+
+        const cache = {};
+
+        for (const [string, , name] of message.content.matchAll(this.client.util.REGEX_EMOJI)) {
+
+            emojis.push({ ...base, type : 'message', emoji : string.slice(1, -1), name, unicode : false, index : cache[string] || 0 });
+
+            cache[string] = (cache[string] || 0) + 1;
+        }
+
+        for (const [string] of message.content.matchAll(this.client.util.REGEX_UNICODE_EMOJI)) {
+
+            emojis.push({ ...base, type : 'message', emoji : string, name : string, unicode : true, index : cache[string] || 0 });
+
+            cache[string] = (cache[string] || 0) + 1;
         }
 
         return emojis;

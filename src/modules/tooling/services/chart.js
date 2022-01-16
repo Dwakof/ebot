@@ -203,13 +203,14 @@ module.exports = class ChartService extends Service {
     basicTicksConfig(merge = {}) {
 
         return Hoek.merge({
+            display         : true,
             maxRotation     : 0,
             padding         : 10,
             align           : 'center',
-            font            : { size : 28 },
+            font            : { size : 28, weight : 600 },
             color           : 'rgb(235,235,235)',
             textStrokeColor : 'rgb(30,30,30)',
-            textStrokeWidth : 1
+            textStrokeWidth : 0
         }, merge);
     }
 
