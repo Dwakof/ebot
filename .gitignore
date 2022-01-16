@@ -4,6 +4,8 @@
 # ADD CODE
 !src/
 !src/**
+!lib/
+!lib/**
 !test
 !test/**
 !scripts

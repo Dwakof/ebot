@@ -1,5 +1,8 @@
 'use strict';
 
+// eslint-disable-next-line no-unused-vars
+const { Interaction } = require('discord.js');
+
 const { Routes }        = require('discord-api-types/v9');
 const { AkairoHandler } = require('discord-akairo');
 
@@ -98,7 +101,15 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
                 emitter  : 'core',
                 global   : false,
                 module   : 'ApplicationCommandHandler',
-                commands : guildCommands.map(({ name }) => name)
+                commands : Array.from(this.commands.entries()).reduce((acc, [key, { applicationCommand : { global } }]) => {
+
+                    if (global) {
+
+                        return acc;
+                    }
+
+                    return [...acc, key];
+                }, [])
             });
         }
         catch (err) {
@@ -120,7 +131,15 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
                 emitter  : 'core',
                 global   : true,
                 module   : 'ApplicationCommandHandler',
-                commands : globalCommands.map(({ name }) => name)
+                commands : Array.from(this.commands.entries()).reduce((acc, [key, { applicationCommand : { global } }]) => {
+
+                    if (!global) {
+
+                        return acc;
+                    }
+
+                    return [...acc, key];
+                }, [])
             });
         }
         catch (err) {
@@ -168,6 +187,11 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
         let transaction;
 
         const { commandName, options } = interaction;
+
+        if (!commandName) {
+
+            return;
+        }
 
         const id = [commandName, options.getSubcommandGroup(false), options.getSubcommand(false)]
             .filter(Boolean).join('.');

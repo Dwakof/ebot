@@ -1,6 +1,6 @@
 'use strict';
 
-const { ApplicationCommand } = require('../../../core');
+const { ApplicationCommand, Util } = require('../../../core');
 
 class GoogleImagesCommand extends ApplicationCommand {
     constructor() {
@@ -40,11 +40,9 @@ class GoogleImagesCommand extends ApplicationCommand {
                 });
             }
 
-            return this.client.util.replyPaginatedEmbeds(
-                interaction,
-                results.map((result) => GoogleImagesService.toEmbed(result)), {
-                    footerBuilder : (_, index, total) => `Result ${ index + 1 } / ${ total }`
-                });
+            return new Util.PaginatedEmbeds(interaction, results.map((result) => GoogleImagesService.toEmbed(result)), {
+                footer : (_, index, total) => `Result ${ index + 1 } / ${ total }`
+            }).send();
         }
         catch (error) {
 

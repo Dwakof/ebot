@@ -11,6 +11,9 @@ exports.CoreEvents = {
     SERVICE_REGISTERED  : 'serviceRegistered',
     SERVICE_INITIALIZED : 'serviceInitialized',
 
+    VIEW_REGISTERED  : 'viewRegistered',
+    VIEW_INITIALIZED : 'viewInitialized',
+
     COMMAND_HANDLER_REGISTERED             : 'commandHandlerRegistered',
     APPLICATION_COMMAND_HANDLER_REGISTERED : 'applicationCommandHandlerRegistered',
     INHIBITOR_HANDLER_REGISTERED           : 'inhibitorHandlerRegistered',

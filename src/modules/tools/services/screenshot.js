@@ -1,12 +1,11 @@
 'use strict';
 
-const Puppeteer = require('puppeteer');
-const Pug       = require('pug');
-const Path      = require('path');
+const Pug  = require('pug');
+const Path = require('path');
 
-const { Invite, MessageMentions } = require('discord.js');
+const { markdownEngine : MarkdownEngine, rules, toHTML } = require('discord-markdown');
 
-const Hoek = require('@hapi/hoek');
+const { Invite } = require('discord.js');
 
 const { Service } = require('../../../core');
 
@@ -17,45 +16,69 @@ const UIVersion = Pgk.dependencies[UIPackage];
 
 module.exports = class ScreenshotService extends Service {
 
-    #browser;
     #templates;
+    #parser;
+    #output;
 
-    async init() {
+    static #width = 800;
 
-        // TODO mode Puppeteer in his own service so that you can only require page
-
-        this.#browser = await Puppeteer.launch({
-            args           : ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
-            executablePath : process.env.CHROMIUM_PATH || undefined,
-            headless       : true
-        });
+    init() {
 
         this.#templates = {
             message : Pug.compileFile(Path.join(__dirname, '../templates/message.pug')),
             mention : Pug.compileFile(Path.join(__dirname, '../templates/mention.pug')),
             emoji   : Pug.compileFile(Path.join(__dirname, '../templates/emoji.pug'))
         };
+
+        const config = {
+            ...rules,
+            discordEmoji : {
+                ...rules.discordEmoji,
+                html : ({ id, animated, name }) => {
+
+                    return this.#templates.emoji({
+                        url        : `https://cdn.discordapp.com/emojis/${ id }.${ animated ? 'gif' : 'png' }?size=96`,
+                        embedEmoji : false,
+                        name
+                    });
+                }
+            }
+        };
+
+        this.#parser = MarkdownEngine.parserFor(config);
+        this.#output = MarkdownEngine.outputFor(config, 'html');
+    }
+
+    /**
+     * @param {String} messageId
+     * @param {String} channelId
+     *
+     * @return {Promise<Buffer>}
+     */
+    async screenshotMessageId(messageId, channelId) {
+
+        const channel = await this.client.channels.fetch(channelId);
+        const message = await channel.messages.fetch(messageId);
+
+        return this.screenshotMessage(message);
     }
 
     /**
      * @param {Message} message
+     *
      * @return {Promise<Buffer>}
      */
     async screenshotMessage(message) {
 
-        const page = await this.#browser.newPage();
+        const { BrowserService } = this.client.services('tooling');
+
+        const page = await BrowserService.newPage();
 
         try {
 
-            // TODO wire log to client.logger
-
-            // page.on('console', (...args) => console.log(...args));
-            // page.on('error', (...args) => console.error(...args));
-            // page.on('pageerror', (...args) => console.error(...args));
-
             // TODO maybe change viewport size based on attachment ?
 
-            await page.setViewport({ width : 600, height : 600, deviceScaleFactor : 2 });
+            await page.setViewport({ width : ScreenshotService.#width, height : 600, deviceScaleFactor : 2 });
 
             await page.addScriptTag({ url : `https://unpkg.com/${ UIPackage }@${ UIVersion }`, type : 'module' });
 
@@ -98,9 +121,15 @@ module.exports = class ScreenshotService extends Service {
 
                     return embed;
                 }),
-                attachments : Array.from(message.attachments.values()).map((attachment) => {
+                attachments : Array.from(message.attachments.values()).map(({ width, height, ...attachment }) => {
 
-                    return { ...attachment, type : 'media' };
+                    if (width > (ScreenshotService.#width * 0.8)) {
+
+                        height = Math.round(height * (ScreenshotService.#width * 0.8) / width);
+                        width  = (ScreenshotService.#width * 0.8);
+                    }
+
+                    return { ...attachment, width, height, type : 'media' };
                 }),
                 reactions   : Array.from(message.reactions.cache.values()).map((reaction) => {
 
@@ -139,26 +168,49 @@ module.exports = class ScreenshotService extends Service {
                 }
             }
 
-            data.message.content = data.message.content.replace(this.client.util.REGEX_URL, (url) => `<a>${ url }</a>`);
+            const mentions = {
+                users    : {},
+                roles    : {},
+                channels : {}
+            };
 
-            data.message.content = data.message.content.replace(/```([a-z]*\n?[\s\S]*?\n?)```/g, (code) => {
+            for (const [id] of message.mentions.users) {
 
-                // TODO named code blocks
+                const mentionedMember = await message.guild.members.fetch(id, { force : true }); // To be sure to get updated info of the member like `displayHexColor`
 
-                return `<pre><code>${ code.replace(/`/g, '') }</code></pre>`;
-            });
+                mentions.users[id] = this.#templates.mention({
+                    color : mentionedMember.displayHexColor,
+                    type  : 'user',
+                    name  : mentionedMember.nickname ?? mentionedMember.user.username
+                });
+            }
 
-            data.message.content = data.message.content.replace(/`([a-z]*\n?[\s\S]*?\n?)`/g, (code) => {
+            mentions.roles = message.mentions.roles.reduce((acc, role, id) => {
 
-                return `<code class="inline">${ code.replace(/`/g, '') }</code>`;
-            });
+                return { ...acc, [`${ id }`] : this.#templates.mention({ color : role.hexColor, type : 'role', name : role.name }) };
 
-            data.message.content = data.message.content.replace(/\r?\n|\r/g, '</br>');
+            }, {});
 
-            // TODO Italic
-            // TODO Bold
+            mentions.channels = message.mentions.channels.reduce((acc, channel, id) => {
 
-            // Replace emoji
+                if (channel.isVoice()) {
+
+                    return { ...acc, [`${ id }`] : this.#templates.mention({ type : 'voice', name : channel.name }) };
+                }
+
+                return { ...acc, [`${ id }`] : this.#templates.mention({ type : 'channel', name : channel.name }) };
+
+            }, {});
+
+            data.message.content = toHTML(data.message.content, {
+                discordCallback : {
+                    user     : ({ id }) => mentions.users[id],
+                    channel  : ({ id }) => mentions.channels[id],
+                    role     : ({ id }) => mentions.roles[id],
+                    everyone : () => this.#templates.mention({ type : 'user', name : 'everyone' }),
+                    here     : () => this.#templates.mention({ type : 'user', name : 'here' })
+                }
+            }, this.#parser, this.#output);
 
             // TODO support Big (Jumboable) emoji (instead of 1.375em it's 3em)
 
@@ -171,88 +223,9 @@ module.exports = class ScreenshotService extends Service {
                 }));
             }
 
-            for (const [string, animated, name, id] of data.message.content.matchAll(this.client.util.REGEX_EMOJI)) {
-
-                let url = `https://cdn.discordapp.com/emojis/${ id }.png?size=96`;
-
-                if (!!animated) {
-
-                    url = `https://cdn.discordapp.com/emojis/${ id }.gif?size=96`;
-                }
-
-                data.message.content = data.message.content.replace(string, this.#templates.emoji({ url, name, embedEmoji : false }));
-            }
-
-            // Replace mention with mention-component
-
-            for (const [id] of message.mentions.users) {
-
-                const regex           = new RegExp(`<@?\!${id}>`);
-                const mentionedMember = await message.guild.members.fetch(id, { force : true }); // To be sure to get updated info of the member like `displayHexColor`
-                const string          = this.#templates.mention({
-                    color : mentionedMember.displayHexColor,
-                    type  : 'user',
-                    name  : mentionedMember.nickname ?? mentionedMember.user.username
-                });
-
-                data.message.content = data.message.content.replace(regex, string);
-            }
-
-            for (const [id, role] of message.mentions.roles) {
-
-                const regex  = new RegExp(`<@?\&${id}>`);
-                const string = this.#templates.mention({ color : role.hexColor, type : 'role', name : role.name });
-
-                data.message.content = data.message.content.replace(regex, string);
-            }
-
-            for (const [id, channel] of message.mentions.channels) {
-
-                const regex = new RegExp(`<@?#${id}>`);
-
-                let string = this.#templates.mention({ type : 'channel', name : channel.name });
-
-                if (channel.isVoice()) {
-
-                    string = this.#templates.mention({ type : 'voice', name : channel.name });
-                }
-
-                data.message.content = data.message.content.replace(regex, string);
-            }
-
-            data.message.content = data.message.content.replace(MessageMentions.EVERYONE_PATTERN, (mention) => {
-
-                return this.#templates.mention({ type : 'user', name : mention.slice(1) });
-            });
-
             await page.setContent(this.#templates.message(data), { waitUntil : 'load' });
 
-            // Smart load algorithm,
-            // checking the size of the html content to wait for JS Frontend to finish rendering and waiting for image to load
-
-            let check         = 0;
-            let done          = false;
-            let contentLength = (await page.content()).length;
-
-            setTimeout(() => (done = true), 5000);
-
-            do {
-
-                await Hoek.wait(250);
-
-                const newContentLength = (await page.content()).length;
-
-                if (newContentLength === contentLength) {
-
-                    check++;
-                }
-                else {
-
-                    check         = 0;
-                    contentLength = newContentLength;
-                }
-
-            } while (check < 3 && !done);
+            await BrowserService.smartWait(page);
 
             await page.waitForNetworkIdle();
 

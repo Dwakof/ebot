@@ -5,6 +5,7 @@ module.exports.Client = require('./client');
 
 module.exports.Module  = require('./struct/module');
 module.exports.Service = require('./struct/service');
+module.exports.View    = require('./struct/view');
 
 module.exports.CommandHandler            = require('./struct/command/commandHandler');
 module.exports.ListenerHandler           = require('./struct/listener/listenerHandler');

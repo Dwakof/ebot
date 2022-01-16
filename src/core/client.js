@@ -291,6 +291,16 @@ module.exports = class EbotClient extends AkairoClient {
         throw new Error(`module ${ moduleName } not found`);
     }
 
+    views(moduleName) {
+
+        if (this.#modules.has(moduleName)) {
+
+            return this.#modules.get(moduleName).module.views();
+        }
+
+        throw new Error(`module ${ moduleName } not found`);
+    }
+
     get commandHandler() {
 
         return this.#commandHandler;
@@ -358,7 +368,7 @@ module.exports = class EbotClient extends AkairoClient {
         this.logger.error({
             event        : CoreEvents.MODULE_ERROR,
             emitter      : module.id,
-            errorMessage : error.toString(),
+            errorMessage : error?.toString(),
             err          : error,
             msg          : message
         });

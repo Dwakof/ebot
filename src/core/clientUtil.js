@@ -2,13 +2,12 @@
 
 const { ClientUtil : Base } = require('discord-akairo');
 
-const Hoek = require('@hapi/hoek');
 const Util = require('util');
 
-const { MessageActionRow, MessageButton, Constants, Message, Interaction } = require('discord.js');
+const { Message, Interaction } = require('discord.js');
 
 // eslint-disable-next-line no-unused-vars
-const { Embed, MessagePayload, MessageOptions, WebhookEditMessageOptions } = require('discord.js');
+const { MessagePayload, MessageOptions, WebhookEditMessageOptions } = require('discord.js');
 
 const { memberNicknameMention, codeBlock, inlineCode } = require('@discordjs/builders');
 
@@ -44,6 +43,8 @@ module.exports = class ClientUtil extends Base {
     REGEX_EMOJI           = CoreUtil.REGEX_EMOJI;
     REGEX_UNICODE_EMOJI   = CoreUtil.REGEX_UNICODE_EMOJI;
 
+    color = CoreUtil.Color;
+
     wait = Util.promisify(setTimeout);
 
     randomNumber = CoreUtil.randomNumber;
@@ -64,10 +65,10 @@ module.exports = class ClientUtil extends Base {
 
     progressBar(value = 0, maxValue = 100, options = {}) {
 
-        const { size = 20, progress = '⣿', half = '⣇', empty = '⣀', start = '', end = '', text = true } = options;
+        const { size = 20, progress = '⣿', half = '⣇', empty = '⣀', start = '', end = '', text = true, code = false, raw = false } = options;
 
         const percentage = Math.min(value / maxValue, 1);          // Calculate the percentage of the bar
-        const current    = Math.floor((size * percentage));               // Calculate the number of progress characters to fill the progress side.
+        const current    = Math.floor((size * percentage));              // Calculate the number of progress characters to fill the progress side.
         const between    = Math.round(size * percentage) - current;    // Calculate the number of half characters (should be 0 or 1)
         let left         = Math.max(size - current - between, 0);  // Calculate the number of empty characters to fill the empty progress side.
 
@@ -82,7 +83,17 @@ module.exports = class ClientUtil extends Base {
             result += `${ Math.round(percentage * 100) }%`.padStart(5, ' ');
         }
 
-        return this.codeBlock(result);
+        if (raw) {
+
+            return result;
+        }
+
+        if (code) {
+
+            return inlineCode(result);
+        }
+
+        return codeBlock(result);
     }
 
     debounce(func, timeout = 300) {
@@ -125,109 +136,6 @@ module.exports = class ClientUtil extends Base {
         }
 
         return `${ user.username }#${ user.discriminator }`;
-    }
-
-    /**
-     * @param {Message}               originalMessage
-     * @param {Array<Embed|Function>} pages
-     * @param {Object}                [options]
-     */
-    async replyPaginatedEmbeds(originalMessage, pages, options = {}) {
-
-        const { timeout, buttons, footerBuilder } = Hoek.applyToDefaults({
-            timeout       : 120000,
-            footerBuilder : (page, index, total) => `Page ${ index + 1 } / ${ total }`,
-            buttons       : {
-                previous : {
-                    customId : 'previous',
-                    label    : 'Previous',
-                    style    : Constants.MessageButtonStyles.SECONDARY,
-                    disabled : true
-                },
-                next     : {
-                    customId : 'next',
-                    label    : 'Next',
-                    style    : Constants.MessageButtonStyles.SECONDARY
-                }
-            }
-        }, options);
-
-        let index = 0;
-
-        const previous = new MessageButton(buttons.previous);
-        const next     = new MessageButton(buttons.next);
-
-        const filter = (interaction) => [previous.customId, next.customId].includes(interaction.customId);
-
-        const getPage = async (i) => {
-
-            let embed = pages[i];
-
-            if (embed instanceof Promise) {
-
-                embed = await embed;
-            }
-
-            if (typeof embed === 'function') {
-
-                embed = await embed(i);
-            }
-
-            if (footerBuilder) {
-
-                embed.setFooter(footerBuilder(embed, i, pages.length));
-            }
-
-            return {
-                embeds     : [embed],
-                components : [new MessageActionRow({ components : [previous, next] })],
-                fetchReply : true
-            };
-        };
-
-        const reply = await originalMessage.reply(await getPage(index));
-
-        const collector = await reply.createMessageComponentCollector({ filter, time : timeout });
-
-        collector.on('collect', async (interaction) => {
-
-            previous.setDisabled(false);
-            next.setDisabled(false);
-
-            switch (interaction.customId) {
-                case previous.customId :
-                    index = Math.max(0, index - 1);
-                    break;
-                case next.customId :
-                    index = Math.min(pages.length - 1, index + 1);
-                    break;
-                default:
-                    return;
-            }
-
-            if (index === 0) {
-
-                previous.setDisabled(true);
-            }
-
-            if (index === pages.length - 1) {
-
-                next.setDisabled(true);
-            }
-
-            await interaction.deferUpdate();
-            await reply.edit(await getPage(index));
-            return collector.resetTimer();
-        });
-
-        collector.on('end', async () => {
-
-            previous.setDisabled(true);
-            next.setDisabled(true);
-            return reply.edit(await getPage(index));
-        });
-
-        return reply;
     }
 
     /**

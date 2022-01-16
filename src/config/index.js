@@ -65,7 +65,8 @@ const store = new Confidence.Store({
         $filter     : { $env : 'NODE_ENV' },
         $base       : {
             name      : 'ebot',
-            level     : { $env : 'LOG_LEVEL', $default : 'info' }
+            level     : { $env : 'LOG_LEVEL', $default : 'info' },
+            redact    : ['err.requestData.files[*].file', 'err.requestData.files[*].attachment']
         },
         development : {
             level     : { $env : 'LOG_LEVEL', $default : 'debug' },

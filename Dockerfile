@@ -41,6 +41,7 @@ RUN apt-get update \
           libxtst6 \
           xdg-utils \
     && rm -rf /var/lib/apt/lists/*
+    && apt-get install -qq build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev libfontconfig1
 
 ENV APP_PATH=/app
 

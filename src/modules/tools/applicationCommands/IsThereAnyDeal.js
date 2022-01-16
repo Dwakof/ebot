@@ -1,6 +1,6 @@
 'use strict';
 
-const { ApplicationCommand } = require('../../../core');
+const { ApplicationCommand, Util } = require('../../../core');
 
 class IsThereAnyDealCommand extends ApplicationCommand {
 
@@ -46,9 +46,9 @@ class IsThereAnyDealCommand extends ApplicationCommand {
                 return IsThereAnyDealService.resultEmbed(info);
             };
 
-            return this.client.util.replyPaginatedEmbeds(interaction, searchResults.map(search), {
+            return new Util.PaginatedEmbeds(interaction, searchResults.map(search), {
                 footerBuilder : (_, index, total) => `Result ${ index + 1 } / ${ total }`
-            });
+            }).send();
         }
         catch (error) {
 

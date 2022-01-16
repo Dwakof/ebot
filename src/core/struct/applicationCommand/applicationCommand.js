@@ -115,7 +115,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
             id = `${ parent.name }.${ command.name }`;
         }
 
-        if (command.root !== RootCommand && command.type === ApplicationCommand.SubTypes.SubcommandGroup) {
+        if (command.root !== RootCommand && parent.type === ApplicationCommand.SubTypes.SubcommandGroup) {
 
             id = `${ this.name }.${ parent.name }.${ command.name }`;
         }

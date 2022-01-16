@@ -1,6 +1,6 @@
 'use strict';
 
-const { ApplicationCommand } = require('../../../core');
+const { ApplicationCommand, Util } = require('../../../core');
 
 class UrbanDictionaryCommand extends ApplicationCommand {
 
@@ -42,7 +42,7 @@ class UrbanDictionaryCommand extends ApplicationCommand {
                 });
             }
 
-            return this.client.util.replyPaginatedEmbeds(interaction, results.map((def) => UrbanDictionaryService.toEmbed(def)));
+            return new Util.PaginatedEmbeds(interaction, results.map((def) => UrbanDictionaryService.toEmbed(def))).send();
         }
         catch (error) {
 

@@ -1,6 +1,7 @@
 'use strict';
 
-const { CanvasRenderService } = require('chartjs-node-canvas');
+// eslint-disable-next-line no-unused-vars
+const { Snowflake, GuildMember } = require('discord.js');
 
 const { Service } = require('../../../core');
 
@@ -144,9 +145,9 @@ module.exports = class KarmaService extends Service {
     }
 
     /**
-     * @param {DiscordJS.Message} message
+     * @param {Message} message
      *
-     * @return {Promise<Map<Snowflake, { member : DiscordJS.GuildMember, value : integer }>>}
+     * @return {Promise<Map<Snowflake, { member : GuildMember, value : integer }>>}
      */
     async parseMessage(message) {
 
@@ -243,84 +244,57 @@ module.exports = class KarmaService extends Service {
         return Member.query().deleteById([guildId, userId, messageId, giverId, type, value]);
     }
 
-
-    canvasService = new CanvasRenderService(1200, 600, (ChartJS) => {
-
-        ChartJS.plugins.register({
-            beforeRender : function ({ chart, data, scales, height, ctx }, options) {
-
-                const dataset = data.datasets[0];
-                const yPos    = scales['y-axis-0'].getPixelForValue(0);
-
-                const gradientFill = ctx.createLinearGradient(0, 0, 0, height);
-
-                gradientFill.addColorStop(0, 'rgba(78, 246, 23, 1)');
-                gradientFill.addColorStop(yPos / height, 'rgba(94, 154, 19, 0.7)');
-                gradientFill.addColorStop(yPos / height, 'rgba(153, 9, 9, 0.7)');
-                gradientFill.addColorStop(1, 'rgba(198, 15, 15, 1)');
-
-                chart.data.datasets[0]._meta[Object.keys(dataset._meta)[0]].dataset._model.backgroundColor = gradientFill;
-            }
-        });
-    });
-
     /**
      * @param {Array<Object>} stats
      *
-     * @return {Readable}
+     * @return {Promise<Buffer>}
      */
     renderGraph(stats) {
 
-        const labels = stats.map(({ time }) => time);
-        const values = stats.map(({ value }) => value);
+        const { ChartService } = this.client.services('tooling');
 
-        return this.canvasService.renderToStream({
+        const GREEN = '#12d512';
+        const RED   = '#cb1111';
+
+        return ChartService.renderToBuffer({
+            width   : 1200,
+            height  : 600,
             type    : 'line',
             data    : {
-                labels,
                 datasets : [
                     {
-                        label       : 'karma',
-                        steppedLine : false,
-                        data        : values
+                        label                  : 'karma',
+                        fill                   : true,
+                        cubicInterpolationMode : 'monotone',
+                        data                   : stats.map(({ time, value }) => ({ x : time.getTime(), y : value })),
+                        parsing                : false,
+                        normalized             : true,
+                        borderColor            : ChartService.linearVerticalSplitAtZeroBackgroundColorGradient(
+                            this.client.util.color(GREEN).darken(0.2).css(),
+                            this.client.util.color(GREEN).darken(0.2).alpha(0.5).css(),
+                            this.client.util.color(RED).darken(0.2).alpha(0.5).css(),
+                            this.client.util.color(RED).darken(0.2).css()
+                        ),
+                        backgroundColor        : ChartService.linearVerticalSplitAtZeroBackgroundColorGradient(
+                            this.client.util.color(GREEN).darken(0.3).css(),
+                            this.client.util.color(GREEN).darken(0.4).alpha(0).css(),
+                            this.client.util.color(RED).darken(0.4).alpha(0).css(),
+                            this.client.util.color(RED).darken(0.3).css()
+                        )
                     }
                 ]
             },
             options : {
-                legend   : { display : false },
-                elements : {
-                    point : {
-                        radius : 0
+                elements : { point : { radius : 0 } },
+                plugins  : { legend : { display : false } },
+                scales   : ChartService.basicTimeSeriesScales({
+                    x : {
+                        ticks : {
+                            maxTicksLimit : 7
+                        }
                     }
-                },
-                scales   : {
-                    xAxes : [
-                        {
-                            time      : { round : true },
-                            type      : 'time',
-                            gridLines : { display : false },
-                            ticks     : {
-                                source    : 'auto',
-                                fontColor : 'rgba(142, 146, 151, 1)',
-                                fontSize  : 20
-                            }
-                        }
-                    ],
-                    yAxes : [
-                        {
-                            gridLines : { display : false },
-                            ticks     : {
-                                precision    : 0,
-                                suggestedMin : 0,
-                                suggestedMax : 0,
-                                fontColor    : 'rgba(142, 146, 151, 1)',
-                                fontSize     : 20
-                            }
-                        }
-                    ]
-                }
+                })
             }
-
         });
     }
 };
