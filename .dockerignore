@@ -4,6 +4,7 @@
 # ADD CODE
 !index.js
 !src/**
+!lib/**
 !test
 !test/*
 
