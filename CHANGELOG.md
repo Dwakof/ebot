@@ -1,3 +1,18 @@
+# [0.16.0](https://github.com/Dwakof/ebot/compare/v0.15.1...v0.16.0) (2022-01-16)
+
+
+### Bug Fixes
+
+* applicationCommand using subgroup not working as expected ([440b3c7](https://github.com/Dwakof/ebot/commit/440b3c76c46c9f67c31cea0a36aea7f3bcd84eb0))
+
+
+### Features
+
+* finished stats maybe ([7cb80a4](https://github.com/Dwakof/ebot/commit/7cb80a4daa00274029340cec8b59410eb16307e3))
+* implement views manager (similar to service) ([3c977e4](https://github.com/Dwakof/ebot/commit/3c977e40bc7b1ec50a6d8ff7b4542f6c3d5fa841))
+* rework the chartjs component to make a dedicated service, add some more start output, rework karma command to use chartjs service ([e5731e5](https://github.com/Dwakof/ebot/commit/e5731e56bad44e298ce2eb86d85b3778ea055f2e))
+* stats command base ([9018e1d](https://github.com/Dwakof/ebot/commit/9018e1d31ef8c8e672d0f5ec38004505710f01a4))
+
 ## [0.15.1](https://github.com/Dwakof/ebot/compare/v0.15.0...v0.15.1) (2021-11-26)
 
 
