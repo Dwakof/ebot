@@ -59,8 +59,6 @@ module.exports = class Stats extends ApplicationCommand {
                 rankingChannelsPerMessages : StatsService.rankingChannelsPerMessages({ ...filter, limit : 6 })
             });
 
-            console.log(stats);
-
             return MessageOverviewView.user(user, stats);
         }
 
@@ -74,8 +72,6 @@ module.exports = class Stats extends ApplicationCommand {
                 rankingUsersPerMessages : StatsService.rankingUsersPerMessages({ ...filter, limit : 6 })
             });
 
-            console.log(stats);
-
             return MessageOverviewView.channel(channel, stats);
         }
 
@@ -85,8 +81,6 @@ module.exports = class Stats extends ApplicationCommand {
             rankingUsersPerMessages    : StatsService.rankingUsersPerMessages({ ...filter, limit : 6 }),
             rankingChannelsPerMessages : StatsService.rankingChannelsPerMessages({ ...filter, limit : 6 })
         });
-
-        console.log(stats);
 
         return MessageOverviewView.guild(guild, stats);
     }
@@ -240,8 +234,8 @@ module.exports = class Stats extends ApplicationCommand {
             const stats = await Util.PromiseProps({
                 mostUsedEmoji                  : StatsService.mostUsedEmoji(filter),
                 countUsedEmoji                 : StatsService.countUsedEmoji(filter),
-                rankingUsersPerEmoji           : StatsService.rankingUsersPerEmoji(filter),
-                averageEmojiPerMessageOverTime : StatsService.averageEmojiPerMessageOverTime(filter)
+                averageEmojiPerMessageOverTime : StatsService.averageEmojiPerMessageOverTime(filter),
+                rankingUsersPerEmoji           : StatsService.rankingUsersPerEmoji({ ...filter, limit : 6 })
             });
 
             return EmojiOverviewView.channel(channel, stats);
@@ -250,8 +244,8 @@ module.exports = class Stats extends ApplicationCommand {
         const stats = await Util.PromiseProps({
             mostUsedEmoji                  : StatsService.mostUsedEmoji(filter),
             countUsedEmoji                 : StatsService.countUsedEmoji(filter),
-            rankingUsersPerEmoji           : StatsService.rankingUsersPerEmoji(filter),
-            averageEmojiPerMessageOverTime : StatsService.averageEmojiPerMessageOverTime(filter)
+            averageEmojiPerMessageOverTime : StatsService.averageEmojiPerMessageOverTime(filter),
+            rankingUsersPerEmoji           : StatsService.rankingUsersPerEmoji({ ...filter, limit : 6 })
         });
 
         return EmojiOverviewView.guild(guild, stats);
