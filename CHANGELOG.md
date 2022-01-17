@@ -1,3 +1,10 @@
+## [0.16.1](https://github.com/Dwakof/ebot/compare/v0.16.0...v0.16.1) (2022-01-17)
+
+
+### Bug Fixes
+
+* remove console.log and fix a missing limit on user ranking for stats ([d3212ed](https://github.com/Dwakof/ebot/commit/d3212ed4be93db19bfc06848f18c412f4066377b))
+
 # [0.16.0](https://github.com/Dwakof/ebot/compare/v0.15.1...v0.16.0) (2022-01-16)
 
 
