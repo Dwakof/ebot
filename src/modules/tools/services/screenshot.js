@@ -70,7 +70,7 @@ module.exports = class ScreenshotService extends Service {
      */
     async screenshotMessage(message) {
 
-        const { BrowserService } = this.client.services('tooling');
+        const { BrowserService } = this.services('tooling');
 
         const page = await BrowserService.newPage();
 

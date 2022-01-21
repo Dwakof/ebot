@@ -15,7 +15,7 @@ module.exports = class MimicService extends Service {
 
     async mimic(guildId, userId, initialState = '', retry = 5) {
 
-        const { Mimic } = this.client.providers('mimic');
+        const { Mimic } = this.providers();
 
         const { Model } = Mimic.models;
 

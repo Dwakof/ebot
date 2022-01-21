@@ -75,7 +75,7 @@ module.exports = class EmojiOverviewView extends View {
 
     topEmojis(embed, stats) {
 
-        const { CommonView } = this.client.views('history');
+        const { CommonView } = this.views();
 
         const { mostUsedEmoji } = stats;
 
@@ -89,7 +89,7 @@ module.exports = class EmojiOverviewView extends View {
 
     topUser(embed, stats) {
 
-        const { CommonView } = this.client.views('history');
+        const { CommonView } = this.views();
 
         const { rankingUsersPerEmoji } = stats;
 
@@ -132,7 +132,7 @@ module.exports = class EmojiOverviewView extends View {
 
     async averageOverTime(embed, stats) {
 
-        const { ChartService } = this.client.services('tooling');
+        const { ChartService } = this.services('tooling');
 
         const { averageEmojiPerMessageOverTime } = stats;
 

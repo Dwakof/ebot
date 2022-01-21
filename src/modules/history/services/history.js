@@ -11,9 +11,9 @@ module.exports = class HistoryService extends Service {
      */
     async upsertMessage(message) {
 
-        const { SyncService } = this.client.services('history');
+        const { SyncService } = this.services();
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Message, Emoji } = History.models;
 
@@ -34,7 +34,7 @@ module.exports = class HistoryService extends Service {
 
     baseQuery({ userId, guildId, channelId, after, before }) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Message } = History.models;
 

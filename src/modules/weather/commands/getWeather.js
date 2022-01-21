@@ -13,7 +13,6 @@ module.exports = class WeatherCommand extends Command {
 
         super('weather', {
             aliases     : ['weather'],
-            category    : 'weather',
             args        : [
                 {
                     id    : 'location',

@@ -15,7 +15,6 @@ class InfoCommand extends ApplicationCommand {
     constructor() {
 
         super('info', {
-            category    : 'tools',
             description : 'Get informations on the bot',
             global      : true
         });

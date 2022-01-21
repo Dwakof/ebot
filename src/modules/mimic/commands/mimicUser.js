@@ -10,7 +10,6 @@ module.exports = class MimicUserCommand extends Command {
 
         super('mimic', {
             aliases  : ['mimic'],
-            category : 'mimic',
             channel  : 'guild',
             editable : false,
             args     : [
@@ -32,7 +31,7 @@ module.exports = class MimicUserCommand extends Command {
 
         if (member) {
 
-            const { MimicService, ReplyService } = this.client.services('mimic');
+            const { MimicService, ReplyService } = this.services();
 
             try {
                 const temp = await message.util.send('thinking...');

@@ -10,7 +10,6 @@ class AvatarCommand extends Command {
 
         super('icon', {
             aliases           : ['icon'],
-            category          : 'tools',
             clientPermissions : [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.EMBED_LINKS],
             channel           : 'guild',
             description       : {

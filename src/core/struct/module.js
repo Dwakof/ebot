@@ -3,6 +3,8 @@
 const Fs   = require('fs/promises');
 const Path = require('path');
 
+const { Category } = require('discord-akairo');
+
 const CoreUtil       = require('../util');
 const { CoreEvents } = require('../constants');
 
@@ -81,55 +83,62 @@ class Module {
         }
     }
 
-    async registerCommands() {
+    async registerAkairoModule(collection, handler, subPath, type) {
 
-        for (const { name, path, file } of await CoreUtil.requireDir(Path.join(this.#path, 'commands'), true)) {
+        const category = new Category(this.#name);
+
+        for (const { name, path, file } of await CoreUtil.requireDir(Path.join(this.#path, subPath), true)) {
 
             try {
 
-                const command = this.#client.commandHandler.load(file);
+                const module = handler.load(file);
 
-                this.#commands.set(command.id, { path, command });
+                module.categoryID = this.#name;
+
+                if (this.#name !== 'default') {
+
+                    handler.categories.get('default')?.delete(module.id);
+                }
+
+                category.set(module.id, module);
+
+                if (!handler.categories.get(this.#name)) {
+
+                    handler.categories.set(this.#name, category);
+                }
+
+                collection.set(module.id, { path, [type] : module });
             }
             catch (error) {
 
-                throw new Error(`Could not register command ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
+                throw new Error(`Could not register ${ type } ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
             }
+        }
+
+        if (handler.categories.get('default')?.size === 0) {
+
+            handler.categories.delete('default');
         }
     }
 
-    async registerListeners() {
+    registerCommands() {
 
-        for (const { name, path, file } of await CoreUtil.requireDir(Path.join(this.#path, 'listeners'), true)) {
-
-            try {
-
-                const listener = this.#client.listenerHandler.load(file);
-
-                this.#listeners.set(file.id, { path, listener });
-            }
-            catch (error) {
-
-                throw new Error(`Could not register listener ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
-            }
-        }
+        return this.registerAkairoModule(this.#commands, this.#client.commandHandler, 'commands', 'command');
     }
 
-    async registerInhibitors() {
+    registerListeners() {
 
-        for (const { name, path, file } of await CoreUtil.requireDir(Path.join(this.#path, 'inhibitors'), true)) {
+        return this.registerAkairoModule(this.#listeners, this.#client.listenerHandler, 'listeners', 'listener');
+    }
 
-            try {
+    registerInhibitors() {
 
-                const inhibitor = this.#client.inhibitorHandler.load(file);
+        return this.registerAkairoModule(this.#inhibitors, this.#client.inhibitorHandler, 'inhibitors', 'inhibitor');
+    }
 
-                this.#inhibitors.set(inhibitor.id, { path, inhibitor });
-            }
-            catch (error) {
+    registerApplicationCommands() {
 
-                throw new Error(`Could not register inhibitor ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
-            }
-        }
+        return this.registerAkairoModule(this.#applicationCommands, this.#client.applicationCommandHandler, 'applicationCommands', 'applicationCommand');
     }
 
     async registerProviders() {
@@ -182,7 +191,7 @@ class Module {
                     throw new Error('Only instance of Service can be registered as service');
                 }
 
-                const service = new file(this.#client);
+                const service = new file(this.#client, this.#name);
                 const id      = service.id;
 
                 if (this.#services.has(id)) {
@@ -217,7 +226,7 @@ class Module {
                     throw new Error('Only instance of View can be registered as view');
                 }
 
-                const view = new file(this.#client);
+                const view = new file(this.#client, this.#name);
                 const id   = view.id;
 
                 if (this.#views.has(id)) {
@@ -237,23 +246,6 @@ class Module {
             catch (error) {
 
                 throw new Error(`Could not register view ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
-            }
-        }
-    }
-
-    async registerApplicationCommands() {
-
-        for (const { name, path, file } of await CoreUtil.requireDir(Path.join(this.#path, 'applicationCommands'), true)) {
-
-            try {
-
-                const applicationCommand = this.#client.applicationCommandHandler.load(file);
-
-                this.#applicationCommands.set(applicationCommand.id, { path, applicationCommand });
-            }
-            catch (error) {
-
-                throw new Error(`Could not register application command ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
             }
         }
     }

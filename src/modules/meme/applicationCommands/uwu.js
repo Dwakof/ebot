@@ -6,7 +6,6 @@ class UwUCommand extends ApplicationCommand {
     constructor() {
 
         super('uwu', {
-            category    : 'meme',
             description : 'Whwen y-you wawnt to swend a cwoot missage to sempwai, OwO',
             global      : true
         });
@@ -28,7 +27,7 @@ class UwUCommand extends ApplicationCommand {
 
     uwuify(interaction, { message }) {
 
-        const { UwuService } = this.client.services('meme');
+        const { UwuService } = this.services();
 
         return this.client.util.send(interaction, UwuService.uwuify(message));
     }

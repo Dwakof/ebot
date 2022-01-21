@@ -29,7 +29,7 @@ module.exports = class KarmaMessageCreatedListener extends Listener {
             }
         }
 
-        const { KarmaService } = this.client.services('karma');
+        const { KarmaService } = this.services();
 
         const guildId   = message.guild.id;
         const messageId = message.id;

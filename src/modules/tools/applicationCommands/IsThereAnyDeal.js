@@ -7,7 +7,6 @@ class IsThereAnyDealCommand extends ApplicationCommand {
     constructor() {
 
         super('deal', {
-            category    : 'tools',
             description : 'Displays current price overview',
             global      : true
         });
@@ -29,7 +28,7 @@ class IsThereAnyDealCommand extends ApplicationCommand {
 
     async getDeals(interaction, { title }) {
 
-        const { IsThereAnyDealService } = this.client.services('tools');
+        const { IsThereAnyDealService } = this.services();
 
         try {
             const searchResults = await IsThereAnyDealService.search(title);

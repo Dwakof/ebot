@@ -6,7 +6,7 @@ module.exports = class Mimic extends ApplicationCommand {
 
     constructor() {
 
-        super('mimic', { category : 'mimic', description : 'Mimic an user, ebot, or the whole guild' });
+        super('mimic', { description : 'Mimic an user, ebot, or the whole guild' });
     }
 
     static get subcommands() {
@@ -55,7 +55,7 @@ module.exports = class Mimic extends ApplicationCommand {
 
     async mimic(interaction, userId, start = '') {
 
-        const { MimicService, ReplyService } = this.client.services('mimic');
+        const { MimicService, ReplyService } = this.services();
 
         try {
 

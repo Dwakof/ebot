@@ -32,7 +32,7 @@ module.exports = class KarmaReactionAddListener extends Listener {
             return;
         }
 
-        const { KarmaService } = this.client.services('karma');
+        const { KarmaService } = this.services();
 
         const user = await reaction.message.guild.members.fetch(reaction.message.author);
 

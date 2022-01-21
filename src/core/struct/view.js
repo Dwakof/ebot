@@ -15,10 +15,12 @@ class View {
 
     /**
      * @param {EbotClient} client
+     * @param {String}     module
      */
-    constructor(client) {
+    constructor(client, module) {
 
         this.client = client;
+        this.module = module;
         this.id     = new.target.name;
     }
 
@@ -55,6 +57,16 @@ class View {
         }
 
         return Util.RANK_LIST[parseInt(rank) - 1] || Util.ordinal(parseInt(rank));
+    }
+
+    services(module = this.module) {
+
+        return this.client.services(module);
+    }
+
+    views(module = this.module) {
+
+        return this.client.views(module);
     }
 }
 

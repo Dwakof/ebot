@@ -7,7 +7,6 @@ class DecideCommand extends ApplicationCommand {
     constructor() {
 
         super('decide', {
-            category    : 'tools',
             description : 'Makes a random decision on one of the given options',
             global      : true
         });

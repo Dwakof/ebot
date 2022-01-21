@@ -49,7 +49,7 @@ module.exports = class SyncService extends Service {
 
     syncChannel(guildId, channelId) {
 
-        const { State, History } = this.client.providers('history');
+        const { State, History } = this.providers();
 
         const stateKey = `${ guildId }_${ channelId }`;
 
@@ -117,7 +117,7 @@ module.exports = class SyncService extends Service {
 
     syncGuild(guildId) {
 
-        const { State } = this.client.providers('history');
+        const { State } = this.providers();
 
         const stateKey = guildId;
 

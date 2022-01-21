@@ -30,7 +30,7 @@ module.exports = class BuildService extends Service {
      */
     buildThing(guildId, { type, id, query = { guildId }, countMethod, messageGenerator }) {
 
-        const { Mimic, State } = this.client.providers('mimic');
+        const { Mimic, State } = this.providers();
 
         const { Model } = Mimic.models;
 
@@ -104,7 +104,7 @@ module.exports = class BuildService extends Service {
      */
     buildUser(guildId, userId) {
 
-        const { HistoryService } = this.client.services('history');
+        const { HistoryService } = this.services('history');
 
         return this.buildThing(guildId, {
             type             : 'user',
@@ -121,7 +121,7 @@ module.exports = class BuildService extends Service {
      */
     buildEbot(guildId) {
 
-        const { ReplyService } = this.client.services('mimic');
+        const { ReplyService } = this.services();
 
         return this.buildThing(guildId, {
             type             : 'ebot',
@@ -138,7 +138,7 @@ module.exports = class BuildService extends Service {
      */
     buildGuild(guildId) {
 
-        const { HistoryService } = this.client.services('history');
+        const { HistoryService } = this.services('history');
 
         return this.buildThing(guildId, {
             type             : 'user',
@@ -151,9 +151,9 @@ module.exports = class BuildService extends Service {
 
     buildAll(guildId) {
 
-        const { HistoryService } = this.client.services('history');
+        const { HistoryService } = this.services('history');
 
-        const { State } = this.client.providers('mimic');
+        const { State } = this.providers();
 
         return new Util.Task(async (task) => {
 

@@ -10,7 +10,6 @@ module.exports = class DwakofCommand extends Command {
 
         super('dwakof', {
             aliases           : ['dwakof'],
-            category          : 'ascii',
             clientPermissions : [Permissions.FLAGS.SEND_MESSAGES],
             args              : [],
             description       : {

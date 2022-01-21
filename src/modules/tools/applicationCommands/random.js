@@ -7,7 +7,6 @@ class RandomNumberCommand extends ApplicationCommand {
     constructor() {
 
         super('random', {
-            category    : 'tools',
             description : 'Generates a random number within given range',
             global      : true
         });

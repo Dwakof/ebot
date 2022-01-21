@@ -13,7 +13,7 @@ module.exports = class ReplyService extends Service {
      */
     saveReply(message, userId) {
 
-        const { Mimic } = this.client.providers('mimic');
+        const { Mimic } = this.providers();
 
         const { Reply } = Mimic.models;
 
@@ -27,7 +27,7 @@ module.exports = class ReplyService extends Service {
 
     #baseQuery({ guildId, after, before }) {
 
-        const { Mimic } = this.client.providers('mimic');
+        const { Mimic } = this.providers();
 
         const { Reply } = Mimic.models;
 

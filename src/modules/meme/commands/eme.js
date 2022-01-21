@@ -10,7 +10,6 @@ module.exports = class EyeMouthEyeCommand extends Command {
 
         super('eme', {
             aliases           : ['eyemoutheye', 'eme'],
-            category          : 'meme',
             clientPermissions : [Permissions.FLAGS.SEND_MESSAGES],
             args              : [],
             description       : {

@@ -6,7 +6,6 @@ class UwUMessageCommand extends ApplicationCommand {
     constructor() {
 
         super('uwuify', {
-            category : 'meme',
             type     : ApplicationCommand.Types.MessageCommand
         });
     }
@@ -18,7 +17,7 @@ class UwUMessageCommand extends ApplicationCommand {
 
     async uwuify(interaction) {
 
-        const { UwuService } = this.client.services('meme');
+        const { UwuService } = this.services();
 
         const message = interaction.options.data[0].message;
 

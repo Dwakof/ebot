@@ -9,7 +9,6 @@ class AvatarCommand extends ApplicationCommand {
     constructor() {
 
         super('avatar', {
-            category    : 'tools',
             description : 'Show avatar of the mentioned user or by default you',
             global      : true
         });

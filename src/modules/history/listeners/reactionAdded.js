@@ -40,7 +40,7 @@ module.exports = class HistoryReactionAddedListener extends Listener {
             }
         }
 
-        const { HistoryService } = this.client.services('history');
+        const { HistoryService } = this.services();
 
         return HistoryService.upsertMessage(reaction.message);
     }

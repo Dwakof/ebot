@@ -14,7 +14,6 @@ class HelpCommand extends Command {
                 content : 'Get help',
                 usage   : '[command]'
             },
-            category          : 'tools',
             clientPermissions : [Permissions.FLAGS.EMBED_LINKS, Permissions.FLAGS.SEND_MESSAGES],
             ratelimit         : 2,
             args              : [

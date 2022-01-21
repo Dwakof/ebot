@@ -6,7 +6,6 @@ class GoogleImagesCommand extends ApplicationCommand {
     constructor() {
 
         super('image', {
-            category    : 'tools',
             description : 'Searches Google Images',
             global      : true
         });
@@ -28,7 +27,7 @@ class GoogleImagesCommand extends ApplicationCommand {
 
     async search(interaction, { query }) {
 
-        const { GoogleImagesService } = this.client.services('tools');
+        const { GoogleImagesService } = this.services();
 
         try {
 

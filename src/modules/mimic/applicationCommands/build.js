@@ -6,7 +6,7 @@ module.exports = class Rebuild extends ApplicationCommand {
 
     constructor() {
 
-        super('build-mimic', { category : 'mimic', description : `Build guild's models`, defaultPermission : false });
+        super('build-mimic', { description : `Build guild's models`, defaultPermission : false });
     }
 
     static get command() {
@@ -30,9 +30,9 @@ module.exports = class Rebuild extends ApplicationCommand {
 
     async build(interaction, { guild : guildId }) {
 
-        const { State } = this.client.providers('mimic');
+        const { State } = this.providers();
 
-        const { BuildService } = this.client.services('mimic');
+        const { BuildService } = this.services();
 
         if (!guildId) {
 

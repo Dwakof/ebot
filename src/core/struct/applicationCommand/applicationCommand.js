@@ -34,7 +34,6 @@ module.exports = class ApplicationCommand extends AkairoModule {
      */
     #methods = new Map();
 
-
     constructor(id, { description, category, global, defaultPermission, type }) {
 
         super(id, { description, category });
@@ -200,7 +199,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
             throw new Error(`Command ${ id } not found on ApplicationCommand ${ this.name } in category ${ this.categoryID }`);
         }
 
-        return (this.#methods.get(id)).method(interaction);
+        return this.#methods.get(id).method(interaction);
     }
 
     /**
@@ -432,5 +431,23 @@ module.exports = class ApplicationCommand extends AkairoModule {
         }
 
         return permissions.flat();
+    }
+
+    services(module = this.categoryID) {
+
+        return this.client.services(module);
+    }
+
+    views(module = this.categoryID) {
+
+        return this.client.views(module);
+    }
+
+    /**
+     * @deprecated
+     */
+    providers(module = this.categoryID) {
+
+        return this.client.providers(module);
     }
 };

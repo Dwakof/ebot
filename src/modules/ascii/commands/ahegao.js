@@ -10,7 +10,6 @@ module.exports = class AhegaoCommand extends Command {
 
         super('ahegao', {
             aliases           : ['ahegao'],
-            category          : 'ascii',
             clientPermissions : [Permissions.FLAGS.SEND_MESSAGES],
             args              : [],
             description       : {

@@ -7,7 +7,6 @@ class UrbanDictionaryCommand extends ApplicationCommand {
     constructor() {
 
         super('ud', {
-            category    : 'tools',
             description : 'Search Urban Dictionary for given term',
             global      : true
         });
@@ -30,7 +29,7 @@ class UrbanDictionaryCommand extends ApplicationCommand {
 
     async search(interaction, { term }) {
 
-        const { UrbanDictionaryService } = this.client.services('tools');
+        const { UrbanDictionaryService } = this.services();
 
         try {
 

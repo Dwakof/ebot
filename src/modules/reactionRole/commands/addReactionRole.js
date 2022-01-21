@@ -10,7 +10,6 @@ module.exports = class AddReactionRoleCommand extends Command {
 
         super('add reaction role', {
             aliases           : ['add reactionRole', 'addReactionRole', 'add reaction role'],
-            category          : 'reactionRole',
             userPermissions   : [Permissions.FLAGS.ADMINISTRATOR],
             clientPermissions : [Permissions.FLAGS.MANAGE_MESSAGES],
             channel           : 'guild',

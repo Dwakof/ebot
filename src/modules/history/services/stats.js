@@ -73,7 +73,7 @@ module.exports = class StatsService extends Service {
      */
     mostReactedMessage(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Emoji, Message } = History.models;
 
@@ -102,7 +102,7 @@ module.exports = class StatsService extends Service {
 
     mostUsedEmoji(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Emoji } = History.models;
 
@@ -126,7 +126,7 @@ module.exports = class StatsService extends Service {
 
     countUsedEmoji(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Emoji } = History.models;
 
@@ -140,7 +140,7 @@ module.exports = class StatsService extends Service {
 
     async averageEmojiPerPeriod(options) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Emoji } = History.models;
 
@@ -159,7 +159,7 @@ module.exports = class StatsService extends Service {
 
     async averageEmojiPerMessageOverTime(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Message, Emoji } = History.models;
 
@@ -235,7 +235,7 @@ module.exports = class StatsService extends Service {
 
     rankingUsersPerEmoji(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Emoji } = History.models;
 
@@ -280,7 +280,7 @@ module.exports = class StatsService extends Service {
 
     rankOfUserForEmoji(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Emoji } = History.models;
 
@@ -294,7 +294,7 @@ module.exports = class StatsService extends Service {
 
     mostUsedReactionEmoji(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Emoji } = History.models;
 
@@ -319,7 +319,7 @@ module.exports = class StatsService extends Service {
 
     mostReceivedReactionEmoji(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Emoji, Message } = History.models;
 
@@ -348,7 +348,7 @@ module.exports = class StatsService extends Service {
 
     countReceivedReactionEmoji(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Emoji, Message } = History.models;
 
@@ -369,7 +369,7 @@ module.exports = class StatsService extends Service {
 
     countGivenReactionEmoji(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Emoji } = History.models;
 
@@ -384,7 +384,7 @@ module.exports = class StatsService extends Service {
 
     topUserReceivedReactionEmoji(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Emoji } = History.models;
 
@@ -413,7 +413,7 @@ module.exports = class StatsService extends Service {
 
     topUserGivenReactionEmoji(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Emoji } = History.models;
 
@@ -437,7 +437,7 @@ module.exports = class StatsService extends Service {
 
     async countMessageOverTime(options) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Message } = History.models;
 
@@ -495,7 +495,7 @@ module.exports = class StatsService extends Service {
 
     async dailyActivity(options) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Message } = History.models;
 
@@ -522,7 +522,7 @@ module.exports = class StatsService extends Service {
 
     async weeklyActivity(options) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Message } = History.models;
 
@@ -550,7 +550,7 @@ module.exports = class StatsService extends Service {
 
     async averageMessagePerPeriod(options) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Message } = History.models;
 
@@ -569,7 +569,7 @@ module.exports = class StatsService extends Service {
 
     mostActivePeriod(options) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Message } = History.models;
 
@@ -591,7 +591,7 @@ module.exports = class StatsService extends Service {
 
     topUserMessages(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Message } = History.models;
 
@@ -614,7 +614,7 @@ module.exports = class StatsService extends Service {
 
     rankingUsersPerMessages(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Message } = History.models;
 
@@ -658,7 +658,7 @@ module.exports = class StatsService extends Service {
 
     rankingChannelsPerMessages(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Message } = History.models;
 
@@ -702,7 +702,7 @@ module.exports = class StatsService extends Service {
 
     rankOfUserForMessage(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Message } = History.models;
 
@@ -716,7 +716,7 @@ module.exports = class StatsService extends Service {
 
     async firstAndLastMessages(options = {}) {
 
-        const { History } = this.client.providers('history');
+        const { History } = this.providers();
 
         const { Message } = History.models;
 

@@ -30,7 +30,7 @@ module.exports = class Karma extends ApplicationCommand {
             user = interaction.user;
         }
 
-        const { KarmaService } = this.client.services('karma');
+        const { KarmaService } = this.services();
 
         const embed = this.client.util.embed()
             .setTitle(`Karma for ${ user.username }`)

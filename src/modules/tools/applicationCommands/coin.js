@@ -7,7 +7,6 @@ class CoinFlipCommand extends ApplicationCommand {
     constructor() {
 
         super('coin', {
-            category    : 'tools',
             description : 'Flips a coin',
             global      : true
         });

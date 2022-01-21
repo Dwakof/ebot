@@ -109,7 +109,7 @@ module.exports = class MessageOverviewView extends View {
 
     topChannel(embed, stats) {
 
-        const { CommonView } = this.client.views('history');
+        const { CommonView } = this.views();
 
         const { rankingChannelsPerMessages } = stats;
 
@@ -132,7 +132,7 @@ module.exports = class MessageOverviewView extends View {
 
     topUser(embed, stats) {
 
-        const { CommonView } = this.client.views('history');
+        const { CommonView } = this.views();
 
         const { rankingUsersPerMessages } = stats;
 
@@ -155,7 +155,7 @@ module.exports = class MessageOverviewView extends View {
 
     async chartOverTime(embed, stats) {
 
-        const { ChartService } = this.client.services('tooling');
+        const { ChartService } = this.services('tooling');
 
         const { countMessageOverTime } = stats;
 

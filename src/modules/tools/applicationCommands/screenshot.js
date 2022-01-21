@@ -7,7 +7,6 @@ module.exports = class ScreenshotCommand extends ApplicationCommand {
     constructor() {
 
         super('screenshot', {
-            category : 'tools',
             // description : 'Search Urban Dictionary for given term',
             type : ApplicationCommand.Types.MessageCommand
         });
@@ -21,7 +20,7 @@ module.exports = class ScreenshotCommand extends ApplicationCommand {
 
     async screenshot(interaction) {
 
-        const { ScreenshotService } = this.client.services('tools');
+        const { ScreenshotService } = this.services();
 
         try {
 

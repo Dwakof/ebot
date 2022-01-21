@@ -10,10 +10,12 @@ class Service {
 
     /**
      * @param {EbotClient} client
+     * @param {String}     module
      */
-    constructor(client) {
+    constructor(client, module) {
 
         this.client = client;
+        this.module = module;
         this.id     = new.target.name;
     }
 
@@ -22,6 +24,21 @@ class Service {
      */
     init() {
 
+    }
+
+    services(module = this.module) {
+
+        return this.client.services(module);
+    }
+
+    views(module = this.module) {
+
+        return this.client.views(module);
+    }
+
+    providers(module = this.module) {
+
+        return this.client.providers(module);
     }
 }
 

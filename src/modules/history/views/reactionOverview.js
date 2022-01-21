@@ -111,7 +111,7 @@ module.exports = class ReactionOverviewView extends View {
 
     topReactions(embed, stats) {
 
-        const { CommonView } = this.client.views('history');
+        const { CommonView } = this.views();
 
         const { mostUsedReactionEmoji, mostReceivedReactionEmoji } = stats;
 
@@ -136,7 +136,7 @@ module.exports = class ReactionOverviewView extends View {
 
     topReactionsGlobal(embed, stats) {
 
-        const { CommonView } = this.client.views('history');
+        const { CommonView } = this.views();
 
         const { mostUsedReactionEmoji } = stats;
 
@@ -150,7 +150,7 @@ module.exports = class ReactionOverviewView extends View {
 
     topUser(embed, stats) {
 
-        const { CommonView } = this.client.views('history');
+        const { CommonView } = this.views();
 
         const { topUserReceivedReactionEmoji, topUserGivenReactionEmoji } = stats;
 
@@ -184,7 +184,7 @@ module.exports = class ReactionOverviewView extends View {
 
         embed.addField('Most reacted message', hyperlink('<link message>', Util.linkUrl({ guildId, channelId, messageId })), false);
 
-        const { ScreenshotService } = this.client.services('tools');
+        const { ScreenshotService } = this.services('tools');
 
         const buffer = await ScreenshotService.screenshotMessageId(messageId, channelId);
 

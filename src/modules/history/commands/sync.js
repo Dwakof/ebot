@@ -8,7 +8,6 @@ module.exports = class SyncCommand extends Command {
 
         super('sync', {
             aliases     : ['sync'],
-            category    : 'history',
             channel     : 'guild',
             ownerOnly   : true,
             editable    : false,
@@ -39,8 +38,8 @@ module.exports = class SyncCommand extends Command {
 
     async exec(message, { guild, channel }) {
 
-        const { State }       = this.client.providers('history');
-        const { SyncService } = this.client.services('history');
+        const { State }       = this.providers();
+        const { SyncService } = this.services();
 
         const guildStatus = await State.get('guild_import', guild.id, { doing : false });
 

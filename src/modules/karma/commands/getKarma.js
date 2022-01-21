@@ -8,7 +8,6 @@ module.exports = class GetKarmaCommand extends Command {
 
         super('karma', {
             aliases     : ['karma'],
-            category    : 'karma',
             channel     : 'guild',
             editable    : true,
             args        : [
@@ -33,7 +32,7 @@ module.exports = class GetKarmaCommand extends Command {
             member = message.guild.members.cache.get(message.author.id);
         }
 
-        const { KarmaService } = this.client.services('karma');
+        const { KarmaService } = this.services();
 
         const embed = this.client.util.embed()
             .setTitle(`Karma for ${ member.user.username }`)

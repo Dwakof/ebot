@@ -8,7 +8,6 @@ module.exports = class BuildCommand extends Command {
 
         super('buildMimic', {
             aliases     : ['rebuildMimic'],
-            category    : 'mimic',
             channel     : 'guild',
             ownerOnly   : true,
             editable    : false,
@@ -32,8 +31,8 @@ module.exports = class BuildCommand extends Command {
 
     async exec(message, { guild }) {
 
-        const { State }        = this.client.providers('mimic');
-        const { BuildService } = this.client.services('mimic');
+        const { State }        = this.providers();
+        const { BuildService } = this.services();
 
         const status = await State.get('guild_rebuild', guild.id, { doing : false });
 

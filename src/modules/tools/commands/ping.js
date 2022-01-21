@@ -8,10 +8,7 @@ class PingCommand extends Command {
 
     constructor() {
 
-        super('ping', {
-            aliases  : ['ping'],
-            category : 'tools'
-        });
+        super('ping', { aliases : ['ping'] });
     }
 
     async exec(message, args) {

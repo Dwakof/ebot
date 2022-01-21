@@ -17,4 +17,22 @@ module.exports = class Listener extends AkairoListener {
      * @type {EbotClient}
      */
     client;
+
+    services(module = this.categoryID) {
+
+        return this.client.services(module);
+    }
+
+    views(module = this.categoryID) {
+
+        return this.client.views(module);
+    }
+
+    /**
+     * @deprecated
+     */
+    providers(module = this.categoryID) {
+
+        return this.client.providers(module);
+    }
 };

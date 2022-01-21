@@ -73,7 +73,7 @@ module.exports = class KarmaService extends Service {
 
     getInfoUser(guildId, userId) {
 
-        const { Karma } = this.client.providers('karma');
+        const { Karma } = this.providers();
 
         const { Member } = Karma.models;
 
@@ -100,7 +100,7 @@ module.exports = class KarmaService extends Service {
 
     async getStatsUser(guildId, userId) {
 
-        const { Karma } = this.client.providers('karma');
+        const { Karma } = this.providers();
 
         const { Member } = Karma.models;
 
@@ -217,7 +217,7 @@ module.exports = class KarmaService extends Service {
      */
     addKarma(karma) {
 
-        const { Karma } = this.client.providers('karma');
+        const { Karma } = this.providers();
 
         const { Member } = Karma.models;
 
@@ -237,7 +237,7 @@ module.exports = class KarmaService extends Service {
      */
     cancelKarma({ guildId, userId, messageId, giverId, type, value }) {
 
-        const { Karma } = this.client.providers('karma');
+        const { Karma } = this.providers();
 
         const { Member } = Karma.models;
 
@@ -251,7 +251,7 @@ module.exports = class KarmaService extends Service {
      */
     renderGraph(stats) {
 
-        const { ChartService } = this.client.services('tooling');
+        const { ChartService } = this.services('tooling');
 
         const GREEN = '#12d512';
         const RED   = '#cb1111';

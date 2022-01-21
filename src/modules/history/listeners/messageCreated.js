@@ -29,7 +29,7 @@ module.exports = class HistoryMessageCreatedListener extends Listener {
             }
         }
 
-        const { HistoryService } = this.client.services('history');
+        const { HistoryService } = this.services();
 
         return HistoryService.upsertMessage(message);
     }

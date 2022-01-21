@@ -6,7 +6,7 @@ module.exports = class Miwic extends ApplicationCommand {
 
     constructor() {
 
-        super('miwic', { category : 'mimic', description : 'Miwic an uswer, uwu, ebot, or te whwole guild' });
+        super('miwic', { description : 'Miwic an uswer, uwu, ebot, or te whwole guild' });
     }
 
     static get subcommands() {
@@ -55,8 +55,8 @@ module.exports = class Miwic extends ApplicationCommand {
 
     async miwic(interaction, userId, start = '') {
 
-        const { MimicService, ReplyService } = this.client.services('mimic');
-        const { UwuService } = this.client.services('meme');
+        const { MimicService, ReplyService } = this.services();
+        const { UwuService } = this.services('meme');
 
         try {
 

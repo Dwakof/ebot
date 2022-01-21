@@ -10,7 +10,6 @@ module.exports = class ClapCommand extends Command {
 
         super('clap', {
             aliases           : ['clap'],
-            category          : 'meme',
             clientPermissions : [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.MANAGE_MESSAGES],
             args              : [
                 {

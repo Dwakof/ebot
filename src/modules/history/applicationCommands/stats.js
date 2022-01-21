@@ -6,7 +6,7 @@ module.exports = class Stats extends ApplicationCommand {
 
     constructor() {
 
-        super('stats', { category : 'history', description : 'Get stats for an user or the guild' });
+        super('stats', { description : 'Get stats for an user or the guild' });
     }
 
     static get subcommands() {
@@ -43,8 +43,8 @@ module.exports = class Stats extends ApplicationCommand {
 
     async _message({ guild, user, channel }) {
 
-        const { StatsService }        = this.client.services('history');
-        const { MessageOverviewView } = this.client.views('history');
+        const { StatsService }        = this.services();
+        const { MessageOverviewView } = this.views();
 
         const filter = { guildId : guild.id };
 
@@ -87,8 +87,8 @@ module.exports = class Stats extends ApplicationCommand {
 
     async _daily({ guild, user, channel }) {
 
-        const { StatsService }      = this.client.services('history');
-        const { DailyActivityView } = this.client.views('history');
+        const { StatsService }      = this.services();
+        const { DailyActivityView } = this.views();
 
         const filter = { guildId : guild.id };
 
@@ -126,8 +126,8 @@ module.exports = class Stats extends ApplicationCommand {
 
     async _weekly({ guild, user, channel }) {
 
-        const { StatsService }       = this.client.services('history');
-        const { WeeklyActivityView } = this.client.views('history');
+        const { StatsService }       = this.services();
+        const { WeeklyActivityView } = this.views();
 
         const filter = { guildId : guild.id };
 
@@ -165,8 +165,8 @@ module.exports = class Stats extends ApplicationCommand {
 
     async _reaction({ guild, user, channel }) {
 
-        const { StatsService }         = this.client.services('history');
-        const { ReactionOverviewView } = this.client.views('history');
+        const { StatsService }         = this.services();
+        const { ReactionOverviewView } = this.views();
 
         const filter = { guildId : guild.id };
 
@@ -208,8 +208,8 @@ module.exports = class Stats extends ApplicationCommand {
 
     async _emoji({ guild, user, channel }) {
 
-        const { StatsService }      = this.client.services('history');
-        const { EmojiOverviewView } = this.client.views('history');
+        const { StatsService }      = this.services();
+        const { EmojiOverviewView } = this.views();
 
         const filter = { guildId : guild.id };
 
