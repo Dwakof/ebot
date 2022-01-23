@@ -89,8 +89,6 @@ module.exports = class EmojiOverviewView extends View {
 
     topUser(embed, stats) {
 
-        const { CommonView } = this.views();
-
         const { rankingUsersPerEmoji } = stats;
 
         if (!rankingUsersPerEmoji) {
@@ -98,7 +96,7 @@ module.exports = class EmojiOverviewView extends View {
             return;
         }
 
-        return CommonView.twoColumnSplitMiddle(embed, rankingUsersPerEmoji, 'Top users', {
+        return this.twoColumnSplitMiddle(embed, rankingUsersPerEmoji, 'Top users', {
             callback : ({ count, authorId, rank, total }, column) => {
 
                 return [

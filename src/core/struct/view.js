@@ -68,6 +68,134 @@ class View {
 
         return this.client.views(module);
     }
+
+    multiColumnSingleFullWidthField(embed, values, title = 'Title', options = {}) {
+
+        const { row = 3, column = 4, callback, emptyValueCallback = () => ''.padStart(4, Util.BLANK_CHAR_SPACE) } = options;
+
+        const chunk = Util.chunk(values, row);
+
+        const lines = [];
+
+        for (let i = 0; i < row; ++i) {
+
+            const cells = [];
+
+            for (let j = 0; j < column; ++j) {
+
+                const value = (chunk[j] || [])[i];
+
+                if (!value) {
+
+                    cells.push(emptyValueCallback());
+                    continue;
+                }
+
+                cells.push(callback(value, chunk[j], column, row));
+            }
+
+            lines.push(cells.join(Util.BLANK_CHAR_SPACE + Util.BLANK_CHAR_SPACE));
+        }
+
+        embed.addField(title, lines.join('\n'), false);
+
+        return embed;
+    }
+
+    multiColumnSingleField(embed, values, title = 'Title', options = {}) {
+
+        const { row = 3, column = 2, callback, emptyValueCallback = () => ''.padStart(4, Util.BLANK_CHAR_SPACE) } = options;
+
+        const chunk = Util.chunk(values, Math.ceil(values.length / column));
+
+        const lines = [];
+
+        for (let i = 0; i < row; ++i) {
+
+            const cells = [];
+
+            for (let j = 0; j < column; ++j) {
+
+                const value = (chunk[j] || [])[i];
+
+                if (!value) {
+
+                    cells.push(emptyValueCallback());
+                    continue;
+                }
+
+                cells.push(callback(value, chunk[j], j, i));
+            }
+
+            lines.push(cells.join(Util.BLANK_CHAR_SPACE + Util.BLANK_CHAR_SPACE));
+        }
+
+        embed.addField(title, lines.join('\n') || Util.BLANK_CHAR, true);
+
+        return embed;
+    }
+
+    twoColumnSplitMiddle(embed, values, title = 'Title', options = {}) {
+
+        const { callback } = options;
+
+        const [columns1, columns2 = []] = Util.chunk(values, Math.ceil(values.length / 2));
+
+        let lines = [];
+
+        for (const [i, value] of columns1.entries()) {
+
+            lines.push(callback(value, columns1, i, 0));
+        }
+
+        embed.addField(title, lines.join('\n'), true);
+
+        this.emptyRow(embed);
+
+        lines = [];
+
+        for (const [i, value] of columns2.entries()) {
+
+            lines.push(callback(value, columns2, i, 0));
+        }
+
+        embed.addField(Util.BLANK_CHAR, lines.join('\n'), true);
+
+        return embed;
+    }
+
+    twoColumnEmptyThird(embed, values, title = 'Title', options = {}) {
+
+        const { callback } = options;
+
+        const [columns1, columns2 = []] = Util.chunk(values, Math.ceil(values.length / 2));
+
+        let lines = [];
+
+        for (const [i, value] of columns1.entries()) {
+
+            lines.push(callback(value, columns1, i, 0));
+        }
+
+        embed.addField(title, lines.join('\n'), true);
+
+        lines = [];
+
+        for (const [i, value] of columns2.entries()) {
+
+            lines.push(callback(value, columns2, i, 0));
+        }
+
+        embed.addField(Util.BLANK_CHAR, lines.join('\n'), true);
+        this.emptyRow(embed);
+
+        return embed;
+    }
+
+    emptyRow(embed) {
+
+        return embed.addField(Util.BLANK_CHAR, Util.BLANK_CHAR, true);
+    }
 }
 
 module.exports = View;

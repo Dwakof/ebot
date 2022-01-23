@@ -109,8 +109,6 @@ module.exports = class MessageOverviewView extends View {
 
     topChannel(embed, stats) {
 
-        const { CommonView } = this.views();
-
         const { rankingChannelsPerMessages } = stats;
 
         if (!rankingChannelsPerMessages) {
@@ -118,7 +116,7 @@ module.exports = class MessageOverviewView extends View {
             return;
         }
 
-        return CommonView.twoColumnEmptyThird(embed, rankingChannelsPerMessages, 'Top channels', {
+        return this.twoColumnEmptyThird(embed, rankingChannelsPerMessages, 'Top channels', {
             callback : ({ count, rank, total, channelId }, column) => {
 
                 return [
@@ -132,8 +130,6 @@ module.exports = class MessageOverviewView extends View {
 
     topUser(embed, stats) {
 
-        const { CommonView } = this.views();
-
         const { rankingUsersPerMessages } = stats;
 
         if (!rankingUsersPerMessages) {
@@ -141,7 +137,7 @@ module.exports = class MessageOverviewView extends View {
             return;
         }
 
-        return CommonView.twoColumnEmptyThird(embed, rankingUsersPerMessages, 'Top users', {
+        return this.twoColumnEmptyThird(embed, rankingUsersPerMessages, 'Top users', {
             callback : ({ count, rank, total, authorId }, column) => {
 
                 return [

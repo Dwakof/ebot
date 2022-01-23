@@ -1,6 +1,6 @@
 'use strict';
 
-const { ApplicationCommand } = require('../../../core');
+const { ApplicationCommand, Util } = require('../../../core');
 
 module.exports = class ScreenshotCommand extends ApplicationCommand {
 
@@ -37,7 +37,7 @@ module.exports = class ScreenshotCommand extends ApplicationCommand {
 
             const buffer = await bufferPromise;
 
-            await reply.edit({ files : [buffer], content : '⠀' });
+            await reply.edit({ files : [buffer], content : Util.BLANK_CHAR_SPACE });
         }
         catch (error) {
 

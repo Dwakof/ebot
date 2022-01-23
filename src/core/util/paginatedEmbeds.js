@@ -110,34 +110,42 @@ class PaginatedEmbeds {
             return { ...(await this.getFromCache(index)), components : [new MessageActionRow({ components : Array.from(this.#components.values()) })] };
         }
 
-        let embed = this.#pages[index];
+        let page = this.#pages[index];
 
-        if (embed instanceof Promise) {
+        if (page instanceof Promise) {
 
-            embed = await embed;
+            page = await page;
         }
 
-        if (typeof embed === 'function') {
+        if (typeof page === 'function') {
 
-            embed = await embed(index);
+            page = await page(index);
+        }
+
+        if (page instanceof MessageEmbed) {
+
+            page = { embeds : [page] };
+        }
+
+        if (Array.isArray(page)) {
+
+            page = { embeds : page };
         }
 
         if (this.#options.footer) {
 
-            this.setFooter(embed);
+            for (const embed of page.embeds) {
+
+                this.setFooter(embed);
+            }
         }
 
-        if (embed instanceof MessageEmbed) {
-
-            embed = { embeds : [embed] };
-        }
-
-        return { ...embed, components : [new MessageActionRow({ components : Array.from(this.#components.values()) })] };
+        return { ...page, components : [new MessageActionRow({ components : Array.from(this.#components.values()) })] };
     }
 
     async send() {
 
-        if (this.#interaction instanceof Interaction) {
+        if (this.#interaction instanceof Interaction && !this.#interaction.deferred) {
 
             await this.#interaction.deferReply();
         }
@@ -357,12 +365,14 @@ class DashboardPaginatedEmbeds extends PaginatedEmbeds {
         const pages   = [];
         const buttons = { previous : false, next : false };
 
-        for (const [index, { id, label, embed }] of dashboards.entries()) {
+        for (const [index, { id, label, embed, style = {} }] of dashboards.entries()) {
+
+            const { selected = Constants.MessageButtonStyles.PRIMARY, unselected = Constants.MessageButtonStyles.SECONDARY } = style;
 
             pages.push(embed);
             buttons[id] = {
                 label,
-                style   : Constants.MessageButtonStyles.SECONDARY,
+                style   : unselected,
                 onClick : function () {
 
                     this.index = index;
@@ -370,12 +380,12 @@ class DashboardPaginatedEmbeds extends PaginatedEmbeds {
                 onReply : function (button) {
 
                     button.setDisabled(false);
-                    button.setStyle(Constants.MessageButtonStyles.SECONDARY);
+                    button.setStyle(unselected);
 
                     if (index === this.index) {
 
                         button.setDisabled(true);
-                        button.setStyle(Constants.MessageButtonStyles.PRIMARY);
+                        button.setStyle(selected);
                     }
                 }
             };

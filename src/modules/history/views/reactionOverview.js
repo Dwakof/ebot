@@ -6,11 +6,6 @@ const { hyperlink, userMention, inlineCode }                                    
 
 const { View, Util } = require('../../../core');
 
-const displayEmoji = (emoji) => {
-
-    return emoji.indexOf(':') !== -1 ? `<${ emoji }>` : emoji;
-};
-
 module.exports = class ReactionOverviewView extends View {
 
     /**
@@ -115,7 +110,7 @@ module.exports = class ReactionOverviewView extends View {
 
         const { mostUsedReactionEmoji, mostReceivedReactionEmoji } = stats;
 
-        CommonView.multiColumnSingleField(embed, mostUsedReactionEmoji, 'Top given reaction', {
+        this.multiColumnSingleField(embed, mostUsedReactionEmoji, 'Top given reaction', {
             callback : (value, column) => {
 
                 return inlineCode(`${ Util.padLeftString(value.count, Util.max(column, ({ count }) => count)) } x `) + CommonView.displayEmoji(value.emoji);
@@ -124,7 +119,7 @@ module.exports = class ReactionOverviewView extends View {
 
         embed.addField(Util.BLANK_CHAR, Util.BLANK_CHAR, true);
 
-        CommonView.multiColumnSingleField(embed, mostReceivedReactionEmoji, 'Top received reaction', {
+        this.multiColumnSingleField(embed, mostReceivedReactionEmoji, 'Top received reaction', {
             callback : (value, column) => {
 
                 return inlineCode(`${ Util.padLeftString(value.count, Util.max(column, ({ count }) => count)) } x `) + CommonView.displayEmoji(value.emoji);
@@ -140,21 +135,19 @@ module.exports = class ReactionOverviewView extends View {
 
         const { mostUsedReactionEmoji } = stats;
 
-        return CommonView.multiColumnSingleFullWidthField(embed, mostUsedReactionEmoji, 'Top given reaction', {
+        return this.multiColumnSingleFullWidthField(embed, mostUsedReactionEmoji, 'Top given reaction', {
             callback({ count, emoji }, column) {
 
-                return inlineCode(`${ Util.padLeftString(count, Util.max(column, (v) => v?.count || 0)) } x `) + displayEmoji(emoji);
+                return inlineCode(`${ Util.padLeftString(count, Util.max(column, (v) => v?.count || 0)) } x `) + CommonView.displayEmoji(emoji);
             }
         });
     }
 
     topUser(embed, stats) {
 
-        const { CommonView } = this.views();
-
         const { topUserReceivedReactionEmoji, topUserGivenReactionEmoji } = stats;
 
-        CommonView.multiColumnSingleField(embed, topUserGivenReactionEmoji, 'Top reactions', {
+        this.multiColumnSingleField(embed, topUserGivenReactionEmoji, 'Top reactions', {
             column   : 1,
             callback : ({ count, authorId }, column, i, j) => {
 
@@ -162,7 +155,7 @@ module.exports = class ReactionOverviewView extends View {
             }
         });
 
-        CommonView.multiColumnSingleField(embed, topUserReceivedReactionEmoji, 'Top reacted', {
+        this.multiColumnSingleField(embed, topUserReceivedReactionEmoji, 'Top reacted', {
             column   : 1,
             callback : ({ count, authorId }, column, i, j) => {
 
