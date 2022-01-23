@@ -18,7 +18,7 @@ const knexDefault = new Confidence.Store({
 const store = new Confidence.Store({
     version : Pkg.version,
     ebot    : {
-        cacheWarmup   : {
+        cacheWarmup         : {
             guilds : { $env : 'EBOT_CACHE_WARMUP_GUILDS', $coerce : 'array', $default : [] },
             users  : { $env : 'EBOT_CACHE_WARMUP_USERS', $coerce : 'array', $default : [] }
         },
@@ -64,9 +64,9 @@ const store = new Confidence.Store({
     logger  : {
         $filter     : { $env : 'NODE_ENV' },
         $base       : {
-            name      : 'ebot',
-            level     : { $env : 'LOG_LEVEL', $default : 'info' },
-            redact    : ['err.requestData.files[*].file', 'err.requestData.files[*].attachment']
+            name   : 'ebot',
+            level  : { $env : 'LOG_LEVEL', $default : 'info' },
+            redact : ['err.requestData.files[*].file', 'err.requestData.files[*].attachment']
         },
         development : {
             level     : { $env : 'LOG_LEVEL', $default : 'debug' },
@@ -148,8 +148,8 @@ const store = new Confidence.Store({
                 apiKey   : { $env : 'GOOGLE_CSE_API_KEY' },
                 engineId : { $env : 'GOOGLE_CSE_ENGINE_ID' }
             },
-            isthereanydeal : {
-                apiKey : { $env : 'ISTHEREANYDEAL_API_KEY' }
+            isThereAnyDeal : {
+                apiKey : { $env : 'IS_THERE_ANY_DEAL_API_KEY' }
             }
         }
     }

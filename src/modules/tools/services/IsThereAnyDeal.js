@@ -78,7 +78,7 @@ module.exports = class IsThereAnyDealService extends Service {
             prefixUrl    : 'https://api.isthereanydeal.com',
             responseType : 'json',
             searchParams : {
-                'key' : this.client.settings.plugins.tool.isthereanydeal.apiKey
+                'key' : this.client.settings.plugins.tool.isThereAnyDeal.apiKey
             }
         });
     }
