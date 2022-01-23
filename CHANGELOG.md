@@ -1,3 +1,10 @@
+# [0.17.0](https://github.com/Dwakof/ebot/compare/v0.16.1...v0.17.0) (2022-01-23)
+
+
+### Features
+
+* Weather 2.0 ([6e4fb93](https://github.com/Dwakof/ebot/commit/6e4fb93deeaee66c10fc4fce13aa59da4cac361b))
+
 ## [0.16.1](https://github.com/Dwakof/ebot/compare/v0.16.0...v0.16.1) (2022-01-17)
 
 
