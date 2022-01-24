@@ -149,7 +149,7 @@ module.exports = class CurrentWeatherView extends View {
             const emoji   = [
                 [':deciduous_tree:', ':evergreen_tree:', ':palm_tree:', ':tanabata_tree:'],
                 [':slight_smile:'],
-                ['slight_frown'],
+                [':slight_frown:'],
                 [':mask:'],
                 [':zombie:']
             ];
