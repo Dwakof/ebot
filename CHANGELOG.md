@@ -1,3 +1,11 @@
+## [0.17.1](https://github.com/Dwakof/ebot/compare/v0.17.0...v0.17.1) (2022-01-24)
+
+
+### Bug Fixes
+
+* change IsThereAnyDeal naming case for config and env ([0e6ee49](https://github.com/Dwakof/ebot/commit/0e6ee49bb28e708c52231e577d15e36a8c7ac8f8))
+* emoji mapping on weather ([eaa5417](https://github.com/Dwakof/ebot/commit/eaa5417540379a4bef0d909b7f86740911785a32))
+
 # [0.17.0](https://github.com/Dwakof/ebot/compare/v0.16.1...v0.17.0) (2022-01-23)
 
 
