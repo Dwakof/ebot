@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@discordjs/builders": "0.11.0",
-    "@discordjs/rest": "0.2.0-canary.0",
+    "@discordjs/rest": "0.3.0",
     "@hapi/hoek": "9.2.1",
     "@hapipal/confidence": "6.0.1",
     "@sentry/node": "6.16.1",
