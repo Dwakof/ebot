@@ -151,6 +151,11 @@ const store = new Confidence.Store({
             isThereAnyDeal : {
                 apiKey : { $env : 'IS_THERE_ANY_DEAL_API_KEY' }
             }
+        },
+        currency     : {
+            freeCurrencyApi : {
+                apiKey : { $env : 'FREE_CURRENCY_API_KEY' }
+            }
         }
     }
 });
