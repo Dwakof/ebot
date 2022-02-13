@@ -51,7 +51,7 @@
     "pg-query-stream": "4.2.3",
     "pino": "7.6.5",
     "pug": "3.0.2",
-    "puppeteer": "11.0.0",
+    "puppeteer": "13.3.1",
     "undici": "4.14.1",
     "uuid": "8.3.2"
   },
