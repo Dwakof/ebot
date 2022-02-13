@@ -7,7 +7,7 @@ const Util = require('util');
 const { Message, Interaction } = require('discord.js');
 
 // eslint-disable-next-line no-unused-vars
-const { MessagePayload, MessageOptions, WebhookEditMessageOptions } = require('discord.js');
+const { MessagePayload, MessageOptions, WebhookEditMessageOptions, MessageEmbed } = require('discord.js');
 
 const { memberNicknameMention, codeBlock, inlineCode } = require('@discordjs/builders');
 
@@ -140,29 +140,37 @@ module.exports = class ClientUtil extends Base {
 
     /**
      *
-     * @param {Message|Interaction}                                            obj
-     * @param {String|MessagePayload|MessageOptions|WebhookEditMessageOptions} payload
+     * @param {Message|Interaction}                                                         obj
+     * @param {String|MessagePayload|MessageOptions|WebhookEditMessageOptions|MessageEmbed} payload
      */
     send(obj, payload) {
+
+        let _payload = payload;
+
+        if (payload instanceof MessageEmbed) {
+
+            _payload = { embeds : [payload] };
+        }
+
 
         if (obj instanceof Interaction) {
 
             if (obj.deferred || obj.replied) {
 
-                return obj.editReply(payload);
+                return obj.editReply(_payload);
             }
 
-            return obj.reply(payload, { fetchReply : true });
+            return obj.reply(_payload, { fetchReply : true });
         }
 
         if (obj instanceof Message) {
 
             if (obj.util) {
 
-                return obj.util.send(payload);
+                return obj.util.send(_payload);
             }
 
-            return obj.channel.send(payload);
+            return obj.channel.send(_payload);
         }
 
         throw new Error(`Could not send a message using object ${ typeof obj }`);
