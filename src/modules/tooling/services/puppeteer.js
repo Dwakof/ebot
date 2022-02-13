@@ -22,9 +22,9 @@ module.exports = class BrowserService extends Service {
 
         const page = await this.#browser.newPage();
 
-        page.on('console', (...args) => console.log(...args));
-        page.on('error', (...args) => console.error(...args));
-        page.on('pageerror', (...args) => console.error(...args));
+        page.on('console', (...args) => this.logger.debug({ event : 'puppeteer_console', emitter : 'puppeteer', args }));
+        page.on('error', (...args) => this.logger.error({ event : 'puppeteer_error', emitter : 'puppeteer', args }));
+        page.on('pageerror', (...args) => this.logger.error({ event : 'puppeteer_pageerror', emitter : 'puppeteer', args }));
 
         return page;
     }
