@@ -1,3 +1,18 @@
+# [0.18.0](https://github.com/Dwakof/ebot/compare/v0.17.1...v0.18.0) (2022-02-13)
+
+
+### Bug Fixes
+
+* add default value for args on applicationCommand ([8ef299c](https://github.com/Dwakof/ebot/commit/8ef299c91fba187172ede1117cb1471f8296c397))
+* add possibility to pass a MessageEmbed to client.util.send() ([adc03c7](https://github.com/Dwakof/ebot/commit/adc03c78b0a50fe037f615c85c32b29732baee8a))
+* send puppeteer log through the logger instead of relaying on console.log ([915942f](https://github.com/Dwakof/ebot/commit/915942ff8e2e215035302da563ddc98d119b3833))
+* update dependencies ([8666d95](https://github.com/Dwakof/ebot/commit/8666d95511702e9072f475bd266fb8925f3a3e49))
+
+
+### Features
+
+* currency commands ([7ae9ac6](https://github.com/Dwakof/ebot/commit/7ae9ac6ec91e2006089a5f252698cd071638123f)), closes [#234](https://github.com/Dwakof/ebot/issues/234)
+
 ## [0.17.1](https://github.com/Dwakof/ebot/compare/v0.17.0...v0.17.1) (2022-01-24)
 
 
