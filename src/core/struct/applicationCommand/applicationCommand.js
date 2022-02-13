@@ -314,7 +314,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
 
         const result = {};
 
-        for (const [name, { type }] of Object.entries(commandOptions)) {
+        for (const [name, { type, default : defaultValue }] of Object.entries(commandOptions)) {
 
             switch (type) {
                 case ApplicationCommand.SubTypes.String:
@@ -363,6 +363,8 @@ module.exports = class ApplicationCommand extends AkairoModule {
 
                     break;
             }
+
+            result[name] = result[name] ?? defaultValue;
         }
 
         return result;

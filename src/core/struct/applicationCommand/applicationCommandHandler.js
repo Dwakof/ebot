@@ -101,15 +101,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
                 emitter  : 'core',
                 global   : false,
                 module   : 'ApplicationCommandHandler',
-                commands : Array.from(this.commands.entries()).reduce((acc, [key, { applicationCommand : { global } }]) => {
-
-                    if (global) {
-
-                        return acc;
-                    }
-
-                    return [...acc, key];
-                }, [])
+                commands : this.getCommandsArray(false)
             });
         }
         catch (err) {
@@ -131,15 +123,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
                 emitter  : 'core',
                 global   : true,
                 module   : 'ApplicationCommandHandler',
-                commands : Array.from(this.commands.entries()).reduce((acc, [key, { applicationCommand : { global } }]) => {
-
-                    if (!global) {
-
-                        return acc;
-                    }
-
-                    return [...acc, key];
-                }, [])
+                commands : this.getCommandsArray(true)
             });
         }
         catch (err) {
@@ -153,6 +137,24 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
         }
 
         return true;
+    }
+
+    /**
+     * @param {Boolean}  global
+     *
+     * @return {[String, {applicationCommand: ApplicationCommand, args: Array<String>}]}
+     */
+    getCommandsArray(global = true) {
+
+        return Array.from(this.commands.entries()).reduce((acc, [key, { applicationCommand : { global : value } }]) => {
+
+            if (global === value) {
+
+                return [...acc, key];
+            }
+
+            return acc;
+        }, []);
     }
 
     /**
