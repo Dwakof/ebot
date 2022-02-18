@@ -101,6 +101,27 @@ module.exports = class ChartService extends Service {
         return canvas.toDataURL(mine, options.quality);
     }
 
+    /**
+     * @param {Object}  configuration
+     * @param {String}  [mine]
+     * @param {Object}  [options={}]
+     * @param {Number}  options.page
+     * @param {String}  options.matte
+     * @param {Number}  options.density
+     * @param {Number}  options.quality
+     * @param {Boolean} options.outline
+     *
+     * @returns {Promise<String>}
+     */
+    async renderAndUpload(configuration, mine, options = {}) {
+
+        const { UploadService } = this.services();
+
+        const buffer = await this.renderToBuffer(configuration, mine, options);
+
+        return UploadService.upload(buffer, { contentType : 'image/png' });
+    }
+
     linearVerticalSplitAtZeroBackgroundColorGradient(colorHigh, colorHighZero, colorLowZero, colorLow) {
 
         colorHigh     = colorHigh ?? 'rgba(66, 228, 13, 1)';

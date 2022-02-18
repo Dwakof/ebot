@@ -12,7 +12,7 @@ module.exports = class ReactionOverviewView extends View {
      * @param {Guild}  guild
      * @param {Object} stats
      *
-     * @return {Promise<{embeds: MessageEmbed[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async guild(guild, stats) {
 
@@ -26,19 +26,17 @@ module.exports = class ReactionOverviewView extends View {
 
         if (stats.mostReactedMessage) {
 
-            const { attachment } = await this.mostReactedMessage(embed, stats);
-
-            return { embeds : [embed], files : [attachment] };
+            await this.mostReactedMessage(embed, stats);
         }
 
-        return { embeds : [embed] };
+        return embed;
     }
 
     /**
      * @param {TextChannel} channel
      * @param {Object}      stats
      *
-     * @return {Promise<{embeds: MessageEmbed[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async channel(channel, stats) {
 
@@ -52,19 +50,17 @@ module.exports = class ReactionOverviewView extends View {
 
         if (stats.mostReactedMessage) {
 
-            const { attachment } = await this.mostReactedMessage(embed, stats);
-
-            return { embeds : [embed], files : [attachment] };
+            await this.mostReactedMessage(embed, stats);
         }
 
-        return { embeds : [embed] };
+        return embed;
     }
 
     /**
      * @param {GuildMember|User} user
      * @param {Object}           stats
      *
-     * @return {Promise<{embeds: MessageEmbed[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async user(user, stats) {
 
@@ -77,12 +73,10 @@ module.exports = class ReactionOverviewView extends View {
 
         if (stats.mostReactedMessage) {
 
-            const { attachment } = await this.mostReactedMessage(embed, stats);
-
-            return { embeds : [embed], files : [attachment] };
+            await this.mostReactedMessage(embed, stats);
         }
 
-        return { embeds : [embed] };
+        return embed;
     }
 
     totalReactions(embed, stats) {
@@ -169,7 +163,8 @@ module.exports = class ReactionOverviewView extends View {
     /**
      * @param {MessageEmbed} embed
      * @param stats
-     * @return {Promise<{attachment: MessageAttachment, embed : MessageEmbed}>}
+     *
+     * @return {Promise<MessageEmbed>}
      */
     async mostReactedMessage(embed, stats) {
 
@@ -179,12 +174,10 @@ module.exports = class ReactionOverviewView extends View {
 
         const { ScreenshotService } = this.services('tools');
 
-        const buffer = await ScreenshotService.screenshotMessageId(messageId, channelId);
+        const url = await ScreenshotService.screenshotMessageIdAndUpload(messageId, channelId);
 
-        const attachment = this.client.util.attachment(buffer, `${ messageId }.png`);
+        embed.setImage(url);
 
-        embed.setImage('attachment://' + attachment.name);
-
-        return { embed, attachment };
+        return embed;
     }
 };

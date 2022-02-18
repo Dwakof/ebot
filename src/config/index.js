@@ -91,6 +91,21 @@ const store = new Confidence.Store({
         }
     },
     plugins : {
+        tooling      : {
+            upload    : {
+                region      : { $env : 'UPLOAD_REGION' },
+                bucket      : { $env : 'UPLOAD_BUCKET' },
+                endpoint    : { $env : 'UPLOAD_ENDPOINT' },
+                proto       : { $env : 'UPLOAD_PROTO', $default : 'https' },
+                credentials : {
+                    accessKeyId     : { $env : 'UPLOAD_ACCESS_KEY' },
+                    secretAccessKey : { $env : 'UPLOAD_SECRET_KEY' }
+                }
+            },
+            puppeteer : {
+                path : { $env : 'CHROMIUM_PATH', $default : undefined }
+            }
+        },
         karma        : {
             knex : {
                 client     : 'pg',

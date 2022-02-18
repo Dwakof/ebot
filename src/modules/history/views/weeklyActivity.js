@@ -1,10 +1,9 @@
 'use strict';
 
-const { v4 : Uuidv4 } = require('uuid');
-const BezierEasing    = require('bezier-easing');
+const BezierEasing = require('bezier-easing');
 
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed, MessageAttachment, Guild, User, GuildMember, TextChannel } = require('discord.js');
+const { MessageEmbed, Guild, User, GuildMember, TextChannel } = require('discord.js');
 
 const { time : Time } = require('@discordjs/builders');
 
@@ -16,7 +15,7 @@ module.exports = class WeeklyActivityView extends View {
      * @param {Guild} guild
      * @param stats
      *
-     * @return {Promise<{files: MessageAttachment[], embeds: MessageEmbed[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async guild(guild, stats) {
 
@@ -26,16 +25,16 @@ module.exports = class WeeklyActivityView extends View {
 
         this.stats(embed, stats);
 
-        const { attachment } = await this.heatmap(embed, stats);
+        await this.heatmap(embed, stats);
 
-        return { embeds : [embed], files : [attachment] };
+        return embed;
     }
 
     /**
      * @param {TextChannel} channel
      * @param stats
      *
-     * @return {Promise<{files: MessageAttachment[], embeds: MessageEmbed[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async channel(channel, stats) {
 
@@ -45,16 +44,16 @@ module.exports = class WeeklyActivityView extends View {
 
         this.stats(embed, stats);
 
-        const { attachment } = await this.heatmap(embed, stats);
+        await this.heatmap(embed, stats);
 
-        return { embeds : [embed], files : [attachment] };
+        return embed;
     }
 
     /**
      * @param {User|GuildMember} [user]
      * @param stats
      *
-     * @return {Promise<{files: MessageAttachment[], embeds: MessageEmbed[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async user(user, stats) {
 
@@ -64,9 +63,9 @@ module.exports = class WeeklyActivityView extends View {
 
         this.stats(embed, stats);
 
-        const { attachment } = await this.heatmap(embed, stats);
+        await this.heatmap(embed, stats);
 
-        return { embeds : [embed], files : [attachment] };
+        return embed;
     }
 
     stats(embed, stats) {
@@ -88,7 +87,7 @@ module.exports = class WeeklyActivityView extends View {
 
         let data = weeklyActivity.map(({ hour, day, value }) => ({ x : hours[hour], y : days[day === 0 ? 6 : day - 1], value }));
 
-        const { scale = 'Discord', padding = 5, borderRadius = 15, borderWidth = 0, width = 1600, height = 500, id = Uuidv4() } = options;
+        const { scale = 'Discord', padding = 5, borderRadius = 15, borderWidth = 0, width = 1600, height = 500 } = options;
 
         data = Util.normalize(data, 100, 'value');
 
@@ -98,7 +97,7 @@ module.exports = class WeeklyActivityView extends View {
 
         const colors = this.client.util.color.scale(scale).domain([-50, max]);
 
-        const buffer = await ChartService.renderToBuffer({
+        const url = await ChartService.renderAndUpload({
             width, height,
             type    : 'matrix',
             data    : {
@@ -162,8 +161,8 @@ module.exports = class WeeklyActivityView extends View {
         });
 
         embed.addField('Weekly activity', Util.BLANK_CHAR, false);
-        embed.setImage(`attachment://${ id }.png`);
+        embed.setImage(url);
 
-        return { embed, attachment : this.client.util.attachment(buffer, `${ id }.png`) };
+        return embed;
     }
 };

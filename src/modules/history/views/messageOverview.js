@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed, MessageAttachment, TextChannel, Guild, User, GuildMember } = require('discord.js');
+const { MessageEmbed, TextChannel, Guild, User, GuildMember } = require('discord.js');
 
 const { channelMention, userMention, time : Time, inlineCode } = require('@discordjs/builders');
 
@@ -13,7 +13,7 @@ module.exports = class MessageOverviewView extends View {
      * @param {Guild}  guild
      * @param {Object} stats
      *
-     * @return {Promise<{embeds: MessageEmbed[], files: MessageAttachment[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async guild(guild, stats) {
 
@@ -26,16 +26,16 @@ module.exports = class MessageOverviewView extends View {
         this.topChannel(embed, stats);
         this.topUser(embed, stats);
 
-        const { attachment } = await this.chartOverTime(embed, stats);
+        await this.chartOverTime(embed, stats);
 
-        return { embeds : [embed], files : [attachment] };
+        return embed;
     }
 
     /**
      * @param {TextChannel} channel
      * @param {Object}      stats
      *
-     * @return {Promise<{embeds: MessageEmbed[], files: MessageAttachment[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async channel(channel, stats) {
 
@@ -47,16 +47,16 @@ module.exports = class MessageOverviewView extends View {
         this.firstAndLastMessages(embed, stats);
         this.topUser(embed, stats);
 
-        const { attachment } = await this.chartOverTime(embed, stats);
+        await this.chartOverTime(embed, stats);
 
-        return { embeds : [embed], files : [attachment] };
+        return embed;
     }
 
     /**
      * @param {GuildMember|User} user
      * @param {Object}           stats
      *
-     * @return {Promise<{embeds: MessageEmbed[], files: MessageAttachment[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async user(user, stats) {
 
@@ -67,9 +67,9 @@ module.exports = class MessageOverviewView extends View {
         this.firstAndLastMessages(embed, stats);
         this.topChannel(embed, stats);
 
-        const { attachment } = await this.chartOverTime(embed, stats);
+        await this.chartOverTime(embed, stats);
 
-        return { embeds : [embed], files : [attachment] };
+        return embed;
     }
 
     total(embed, stats) {
@@ -155,7 +155,7 @@ module.exports = class MessageOverviewView extends View {
 
         const { countMessageOverTime } = stats;
 
-        const buffer = await ChartService.renderToBuffer({
+        const url = await ChartService.renderAndUpload({
             width   : 1200,
             height  : 600,
             type    : 'bar',
@@ -178,10 +178,10 @@ module.exports = class MessageOverviewView extends View {
             }
         });
 
-        embed.setImage('attachment://chart.png');
+        embed.setImage(url);
 
         embed.addField('Message over time', Util.BLANK_CHAR, false);
 
-        return { embed, attachment : this.client.util.attachment(buffer, 'chart.png') };
+        return embed;
     }
 };

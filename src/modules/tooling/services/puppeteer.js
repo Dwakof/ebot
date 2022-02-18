@@ -13,7 +13,7 @@ module.exports = class BrowserService extends Service {
 
         this.#browser = await Puppeteer.launch({
             args           : ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
-            executablePath : process.env.CHROMIUM_PATH || undefined,
+            executablePath : this.client.settings.plugins.tooling.puppeteer.path,
             headless       : true
         });
     }

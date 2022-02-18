@@ -1,8 +1,8 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed, MessageAttachment, Guild, User, GuildMember, TextChannel } = require('discord.js');
-const { userMention, inlineCode }                                                            = require('@discordjs/builders');
+const { MessageEmbed, Guild, User, GuildMember, TextChannel } = require('discord.js');
+const { userMention, inlineCode }                             = require('@discordjs/builders');
 
 const { View, Util } = require('../../../core');
 
@@ -17,7 +17,7 @@ module.exports = class EmojiOverviewView extends View {
      * @param {Guild}  guild
      * @param {Object} stats
      *
-     * @return {Promise<{embeds: MessageEmbed[], files: MessageAttachment[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async guild(guild, stats) {
 
@@ -28,16 +28,16 @@ module.exports = class EmojiOverviewView extends View {
         this.topEmojis(embed, stats);
         this.topUser(embed, stats);
 
-        const { attachment } = await this.averageOverTime(embed, stats);
+        await this.averageOverTime(embed, stats);
 
-        return { embeds : [embed], files : [attachment] };
+        return embed;
     }
 
     /**
      * @param {TextChannel} channel
      * @param {Object}      stats
      *
-     * @return {Promise<{embeds: MessageEmbed[], files: MessageAttachment[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async channel(channel, stats) {
 
@@ -48,16 +48,16 @@ module.exports = class EmojiOverviewView extends View {
         this.topEmojis(embed, stats);
         this.topUser(embed, stats);
 
-        const { attachment } = await this.averageOverTime(embed, stats);
+        await this.averageOverTime(embed, stats);
 
-        return { embeds : [embed], files : [attachment] };
+        return embed;
     }
 
     /**
      * @param {GuildMember|User} user
      * @param {Object}           stats
      *
-     * @return {Promise<{embeds: MessageEmbed[], files: MessageAttachment[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async user(user, stats) {
 
@@ -68,9 +68,9 @@ module.exports = class EmojiOverviewView extends View {
         this.infoUser(embed, stats);
         this.topEmojis(embed, stats);
 
-        const { attachment } = await this.averageOverTime(embed, stats);
+        await this.averageOverTime(embed, stats);
 
-        return { embeds : [embed], files : [attachment] };
+        return embed;
     }
 
     topEmojis(embed, stats) {
@@ -134,7 +134,7 @@ module.exports = class EmojiOverviewView extends View {
 
         const { averageEmojiPerMessageOverTime } = stats;
 
-        const buffer = await ChartService.renderToBuffer({
+        const url = await ChartService.renderAndUpload({
             width   : 1200,
             height  : 600,
             type    : 'bar',
@@ -164,10 +164,10 @@ module.exports = class EmojiOverviewView extends View {
             }
         });
 
-        embed.setImage('attachment://chart.png');
+        embed.setImage(url);
 
         embed.addField('Percentage of emoji per message', Util.BLANK_CHAR, false);
 
-        return { embed, attachment : this.client.util.attachment(buffer, 'chart.png') };
+        return embed;
     }
 };

@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed, MessageAttachment, Guild, User, GuildMember, TextChannel } = require('discord.js');
+const { MessageEmbed, Guild, User, GuildMember, TextChannel } = require('discord.js');
 
 const { time : Time } = require('@discordjs/builders');
 
@@ -13,7 +13,7 @@ module.exports = class DailyActivityView extends View {
      * @param {Guild} guild
      * @param stats
      *
-     * @return {Promise<{files: MessageAttachment[], embeds: MessageEmbed[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async guild(guild, stats) {
 
@@ -23,16 +23,16 @@ module.exports = class DailyActivityView extends View {
 
         this.stats(embed, stats);
 
-        const { attachment } = await this.chart(embed, stats);
+        await this.chart(embed, stats);
 
-        return { embeds : [embed], files : [attachment] };
+        return embed;
     }
 
     /**
      * @param {TextChannel} channel
      * @param stats
      *
-     * @return {Promise<{files: MessageAttachment[], embeds: MessageEmbed[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async channel(channel, stats) {
 
@@ -42,16 +42,16 @@ module.exports = class DailyActivityView extends View {
 
         this.stats(embed, stats);
 
-        const { attachment } = await this.chart(embed, stats);
+        await this.chart(embed, stats);
 
-        return { embeds : [embed], files : [attachment] };
+        return embed;
     }
 
     /**
      * @param {User|GuildMember} [user]
      * @param stats
      *
-     * @return {Promise<{files: MessageAttachment[], embeds: MessageEmbed[]}>}
+     * @return {Promise<MessageEmbed>}
      */
     async user(user, stats) {
 
@@ -61,9 +61,9 @@ module.exports = class DailyActivityView extends View {
 
         this.stats(embed, stats);
 
-        const { attachment } = await this.chart(embed, stats);
+        await this.chart(embed, stats);
 
-        return { embeds : [embed], files : [attachment] };
+        return embed;
     }
 
     stats(embed, stats) {
@@ -86,7 +86,7 @@ module.exports = class DailyActivityView extends View {
 
         const colors = Color.scale('Discord').domain([0, max]);
 
-        const buffer = await ChartService.renderToBuffer({
+        const url = await ChartService.renderAndUpload({
             width   : 1600,
             height  : 800,
             type    : 'polarArea',
@@ -142,10 +142,10 @@ module.exports = class DailyActivityView extends View {
             }
         });
 
-        embed.setImage('attachment://chart.png');
-
         embed.addField('Daily activity', Util.BLANK_CHAR, false);
 
-        return { embed, attachment : this.client.util.attachment(buffer, 'chart.png') };
+        embed.setImage(url);
+
+        return embed;
     }
 };

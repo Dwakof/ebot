@@ -107,7 +107,7 @@ class PaginatedEmbeds {
 
         if (this.#options.cache && this.#cache.has(index)) {
 
-            return { ...(await this.getFromCache(index)), components : [new MessageActionRow({ components : Array.from(this.#components.values()) })] };
+            return { ...this.#cache.get(index), components : [new MessageActionRow({ components : Array.from(this.#components.values()) })] };
         }
 
         let page = this.#pages[index];
@@ -326,30 +326,6 @@ class PaginatedEmbeds {
         });
 
         this.listening = true;
-    }
-
-    async getFromCache(index) {
-
-        const cached = this.#cache.get(index);
-
-        for (const embed of cached.embeds) {
-
-            if (embed?.image?.url) {
-
-                try {
-
-                    await Got(embed.image.url, { method : 'HEAD' });
-                }
-                catch {
-
-                    this.#reply.client.logger.warn({ message : `Original image where not found for embed, using the proxyURL instead` });
-
-                    embed.image.url = embed.image.proxyURL;
-                }
-            }
-        }
-
-        return cached;
     }
 
     static serializeReply({ embeds }) {

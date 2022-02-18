@@ -64,6 +64,21 @@ module.exports = class ScreenshotService extends Service {
     }
 
     /**
+     * @param {String} messageId
+     * @param {String} channelId
+     *
+     * @return {Promise<String>}
+     */
+    async screenshotMessageIdAndUpload(messageId, channelId) {
+
+        const { UploadService } = this.services('tooling');
+
+        const buffer = await this.screenshotMessageId(messageId, channelId);
+
+        return UploadService.upload(buffer, { contentType : 'image/png' });
+    }
+
+    /**
      * @param {Message} message
      *
      * @return {Promise<Buffer>}
@@ -239,5 +254,19 @@ module.exports = class ScreenshotService extends Service {
 
             await page.close();
         }
+    }
+
+    /**
+     * @param {Message} message
+     *
+     * @return {Promise<String>}
+     */
+    async screenshotMessageAndUpload(message) {
+
+        const { UploadService } = this.services('tooling');
+
+        const buffer = await this.screenshotMessage(message);
+
+        return UploadService.upload(buffer, { contentType : 'image/png' });
     }
 };
