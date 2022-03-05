@@ -1,3 +1,11 @@
+# [0.19.0](https://github.com/Dwakof/ebot/compare/v0.18.0...v0.19.0) (2022-03-05)
+
+
+### Features
+
+* add blyatify ([6463db6](https://github.com/Dwakof/ebot/commit/6463db64c7a006aace28ed85e0a68b89acfb08a6))
+* Add S3 assets uploader to an issue with the paginatedEmbeds where image could be deleted by Discord from their CDN ([af404ba](https://github.com/Dwakof/ebot/commit/af404baeed0140d74072d1f7e677613b3ab769f5))
+
 # [0.18.0](https://github.com/Dwakof/ebot/compare/v0.17.1...v0.18.0) (2022-02-13)
 
 
