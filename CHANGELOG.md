@@ -1,3 +1,11 @@
+## [0.19.1](https://github.com/Dwakof/ebot/compare/v0.19.0...v0.19.1) (2022-03-05)
+
+
+### Bug Fixes
+
+* disable cyrillic rewrite ([514176a](https://github.com/Dwakof/ebot/commit/514176a627007616d80b5e96cb78ce013c73fe10))
+* update puppeteer for a version without security issue ([3964e34](https://github.com/Dwakof/ebot/commit/3964e340de0fb5fa2176a50125b194737203e653))
+
 # [0.19.0](https://github.com/Dwakof/ebot/compare/v0.18.0...v0.19.0) (2022-03-05)
 
 
