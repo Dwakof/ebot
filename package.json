@@ -18,13 +18,13 @@
     "eslint": "npx eslint ."
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.51.0",
+    "@aws-sdk/client-s3": "3.53.1",
     "@discordjs/builders": "0.12.0",
     "@discordjs/rest": "0.3.0",
     "@hapi/hoek": "9.2.1",
     "@hapipal/confidence": "6.0.2",
-    "@sentry/node": "6.18.0",
-    "@sentry/tracing": "6.18.0",
+    "@sentry/node": "6.18.1",
+    "@sentry/tracing": "6.18.1",
     "@skyra/discord-components-core": "3.1.0",
     "ajv-formats": "2.1.1",
     "bezier-easing": "2.1.0",
@@ -33,7 +33,7 @@
     "chartjs-adapter-luxon": "1.1.0",
     "chroma-js": "2.4.2",
     "currency.js": "2.0.4",
-    "dayjs": "1.10.7",
+    "dayjs": "1.10.8",
     "discord-akairo": "github:discord-akairo/discord-akairo",
     "discord-api-types": "0.27.3",
     "discord-markdown": "2.5.1",
@@ -41,7 +41,7 @@
     "dotenv": "16.0.0",
     "emoji-regex": "10.0.0",
     "got": "11.8.3",
-    "keyv": "4.0.5",
+    "keyv": "4.1.1",
     "keyv-file": "0.2.0",
     "knex": "1.0.3",
     "lunr": "2.3.9",
@@ -53,7 +53,7 @@
     "pino": "7.8.0",
     "pug": "3.0.2",
     "puppeteer": "11.0.0",
-    "undici": "4.14.1",
+    "undici": "4.15.0",
     "uuid": "8.3.2"
   },
   "devDependencies": {
@@ -65,12 +65,12 @@
     "@semantic-release/commit-analyzer": "9.0.2",
     "@semantic-release/git": "10.0.1",
     "@semantic-release/github": "8.0.2",
-    "@semantic-release/npm": "9.0.0",
+    "@semantic-release/npm": "9.0.1",
     "@semantic-release/release-notes-generator": "10.0.3",
     "eslint": "8.10.0",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-security": "1.4.0",
-    "pino-pretty": "7.5.1",
+    "pino-pretty": "7.5.3",
     "semantic-release": "19.0.2"
   },
   "optionalDependencies": {
