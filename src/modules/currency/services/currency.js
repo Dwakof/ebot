@@ -15,17 +15,18 @@ module.exports = class CurrencyService extends Service {
      */
     #currencies = new Map();
 
-    static ENDPOINT = 'https://freecurrencyapi.net';
+    static ENDPOINT = 'https://api.currencyapi.com';
 
     #api;
-    #defaultQuery;
+    #apiKey;
+    #defaultQuery = {};
     #index;
 
     async init() {
 
         this.#api = new Client(CurrencyService.ENDPOINT);
 
-        this.#defaultQuery = { apikey : this.client.settings.plugins.currency.freeCurrencyApi.apiKey };
+        this.#apiKey = this.client.settings.plugins.currency.freeCurrencyApi.apiKey;
 
         const rates = await this.getRates();
 
@@ -35,7 +36,7 @@ module.exports = class CurrencyService extends Service {
 
         for (const currency of Object.values(Currencies)) {
 
-            if (currency.code === 'USD' || isNumber(rates[currency.code])) {
+            if (currency.code === 'USD' || isNumber(rates[currency.code]?.value)) {
 
                 this.#currencies.set(currency.code, currency);
             }
@@ -69,7 +70,11 @@ module.exports = class CurrencyService extends Service {
      */
     async #call(method, path, queryParams = {}) {
 
-        const response = await this.#api.request({ path : `${ path }?${ new URLSearchParams({ ...this.#defaultQuery, ...queryParams }) }`, method });
+        const response = await this.#api.request({
+            path    : `${ path }?${ new URLSearchParams({ ...this.#defaultQuery, ...queryParams }) }`,
+            headers : { apikey : this.#apiKey },
+            method
+        });
 
         const { body, statusCode } = response;
 
@@ -95,11 +100,11 @@ module.exports = class CurrencyService extends Service {
      * @param {CurrencyCode} [currency=USD]
      * @param {Object}       [queryOptions={}]
      *
-     * @return {Promise<Record<CurrencyCode, Number>>}
+     * @return {Promise<Record<CurrencyCode, RateObject>>}
      */
     async getRates(currency = 'USD', queryOptions = {}) {
 
-        const { data } = await this.#call('GET', '/api/v2/latest', { base_currency : currency, ...queryOptions });
+        const { data } = await this.#call('GET', '/v3/latest', { base_currency : currency, ...queryOptions });
 
         return data;
     }
@@ -114,10 +119,10 @@ module.exports = class CurrencyService extends Service {
      */
     getHistory(currency = 'USD', from, to, queryOptions = {}) {
 
-        const date_from = new DateTime(from ?? DateTime.now().minus({ month : 1 })).toISODate();
-        const date_to   = new DateTime(to ?? DateTime.now()).toISODate();
+        const datetime_start = new DateTime(from ?? DateTime.now().minus({ month : 1 })).toISODate();
+        const datetime_end   = new DateTime(to ?? DateTime.now()).toISODate();
 
-        return this.#call('GET', '/api/v2/historical', { base_currency : currency, date_from, date_to, ...queryOptions });
+        return this.#call('GET', '/v3/range', { base_currency : currency, datetime_start, datetime_end, ...queryOptions });
     }
 
     /**
@@ -131,9 +136,9 @@ module.exports = class CurrencyService extends Service {
 
         const rates = await this.getRates(from.code);
 
-        const value = this._convert(amount, rates[to.code]);
+        const value = this._convert(amount, rates[to.code].value);
 
-        return { from, to, amount, value, rate : rates[to.code], result : this.format(value, to) };
+        return { from, to, amount, value, rate : rates[to.code].value, result : this.format(value, to) };
     }
 
     /**
@@ -210,13 +215,27 @@ module.exports = class CurrencyService extends Service {
      */
 
     /**
+     * @typedef {Object} RateObject
+     *
+     * @property {CurrencyCode} code
+     * @property {Number} value
+     */
+
+    /**
      * @typedef {Object} RateResponse
      *
      * @property {Object} query
      * @property {Number} query.timestamp
      * @property {String} query.base_currency
      *
-     * @property {Object<CurrencyCode, Number>} data
+     * @property {Object<CurrencyCode, RateObject>} data
+     */
+
+    /**
+     * @typedef {Object} HistoryRate
+     *
+     * @property {IsoDate}                           datetime
+     * @property {Object<CurrencyCode, RateObject>}  currencies
      */
 
     /**
@@ -226,6 +245,6 @@ module.exports = class CurrencyService extends Service {
      * @property {Number} query.timestamp
      * @property {String} query.base_currency
      *
-     * @property {Object<IsoDate, Object<CurrencyCode, Number>>} data
+     * @property {Array<HistoryRate>} data
      */
 };

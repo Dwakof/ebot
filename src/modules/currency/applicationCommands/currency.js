@@ -177,12 +177,12 @@ module.exports = class Currency extends ApplicationCommand {
 
         const stats = [];
 
-        for (const [date, rates] of Object.entries(data)) {
+        for (const { datetime, currencies } of data) {
 
             stats.push({
-                time  : new Date(date),
-                rate  : rates[toCurrency.code],
-                value : CurrencyService._convert(rates[toCurrency.code], amount)
+                time  : new Date(datetime),
+                rate  : currencies[toCurrency.code].value,
+                value : CurrencyService._convert(currencies[toCurrency.code].value, amount)
             });
         }
 
