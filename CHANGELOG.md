@@ -1,3 +1,10 @@
+## [0.19.2](https://github.com/Dwakof/ebot/compare/v0.19.1...v0.19.2) (2022-03-09)
+
+
+### Bug Fixes
+
+* v3 CurrencyAPI ([5c4b993](https://github.com/Dwakof/ebot/commit/5c4b993610cc7fb1bb610e543cc35521c6741da1))
+
 ## [0.19.1](https://github.com/Dwakof/ebot/compare/v0.19.0...v0.19.1) (2022-03-05)
 
 
