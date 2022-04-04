@@ -39,7 +39,7 @@
     "discord-markdown": "2.5.1",
     "discord.js": "13.6.0",
     "dotenv": "16.0.0",
-    "emoji-regex": "10.0.0",
+    "emoji-regex": "10.1.0",
     "got": "11.8.3",
     "keyv": "4.1.1",
     "keyv-file": "0.2.0",
