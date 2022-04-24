@@ -1,10 +1,9 @@
 'use strict';
 
 const { DateTime }                   = require('luxon');
-const { v4 : Uuidv4 }                = require('uuid');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 
-const { Service } = require('../../../core');
+const { Service, Util } = require('../../../core');
 
 module.exports = class UploadService extends Service {
 
@@ -21,7 +20,7 @@ module.exports = class UploadService extends Service {
 
     async upload(file, options = {}) {
 
-        const key = `${ (DateTime.now()).toFormat('yyyy/MM/dd') }/${ Uuidv4() }`;
+        const key = `${ (DateTime.now()).toFormat('yyyy/MM/dd') }/${ Util.uuid() }`;
 
         const command = new PutObjectCommand({
             ACL          : 'public-read',

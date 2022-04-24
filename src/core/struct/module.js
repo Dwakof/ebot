@@ -111,7 +111,7 @@ class Module {
             }
             catch (error) {
 
-                throw new Error(`Could not register ${ type } ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
+                throw new Error(`Could not register ${ type } ${ name } from module ${ this.#name } because of : ${ error.toString() }`, { cause : error });
             }
         }
 
@@ -175,7 +175,7 @@ class Module {
             }
             catch (error) {
 
-                throw new Error(`Could not register provider ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
+                throw new Error(`Could not register provider ${ name } from module ${ this.#name } because of : ${ error.toString() }`, { cause : error });
             }
         }
     }
@@ -210,7 +210,7 @@ class Module {
             }
             catch (error) {
 
-                throw new Error(`Could not register service ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
+                throw new Error(`Could not register service ${ name } from module ${ this.#name } because of : ${ error.toString() }`, { cause : error });
             }
         }
     }
@@ -245,7 +245,7 @@ class Module {
             }
             catch (error) {
 
-                throw new Error(`Could not register view ${ name } from module ${ this.#name } because of : ${ error.toString() }`);
+                throw new Error(`Could not register view ${ name } from module ${ this.#name } because of : ${ error.toString() }`, { cause : error });
             }
         }
     }

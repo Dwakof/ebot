@@ -1,10 +1,24 @@
 'use strict';
 
-const Util = require('util');
+const Util   = require('util');
+const Crypto = require('crypto');
 
 const { isValidObject } = require('./is');
 
 module.exports = {
+
+
+    /**
+     * Return a random UUID.
+     * @see https://nodejs.org/docs/latest-v14.x/api/crypto.html#crypto_crypto_randomuuid_options
+     *
+     * @param {Object} [options]
+     * @return {string}
+     */
+    uuid(options) {
+
+        return Crypto.randomUUID(options);
+    },
 
     PromiseProps(props) {
 

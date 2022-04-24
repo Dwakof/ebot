@@ -9,7 +9,7 @@ const { Message, Interaction } = require('discord.js');
 // eslint-disable-next-line no-unused-vars
 const { MessagePayload, MessageOptions, WebhookEditMessageOptions, MessageEmbed } = require('discord.js');
 
-const { memberNicknameMention, codeBlock, inlineCode } = require('@discordjs/builders');
+const { userMention, codeBlock, inlineCode } = require('@discordjs/builders');
 
 const CoreUtil = require('./util');
 
@@ -110,7 +110,7 @@ module.exports = class ClientUtil extends Base {
 
     ownerIds() {
 
-        return this.client.ownerID.map(memberNicknameMention).join(', ');
+        return this.client.ownerID.map(userMention).join(', ');
     }
 
     chunk(array, chunkSize = 10) {
