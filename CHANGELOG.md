@@ -1,3 +1,11 @@
+## [0.19.3](https://github.com/Dwakof/ebot/compare/v0.19.2...v0.19.3) (2022-04-24)
+
+
+### Bug Fixes
+
+* change currency API to ExchangeRate.host ([3f1c33c](https://github.com/Dwakof/ebot/commit/3f1c33c36d928b96f680b2d39972ec78487c1867))
+* update dependencies + use error's cause + use native UUID from crypto ([0f251eb](https://github.com/Dwakof/ebot/commit/0f251eba303fd4da7d31f8a77f0a210ca986427b))
+
 ## [0.19.2](https://github.com/Dwakof/ebot/compare/v0.19.1...v0.19.2) (2022-03-09)
 
 
