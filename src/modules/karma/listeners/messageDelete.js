@@ -25,6 +25,11 @@ module.exports = class KarmaMessageDeletedListener extends Listener {
             }
             catch (error) {
 
+                if (error.code === 10008) {
+
+                    return;
+                }
+
                 return this.client.handleError(this, error, 'Could not fetch the message from partial', { message });
             }
         }
