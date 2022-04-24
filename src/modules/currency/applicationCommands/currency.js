@@ -173,16 +173,16 @@ module.exports = class Currency extends ApplicationCommand {
 
         await interaction.deferReply();
 
-        const { data } = await CurrencyService.getHistory(fromCurrency.code, DateTime.now().minus(Duration.fromISO(`P${ range }`)));
+        const { rates } = await CurrencyService.getLongerHistory(fromCurrency.code, DateTime.now().minus(Duration.fromISO(`P${ range }`)), undefined, [toCurrency.code]);
 
         const stats = [];
 
-        for (const { datetime, currencies } of data) {
+        for (const [datetime, currencies] of Object.entries(rates)) {
 
             stats.push({
                 time  : new Date(datetime),
-                rate  : currencies[toCurrency.code].value,
-                value : CurrencyService._convert(currencies[toCurrency.code].value, amount)
+                rate  : currencies[toCurrency.code],
+                value : CurrencyService._convert(currencies[toCurrency.code], amount)
             });
         }
 

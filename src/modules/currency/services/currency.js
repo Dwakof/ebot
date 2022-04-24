@@ -15,7 +15,7 @@ module.exports = class CurrencyService extends Service {
      */
     #currencies = new Map();
 
-    static ENDPOINT = 'https://api.currencyapi.com';
+    static ENDPOINT = 'https://api.exchangerate.host';
 
     #api;
     #apiKey;
@@ -26,9 +26,7 @@ module.exports = class CurrencyService extends Service {
 
         this.#api = new Client(CurrencyService.ENDPOINT);
 
-        this.#apiKey = this.client.settings.plugins.currency.freeCurrencyApi.apiKey;
-
-        const rates = await this.getRates();
+        const { rates } = await this.getRates();
 
         const Symbols    = require('../resources/symbols').reduce((agg, { code, symbol }) => ({ ...agg, [code] : symbol }), {});
         const Currencies = require('../resources/currencies')
@@ -36,7 +34,7 @@ module.exports = class CurrencyService extends Service {
 
         for (const currency of Object.values(Currencies)) {
 
-            if (currency.code === 'USD' || isNumber(rates[currency.code]?.value)) {
+            if (currency.code === 'USD' || isNumber(rates[currency.code])) {
 
                 this.#currencies.set(currency.code, currency);
             }
@@ -71,8 +69,7 @@ module.exports = class CurrencyService extends Service {
     async #call(method, path, queryParams = {}) {
 
         const response = await this.#api.request({
-            path    : `${ path }?${ new URLSearchParams({ ...this.#defaultQuery, ...queryParams }) }`,
-            headers : { apikey : this.#apiKey },
+            path : `${ path }?${ new URLSearchParams({ ...this.#defaultQuery, ...queryParams }) }`,
             method
         });
 
@@ -81,12 +78,12 @@ module.exports = class CurrencyService extends Service {
         if (statusCode >= 400) {
 
             this.client.logger.error({
-                msg      : `FreeCurrency API error ${ statusCode }`,
+                msg      : `ExchangeRate API error ${ statusCode }`,
                 response : await body.json(),
                 queryParams, method, statusCode
             });
 
-            const error = new Error(`FreeCurrency API error ${ statusCode }`);
+            const error = new Error(`ExchangeRate API error ${ statusCode }`);
 
             error.response = response;
 
@@ -100,29 +97,81 @@ module.exports = class CurrencyService extends Service {
      * @param {CurrencyCode} [currency=USD]
      * @param {Object}       [queryOptions={}]
      *
-     * @return {Promise<Record<CurrencyCode, RateObject>>}
+     * @return {Promise<RateResponse>}
      */
-    async getRates(currency = 'USD', queryOptions = {}) {
+    getRates(currency = 'USD', queryOptions = {}) {
 
-        const { data } = await this.#call('GET', '/v3/latest', { base_currency : currency, ...queryOptions });
-
-        return data;
+        return this.#call('GET', '/latest', { base : currency, ...queryOptions });
     }
 
     /**
-     * @param {CurrencyCode}  [currency=USD]
-     * @param {Date|Number}   [from=new Date()-30d]
-     * @param {Date|Number}   [to=new Date()]
-     * @param {Object}        [queryOptions={}]
+     * @param {CurrencyCode}          [currency=USD]
+     * @param {Date|Number|DateTime}  [from=new Date()-30d]
+     * @param {Date|Number|DateTime}  [to=new Date()]
+     * @param {Array<CurrencyCode>}   [currencies]
+     * @param {Object}                [queryOptions={}]
      *
      * @return {Promise<HistoryResponse>}
      */
-    getHistory(currency = 'USD', from, to, queryOptions = {}) {
+    getHistory(currency = 'USD', from, to, currencies, queryOptions = {}) {
 
-        const datetime_start = new DateTime(from ?? DateTime.now().minus({ month : 1 })).toISODate();
-        const datetime_end   = new DateTime(to ?? DateTime.now()).toISODate();
+        const start_date = new DateTime(from ?? DateTime.now().minus({ month : 1 })).toISODate();
+        const end_date   = new DateTime(to ?? DateTime.now()).toISODate();
 
-        return this.#call('GET', '/v3/range', { base_currency : currency, datetime_start, datetime_end, ...queryOptions });
+        return this.#call('GET', '/timeseries', { base : currency, start_date, end_date, symbols : currencies, ...queryOptions });
+    }
+
+    /**
+     * @param {CurrencyCode}          [currency=USD]
+     * @param {Date|Number|DateTime}  [from=new Date()-30d]
+     * @param {Date|Number|DateTime}  [to=new Date()]
+     * @param {Array<CurrencyCode>}   [currencies]
+     * @param {Object}                [queryOptions={}]
+     *
+     * @return {Promise<HistoryResponse>}
+     */
+    async getLongerHistory(currency = 'USD', from, to, currencies, queryOptions = {}) {
+
+        const start_date = new DateTime(from ?? DateTime.now().minus({ month : 1 }));
+        const end_date   = new DateTime(to ?? DateTime.now());
+
+        if (end_date.diff(start_date, 'days').toObject().days <= 365) {
+
+            return this.getHistory(currency, from, to, currencies, queryOptions);
+        }
+
+        /**
+         * @type {Map<IsoDate, RateObject>}
+         */
+        const rates = new Map();
+
+        let _start_date = start_date;
+        let _end_date   = start_date.plus({ days : 365 });
+
+        while (_end_date.toMillis() < end_date.toMillis()) {
+
+            const { rates : _rates } = await this.getHistory(currency, _start_date, _end_date, currencies, queryOptions);
+
+            for (const [date, rate] of Object.entries(_rates)) {
+
+                rates.set(date, rate);
+            }
+
+            _start_date = _start_date.plus({ days : 365 });
+            _end_date   = _end_date.plus({ days : 365 });
+
+            if (_end_date.toMillis() > end_date.toMillis()) {
+
+                _end_date = end_date;
+            }
+        }
+
+        /**
+         * @type {IsoDate[]}
+         */
+        const times = Array.from(rates.keys()).sort((a, b) => a.localeCompare(b));
+
+        return { rates : Object.fromEntries(rates), start_date : times.shift(), end_date : times.pop(), base : currency };
     }
 
     /**
@@ -134,11 +183,11 @@ module.exports = class CurrencyService extends Service {
      */
     async convert(from, to, amount) {
 
-        const rates = await this.getRates(from.code);
+        const { rates } = await this.getRates(from.code);
 
-        const value = this._convert(amount, rates[to.code].value);
+        const value = this._convert(amount, rates[to.code]);
 
-        return { from, to, amount, value, rate : rates[to.code].value, result : this.format(value, to) };
+        return { from, to, amount, value, rate : rates[to.code], result : this.format(value, to) };
     }
 
     /**
@@ -192,7 +241,7 @@ module.exports = class CurrencyService extends Service {
 
     list() {
 
-        return Array.from(this.#currencies.values());
+        return Array.from(this.#currencies.values()).sort((a, b) => a.code.localeCompare(b.code));
     }
 
     /**
@@ -215,36 +264,24 @@ module.exports = class CurrencyService extends Service {
      */
 
     /**
-     * @typedef {Object} RateObject
-     *
-     * @property {CurrencyCode} code
-     * @property {Number} value
+     * @typedef {Object<CurrencyCode, Number>} RateObject
      */
 
     /**
      * @typedef {Object} RateResponse
      *
-     * @property {Object} query
-     * @property {Number} query.timestamp
-     * @property {String} query.base_currency
+     * @property {CurrencyCode} base
      *
-     * @property {Object<CurrencyCode, RateObject>} data
-     */
-
-    /**
-     * @typedef {Object} HistoryRate
-     *
-     * @property {IsoDate}                           datetime
-     * @property {Object<CurrencyCode, RateObject>}  currencies
+     * @property {RateObject} rates
      */
 
     /**
      * @typedef {Object} HistoryResponse
      *
-     * @property {Object} query
-     * @property {Number} query.timestamp
-     * @property {String} query.base_currency
+     * @property {CurrencyCode} base
+     * @property {IsoDate}      start_date
+     * @property {IsoDate}      end_date
      *
-     * @property {Array<HistoryRate>} data
+     * @property {Object<IsoDate, RateObject>} rates
      */
 };
