@@ -1,3 +1,24 @@
+# [0.20.0](https://github.com/Dwakof/ebot/compare/v0.19.3...v0.20.0) (2022-05-18)
+
+
+### Bug Fixes
+
+* missing new on DateTime from Luxon ([0b84c29](https://github.com/Dwakof/ebot/commit/0b84c29643accd1d543f8a268250671a598b05f0))
+* remove classic command weather (fuck tarduck) ([24d3441](https://github.com/Dwakof/ebot/commit/24d34417fcb94cded4ec32202d57655142349f79))
+* remove DayJS ([e7cead5](https://github.com/Dwakof/ebot/commit/e7cead505043d73dfbbd6a810cb9448c04298dcc))
+* remove Got ([68693f4](https://github.com/Dwakof/ebot/commit/68693f4c6bec8b1739b7e3921cf71254baf9edda))
+* some clean up as well removing handling application permissions and update dependencies ([9b09ca1](https://github.com/Dwakof/ebot/commit/9b09ca13b7c3c2e796dc36321bf428f1cdeca2f8))
+* update dependencies ([49d8a8c](https://github.com/Dwakof/ebot/commit/49d8a8cfca0ef1b5fcccd062dc1b545eac8eabe4))
+* use a class method for autocomplete on weather ([7886605](https://github.com/Dwakof/ebot/commit/7886605ae9283094a9fef573f32f2fcb1a93ddc6))
+
+
+### Features
+
+* add autocomplete feature on Weather location ([7bf237b](https://github.com/Dwakof/ebot/commit/7bf237b901fd794972898c610ac7849b293d187b))
+* add caching mechanism on service method when specified ([86bbec1](https://github.com/Dwakof/ebot/commit/86bbec13462cceddc015ea84e3ce17f268f78f95))
+* allow autocomplete to be a ApplicationCommand method for reuse ([bb31741](https://github.com/Dwakof/ebot/commit/bb31741ad260c08694993925f8a5cddc7d4a22a2))
+* currency now use autocomplete for currencies ([46c1073](https://github.com/Dwakof/ebot/commit/46c10731401c648fa655158568a4d7da44da9ad9))
+
 ## [0.19.3](https://github.com/Dwakof/ebot/compare/v0.19.2...v0.19.3) (2022-04-24)
 
 
