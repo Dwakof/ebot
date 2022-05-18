@@ -1,7 +1,7 @@
 'use strict';
 
-const { Constants }             = require('discord.js');
-const { memberNicknameMention } = require('@discordjs/builders');
+const { Constants }   = require('discord.js');
+const { userMention } = require('@discordjs/builders');
 
 const { DateTime } = require('luxon');
 
@@ -245,7 +245,7 @@ module.exports = class BuildService extends Service {
             switch (user) {
                 case 'ebot' :
 
-                    embed.addField('User', memberNicknameMention(this.client.user.id), true)
+                    embed.addField('User', userMention(this.client.user.id), true)
                         .setThumbnail(this.client.user.avatarURL({ dynamic : false, size : 128 }));
                     break;
                 case 'guild' :
@@ -256,7 +256,7 @@ module.exports = class BuildService extends Service {
 
                     const member = guild.members.cache.get(user);
 
-                    embed.addField('User', memberNicknameMention(member.id), true)
+                    embed.addField('User', userMention(member.id), true)
                         .setThumbnail(member.user.avatarURL({ dynamic : false, size : 128 }));
                     break;
             }
