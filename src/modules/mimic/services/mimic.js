@@ -1,12 +1,5 @@
 'use strict';
 
-const DayJS        = require('dayjs');
-const Duration     = require('dayjs/plugin/duration');
-const RelativeTime = require('dayjs/plugin/relativeTime');
-
-DayJS.extend(Duration);
-DayJS.extend(RelativeTime);
-
 const { Service } = require('../../../core');
 
 const { Chain } = require('../utils');

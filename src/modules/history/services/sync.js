@@ -3,14 +3,9 @@
 const { SnowflakeUtil, Constants, Permissions } = require('discord.js');
 const { channelMention }                        = require('@discordjs/builders');
 
-const DayJS        = require('dayjs');
-const Duration     = require('dayjs/plugin/duration');
-const RelativeTime = require('dayjs/plugin/relativeTime');
+const { DateTime } = require('luxon');
 
-DayJS.extend(Duration);
-DayJS.extend(RelativeTime);
-
-const { default : PQueue } = require('p-queue');
+const { default : PQueue } = require('p-queue-compat');
 
 const { Service, Util } = require('../../../core');
 
@@ -303,14 +298,14 @@ module.exports = class SyncService extends Service {
             embed.addField('Progress', this.client.util.progressBar(current, total));
         }
 
-        if (doing) {
+        if (startAt) {
 
-            embed.setFooter(`Running for ${ DayJS.duration(DayJS(startAt).diff(DayJS())).humanize() }`);
+            embed.setFooter(`Running for ${ DateTime(startAt).toRelative() }`);
         }
 
         if (!doing) {
 
-            embed.setFooter(`Took ${ DayJS.duration(DayJS(startAt).diff(DayJS(endAt))).humanize() }`);
+            embed.setFooter(`Took ${ DateTime(startAt).diff(DateTime(endAt)).toHuman() }`);
         }
 
         if (done) {
@@ -345,14 +340,14 @@ module.exports = class SyncService extends Service {
 
         embed.setDescription(`${ messages || 0 } messages`);
 
-        if (doing) {
+        if (startAt) {
 
-            embed.setFooter(`running for ${ DayJS.duration(DayJS(startAt).diff(DayJS())).humanize() }`);
+            embed.setFooter(`Running for ${ DateTime(startAt).toRelative() }`);
         }
 
         if (!doing) {
 
-            embed.setFooter(`took ${ DayJS.duration(DayJS(startAt).diff(DayJS(endAt))).humanize() }`);
+            embed.setFooter(`Took ${ DateTime(startAt).diff(DateTime(endAt)).toHuman() }`);
         }
 
         if (done) {

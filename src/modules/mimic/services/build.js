@@ -3,12 +3,7 @@
 const { Constants }             = require('discord.js');
 const { memberNicknameMention } = require('@discordjs/builders');
 
-const DayJS        = require('dayjs');
-const Duration     = require('dayjs/plugin/duration');
-const RelativeTime = require('dayjs/plugin/relativeTime');
-
-DayJS.extend(Duration);
-DayJS.extend(RelativeTime);
+const { DateTime } = require('luxon');
 
 const { Service, Util } = require('../../../core');
 
@@ -274,12 +269,12 @@ module.exports = class BuildService extends Service {
 
         if (startAt) {
 
-            embed.setFooter(`Running for ${ DayJS.duration(DayJS(startAt).diff(DayJS())).humanize() }`);
+            embed.setFooter(`Running for ${ DateTime(startAt).toRelative() }`);
         }
 
         if (!doing) {
 
-            embed.setFooter(`Took ${ DayJS.duration(DayJS(startAt).diff(DayJS(endAt))).humanize() }`);
+            embed.setFooter(`Took ${ DateTime(startAt).diff(DateTime(endAt)).toHuman() }`);
         }
 
         if (done) {
