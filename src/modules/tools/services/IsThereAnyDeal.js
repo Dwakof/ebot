@@ -1,11 +1,11 @@
 'use strict';
 
-const Got = require('got');
+const { Client } = require('undici');
 
 // eslint-disable-next-line no-unused-vars
 const { MessageEmbed } = require('discord.js');
 
-const { Service } = require('../../../core');
+const { ServiceApi } = require('../../../core');
 
 /**
  * @typedef {Object} SearchResultObject
@@ -68,19 +68,15 @@ const { Service } = require('../../../core');
  * @property {GamePriceOverviewObject} overview
  */
 
-module.exports = class IsThereAnyDealService extends Service {
+module.exports = class IsThereAnyDealService extends ServiceApi {
 
-    #api;
+    static ENDPOINT = 'https://api.isthereanydeal.com';
 
     init() {
 
-        this.#api = Got.extend({
-            prefixUrl    : 'https://api.isthereanydeal.com',
-            responseType : 'json',
-            searchParams : {
-                'key' : this.client.settings.plugins.tool.isThereAnyDeal.apiKey
-            }
-        });
+        super.init();
+
+        this.defaultQueryParams = { key : this.client.settings.plugins.tool.isThereAnyDeal.apiKey };
     }
 
     /**
@@ -90,24 +86,23 @@ module.exports = class IsThereAnyDealService extends Service {
      */
     async search(query) {
 
-        const { body, statusCode } = await this.#api.get('v02/search/search', {
-            searchParams : {
-                'limit' : 100,
-                'q'     : query
+        try {
+
+            const body = await this.api.get('/v02/search/search/', { limit : 20, q : query });
+
+            const results = body?.data?.results;
+
+            if (!Array.isArray(results) || results.length <= 0) {
+
+                return false;
             }
-        });
 
-        if (statusCode !== 200) {
+            return results;
+        }
+        catch (error) {
+
             return false;
         }
-
-        const results = body?.data?.results;
-
-        if (!Array.isArray(results) || results.length <= 0) {
-            return false;
-        }
-
-        return results;
     }
 
     /**
@@ -115,21 +110,11 @@ module.exports = class IsThereAnyDealService extends Service {
      *
      * @return {Promise<Array<GameResultObject>>}
      */
-    async getInfo(result) {
-
-        const identifier = result.plain;
+    async getInfo({ plain }) {
 
         // Get Game Info (title, image, etc.)
-        const { body : gameInfoBody } = await this.#api.get('v01/game/info', {
-            searchParams : { 'plains' : identifier }
-        });
-        const info                    = gameInfoBody.data[identifier];
-
-        // Get price overview
-        const { body : overviewBody } = await this.#api.get('v01/game/overview', {
-            searchParams : { 'plains' : identifier }
-        });
-        const overview                = overviewBody.data[identifier];
+        const { data : { [plain] : info } }     = await this.api.get('/v01/game/info', { plains : plain });
+        const { data : { [plain] : overview } } = await this.api.get('/v01/game/overview', { plains : plain });
 
         return { info, overview };
     }

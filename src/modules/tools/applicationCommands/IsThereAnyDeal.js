@@ -28,13 +28,15 @@ class IsThereAnyDealCommand extends ApplicationCommand {
 
     async getDeals(interaction, { title }) {
 
+        await interaction.deferReply();
+
         const { IsThereAnyDealService } = this.services();
 
         try {
             const searchResults = await IsThereAnyDealService.search(title);
 
             if (searchResults === false) {
-                return interaction.reply(
+                return interaction.editReply(
                     IsThereAnyDealService.messageEmbed(title, 'No results found')
                 );
             }
@@ -52,7 +54,7 @@ class IsThereAnyDealCommand extends ApplicationCommand {
         catch (error) {
 
             const embed = IsThereAnyDealService.messageEmbed(title, 'Something went wrong');
-            await interaction.reply({ embeds : [embed] });
+            await interaction.editReply({ embeds : [embed] });
             this.client.handleError(this, error, interaction);
         }
     }

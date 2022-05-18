@@ -29,6 +29,8 @@ class UrbanDictionaryCommand extends ApplicationCommand {
 
     async search(interaction, { term }) {
 
+        await interaction.deferReply();
+
         const { UrbanDictionaryService } = this.services();
 
         try {
@@ -36,7 +38,7 @@ class UrbanDictionaryCommand extends ApplicationCommand {
             const results = await UrbanDictionaryService.search(term);
 
             if (results === false) {
-                return interaction.reply({
+                return interaction.editReply({
                     embeds : [UrbanDictionaryService.embed().setTitle(term).setDescription('No results found')]
                 });
             }
@@ -45,7 +47,7 @@ class UrbanDictionaryCommand extends ApplicationCommand {
         }
         catch (error) {
 
-            await interaction.reply({
+            await interaction.editReply({
                 embeds : [UrbanDictionaryService.embed().setTitle(term).setDescription('Something went wrong')]
             });
 

@@ -36,7 +36,7 @@ module.exports = class Karma extends ApplicationCommand {
 
         try {
 
-            const searches = await LocationService.search(query);
+            const searches = await LocationService.search(query, { limit : 1 });
 
             if (searches.length === 0) {
 

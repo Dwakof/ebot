@@ -1,7 +1,6 @@
 'use strict';
 
 const Hoek = require('@hapi/hoek');
-const Got  = require('got');
 
 const { MessageActionRow, MessageButton, Constants, Message, Interaction, MessageEmbed } = require('discord.js');
 

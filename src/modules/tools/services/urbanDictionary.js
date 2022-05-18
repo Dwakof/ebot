@@ -1,23 +1,13 @@
 'use strict';
 
-const Got = require('got');
-
 // eslint-disable-next-line no-unused-vars
 const { MessageEmbed } = require('discord.js');
 
-const { Service } = require('../../../core');
+const { ServiceApi } = require('../../../core');
 
-module.exports = class UrbanDictionaryService extends Service {
+module.exports = class UrbanDictionaryService extends ServiceApi {
 
-    #api;
-
-    init() {
-
-        this.#api = Got.extend({
-            prefixUrl    : 'https://api.urbandictionary.com',
-            responseType : 'json'
-        });
-    }
+    static ENDPOINT = 'https://api.urbandictionary.com';
 
     /**
      * @typedef {Object} DefinitionObject
@@ -37,19 +27,14 @@ module.exports = class UrbanDictionaryService extends Service {
      */
     async search(term) {
 
-        const { body, statusCode } = await this.#api.get('v0/define', { searchParams : { term } });
+        const { list } = await this.api.get('/v0/define', { term });
 
-        if (statusCode !== 200) {
-
-            return false;
-        }
-
-        if (!Array.isArray(body?.list) || body?.list?.length <= 0) {
+        if (!Array.isArray(list) || list?.length <= 0) {
 
             return false;
         }
 
-        return body.list.sort((one, two) => (two.thumbs_up - two.thumbs_down) - (one.thumbs_up - one.thumbs_down));
+        return list.sort((one, two) => (two.thumbs_up - two.thumbs_down) - (one.thumbs_up - one.thumbs_down));
     }
 
     /**

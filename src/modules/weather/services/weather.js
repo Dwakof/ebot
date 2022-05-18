@@ -1,51 +1,16 @@
 'use strict';
 
-const { Client } = require('undici');
+const { ServiceApi } = require('../../../core');
 
-const { Service } = require('../../../core');
-
-module.exports = class WeatherService extends Service {
+module.exports = class WeatherService extends ServiceApi {
 
     static ENDPOINT = 'https://api.openweathermap.org/';
 
-    #api;
-    #defaultQuery;
-
     init() {
 
-        this.#api = new Client(WeatherService.ENDPOINT);
+        super.init();
 
-        this.#defaultQuery = { appid : this.client.settings.plugins.weather.openWeatherApiKey, units : 'standard', lang : 'en' };
-    }
-
-    /**
-     * @param {String} method
-     * @param {String} path
-     * @param {Object} [queryParams={}]
-     *
-     * @return {Promise<*>}
-     */
-    async #call(method, path, queryParams = {}) {
-
-        const response = await this.#api.request({
-            path : `${ path }?${ new URLSearchParams({ ...this.#defaultQuery, ...queryParams }) }`,
-            method
-        });
-
-        const { body, statusCode } = response;
-
-        if (statusCode >= 400) {
-
-            this.client.logger.error({ msg : `OpenWeather API error ${ statusCode }`, queryParams, path, method, statusCode, response : await body.json() });
-
-            const error = new Error(`OpenWeather API error ${ statusCode }`);
-
-            error.response = response;
-
-            throw error;
-        }
-
-        return body.json();
+        this.defaultQueryParams = { appid : this.client.settings.plugins.weather.openWeatherApiKey, units : 'standard', lang : 'en' };
     }
 
     /**
@@ -57,7 +22,7 @@ module.exports = class WeatherService extends Service {
      */
     getCurrentWeather(lat, lon, queryOptions = {}) {
 
-        return this.#call('GET', '/data/2.5/weather', { lat, lon, ...queryOptions });
+        return this.api.get('/data/2.5/weather', { lat, lon, ...queryOptions });
     }
 
     /**
@@ -70,7 +35,7 @@ module.exports = class WeatherService extends Service {
      */
     getDailyForecast(lat, lon, count = 5, queryOptions = {}) {
 
-        return this.#call('GET', '/data/2.5/daily', { lat, lon, cnt : count, ...queryOptions });
+        return this.api.get('/data/2.5/daily', { lat, lon, cnt : count, ...queryOptions });
     }
 
     /**
@@ -100,7 +65,7 @@ module.exports = class WeatherService extends Service {
             !alerts ? 'alerts' : ''
         ].filter(Boolean).join(',');
 
-        return this.#call('GET', '/data/2.5/onecall', { lat, lon, exclude, ...queryOptions });
+        return this.api.get('/data/2.5/onecall', { lat, lon, exclude, ...queryOptions });
     }
 
     /**
@@ -113,7 +78,7 @@ module.exports = class WeatherService extends Service {
      */
     airQuality(lat, lon, queryOptions = {}) {
 
-        return this.#call('GET', '/data/2.5/air_pollution', { lat, lon, ...queryOptions });
+        return this.api.get('/data/2.5/air_pollution', { lat, lon, ...queryOptions });
     }
 
     CardinalDirection        = ['N', 'E', 'S', 'W'];

@@ -1,11 +1,11 @@
 'use strict';
 
-const Got = require('got');
+// const Got = require('got');
 
 // eslint-disable-next-line no-unused-vars
 const { MessageEmbed } = require('discord.js');
 
-const { Service } = require('../../../core');
+const { ServiceApi } = require('../../../core');
 
 /**
  * @typedef {Object} ResultObject
@@ -28,15 +28,19 @@ const { Service } = require('../../../core');
  * @property {Number} thumbnailHeight
  */
 
-module.exports = class GoogleImagesService extends Service {
+module.exports = class GoogleImagesService extends ServiceApi {
 
-    #api;
+    static ENDPOINT = 'https://www.googleapis.com';
 
     init() {
 
-        this.#api = Got.extend({
-            prefixUrl : 'https://www.googleapis.com'
-        });
+        super.init();
+
+        this.defaultQueryParams = {
+            key        : this.client.settings.plugins.tool.googleImages.apiKey,
+            cx         : this.client.settings.plugins.tool.googleImages.engineId,
+            searchType : 'image'
+        };
     }
 
     /**
@@ -46,27 +50,14 @@ module.exports = class GoogleImagesService extends Service {
      */
     async search(query) {
 
-        const { body, statusCode } = await this.#api.get('customsearch/v1', {
-            searchParams : {
-                key        : this.client.settings.plugins.tool.googleImages.apiKey,
-                cx         : this.client.settings.plugins.tool.googleImages.engineId,
-                q          : query,
-                searchType : 'image',
-                filter     : 1
-            }
-        });
+        const { items } = await  this.api.get('/customsearch/v1', { q : query });
 
-        if (statusCode !== 200) {
+        if (!Array.isArray(items) || items?.length <= 0) {
+
             return false;
         }
 
-        const jsonBody = JSON.parse(body);
-
-        if (!Array.isArray(jsonBody?.items) || jsonBody?.items?.length <= 0) {
-            return false;
-        }
-
-        return jsonBody.items;
+        return items;
     }
 
     /**

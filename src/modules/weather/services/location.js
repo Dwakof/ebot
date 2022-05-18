@@ -1,62 +1,23 @@
 'use strict';
 
-const { Client } = require('undici');
+const { ServiceApi } = require('../../../core');
 
-const { Service } = require('../../../core');
-
-module.exports = class LocationService extends Service {
+module.exports = class LocationService extends ServiceApi {
 
     static ENDPOINT = 'https://eu1.locationiq.com';
 
-    #api;
-    #defaultQuery;
-
     init() {
 
-        this.#api = new Client(LocationService.ENDPOINT);
+        super.init();
 
-        this.#defaultQuery = {
+        this.defaultQueryParams = {
             key               : this.client.settings.plugins.weather.LocationIQApiKey,
             format            : 'json',
             addressdetails    : 1,
             normalizecity     : 1,
-            'accept-language' : 'en',
-            limit             : 1
+            dedupe            : 1,
+            'accept-language' : 'en'
         };
-    }
-
-    /**
-     * @param {String} method
-     * @param {String} path
-     * @param {Object} [queryParams={}]
-     *
-     * @return {Promise<*>}
-     */
-    async #call(method, path, queryParams = {}) {
-
-        const _path = `${ path }?${ new URLSearchParams({ ...this.#defaultQuery, ...queryParams }) }`;
-
-        const response = await this.#api.request({ path : _path, method });
-
-        const { body, statusCode } = response;
-
-        if (statusCode >= 400) {
-
-            this.client.logger.error({
-                msg      : `LocationIQ API error ${ statusCode }`,
-                response : await body.json(),
-                path     : _path,
-                queryParams, method, statusCode
-            });
-
-            const error = new Error(`LocationIQ API error ${ statusCode }`);
-
-            error.response = response;
-
-            throw error;
-        }
-
-        return body.json();
     }
 
     /**
@@ -67,7 +28,12 @@ module.exports = class LocationService extends Service {
      */
     search(query, queryOptions = {}) {
 
-        return this.#call('GET', '/v1/search.php', { q : query, ...queryOptions });
+        return this.api.get('/v1/search.php', { q : query, ...queryOptions });
+    }
+
+    autocomplete(query, queryOptions = {}) {
+
+        return this.api.get('/v1/autocomplete.php', { q : query, ...queryOptions });
     }
 
     /**
@@ -77,9 +43,14 @@ module.exports = class LocationService extends Service {
      * @property {Number} lon
      * @property {String} description
      * @property {Object} address
-     * @property {String} address.city
+     * @property {String} address.hamlet
+     * @property {String} address.village
+     * @property {String} address.municipality
      * @property {String} address.county
      * @property {String} address.state
+     * @property {String} address.region
+     * @property {String} address.postcode
      * @property {String} address.country
+     * @property {String} address.city
      */
 };

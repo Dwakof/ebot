@@ -27,6 +27,8 @@ class GoogleImagesCommand extends ApplicationCommand {
 
     async search(interaction, { query }) {
 
+        await interaction.deferReply();
+
         const { GoogleImagesService } = this.services();
 
         try {
@@ -34,7 +36,7 @@ class GoogleImagesCommand extends ApplicationCommand {
             const results = await GoogleImagesService.search(query);
 
             if (results === false) {
-                return interaction.reply({
+                return interaction.editReply({
                     embeds : [GoogleImagesService.embed().setTitle(query).setDescription('No results found')]
                 });
             }
@@ -45,7 +47,7 @@ class GoogleImagesCommand extends ApplicationCommand {
         }
         catch (error) {
 
-            await interaction.reply({
+            await interaction.editReply({
                 embeds : [GoogleImagesService.embed().setTitle(query).setDescription('Something went wrong')]
             });
 
