@@ -269,12 +269,12 @@ module.exports = class BuildService extends Service {
 
         if (startAt) {
 
-            embed.setFooter(`Running for ${ DateTime(startAt).toRelative() }`);
+            embed.setFooter(`Running for ${ new DateTime(startAt).toRelative() }`);
         }
 
-        if (!doing) {
+        if (startAt && !doing) {
 
-            embed.setFooter(`Took ${ DateTime(startAt).diff(DateTime(endAt)).toHuman() }`);
+            embed.setFooter(`Took ${ new DateTime(startAt).diff(new DateTime(endAt)).toHuman() }`);
         }
 
         if (done) {
