@@ -14,6 +14,11 @@ module.exports = {
             && typeof value.catch === 'function';
     },
 
+    isFunction(value) {
+
+        return typeof value === 'function' || value instanceof Function;
+    },
+
     isValidObject(value) {
 
         if (!value) {

@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { Interaction } = require('discord.js');
+const { Interaction, AutocompleteInteraction, BaseCommandInteraction, CommandInteraction } = require('discord.js');
 
 const { Routes }        = require('discord-api-types/v10');
 const { AkairoHandler } = require('discord-akairo');
@@ -164,7 +164,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
     }
 
     /**
-     * @param {Interaction} interaction
+     * @param {Interaction|AutocompleteInteraction|BaseCommandInteraction|CommandInteraction} interaction
      *
      * @return {Promise<void>}
      */
@@ -195,7 +195,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
         if (interaction.isAutocomplete()) {
 
-            await applicationCommand.autocomplete(id, interaction);
+            await applicationCommand.runAutocomplete(id, interaction);
 
             return;
         }
@@ -258,7 +258,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
             this.emit(ApplicationCommandHandler.Events.ERROR, error, interaction, applicationCommand);
 
-            this.client.handleError(applicationCommand, error, interaction);
+            this.client.handleError(applicationCommand, error);
 
             await this.client.util.send(interaction, 'Whoopsy, something went wrong with the command');
         }

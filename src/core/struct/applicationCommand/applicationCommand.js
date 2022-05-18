@@ -9,8 +9,13 @@ const { AutocompleteInteraction, CommandInteraction } = require('discord.js');
 
 const { AkairoModule } = require('discord-akairo');
 
+const Util = require('../../util');
+
 const RootCommand = Symbol('RootCommand');
 
+/**
+ * @typedef {AkairoModule} ApplicationCommand
+ */
 module.exports = class ApplicationCommand extends AkairoModule {
 
     /**
@@ -39,7 +44,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
 
     constructor(id, { description, category, global, type }) {
 
-        super(id, { description, category });
+        super(id, { category });
 
         this.name        = id;
         this.description = description;
@@ -65,7 +70,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
             Hoek.assert(!this.constructor.subgroups, `A Non-Slash application command cannot have a subgroup`);
             Hoek.assert(!this.constructor.subcommands, `A Non-Slash application command cannot have a subcommands`);
 
-            this.setMethod(this.#command, this.#command, this.constructor.command);
+            this.#setMethod(this.#command, this.#command, this.constructor.command);
         }
 
         if (this.type === ApplicationCommand.Types.SlashCommand) {
@@ -75,7 +80,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
                 Hoek.assert(!this.constructor.subcommands, `The application command class can't have both command and subcommands set`);
                 Hoek.assert(!this.constructor.subgroups, `The application command class can't have both command and subgroups set`);
 
-                this.setMethod(this.#command, this.#command, this.constructor.command);
+                this.#setMethod(this.#command, this.#command, this.constructor.command);
             }
 
             if (this.constructor.subcommands) {
@@ -83,7 +88,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
                 Hoek.assert(!this.constructor.command, `The application command class can't have both subcommands and command set`);
                 Hoek.assert(!this.constructor.subgroups, `The application command class can't have both subcommands and subgroups set`);
 
-                this.subcommands(this.#command, this.constructor.subcommands);
+                this.#subcommands(this.#command, this.constructor.subcommands);
             }
 
             if (this.constructor.subgroups) {
@@ -91,12 +96,12 @@ module.exports = class ApplicationCommand extends AkairoModule {
                 Hoek.assert(!this.constructor.command, `The application command class can't have both subgroups and command set`);
                 Hoek.assert(!this.constructor.subcommands, `The application command class can't have both subgroups and subcommands set`);
 
-                this.subgroups(this.constructor.subgroups);
+                this.#subgroups(this.constructor.subgroups);
             }
         }
     }
 
-    setMethod(parent, command, { method : methodName, options = {} }) {
+    #setMethod(parent, command, { method : methodName, options = {} }) {
 
         let id;
 
@@ -122,7 +127,10 @@ module.exports = class ApplicationCommand extends AkairoModule {
             return this[methodName](interaction, ApplicationCommand.#parsingArgs(interaction, options));
         };
 
-        ApplicationCommand.setOptions(command, options);
+        ApplicationCommand.#setOptions(command, options);
+
+        this.#setAutocomplete(command, options);
+
         this.#methods.set(id, { method, options });
     }
 
@@ -130,7 +138,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
      * @param {Object}               command
      * @param {ApplicationSubgroups} subcommands
      */
-    subcommands(command, subcommands) {
+    #subcommands(command, subcommands) {
 
         command.options = [];
 
@@ -140,7 +148,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
 
             const subcommand = { name, description, type : ApplicationCommand.SubTypes.Subcommand };
 
-            this.setMethod(command, subcommand, { method, options });
+            this.#setMethod(command, subcommand, { method, options });
 
             command.options.push(subcommand);
         }
@@ -149,7 +157,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
     /**
      * @param {ApplicationSubgroups} subgroups
      */
-    subgroups(subgroups) {
+    #subgroups(subgroups) {
 
         this.#command.options = [];
 
@@ -157,7 +165,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
 
             const subgroup = { name, description, type : ApplicationCommand.SubTypes.SubcommandGroup };
 
-            this.subcommands(subgroup, subcommands);
+            this.#subcommands(subgroup, subcommands);
 
             this.#command.options.push(subgroup);
         }
@@ -203,7 +211,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
      * @param {AutocompleteInteraction} interaction
      * @return {Promise}
      */
-    async autocomplete(id, interaction) {
+    async runAutocomplete(id, interaction) {
 
         if (!this.#methods.has(id)) {
 
@@ -221,7 +229,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
 
         try {
 
-            await options[name].autocomplete.call(this, interaction, ApplicationCommand.#parsingArgs(interaction, options));
+            await options[name].autocomplete(interaction);
         }
         catch (error) {
 
@@ -236,7 +244,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
      * @property {String}                          description
      * @property {Boolean}                         [required]
      * @property {Object<String, (String|Number)>} [choices]
-     * @property {Function}                        [autocomplete]
+     * @property {Function|String}                 [autocomplete]
      */
 
     /**
@@ -391,7 +399,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
      * @param {Object}             command
      * @param {ApplicationOptions} applicationOptions
      */
-    static setOptions(command, applicationOptions) {
+    static #setOptions(command, applicationOptions) {
 
         command.options = [];
 
@@ -411,8 +419,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
                     throw new Error(`Autocomplete are only available for types String, Integer or Number`);
                 }
 
-                option.autocomplete       = true;
-                option.autocompleteMethod = autocomplete;
+                option.autocomplete = true;
             }
 
             if (choices) {
@@ -431,6 +438,29 @@ module.exports = class ApplicationCommand extends AkairoModule {
             }
 
             command.options.push(option);
+        }
+    }
+
+    #setAutocomplete(command, applicationOptions) {
+
+        for (const [, option] of Object.entries(applicationOptions)) {
+
+            if (option.autocomplete) {
+
+                if (Util.isString(option.autocomplete)) {
+
+                    Hoek.assert(Util.isFunction(this[option.autocomplete]), `Autocomplete "${ option.autocomplete }" does not exist or is not a function in ApplicationCommand ${ this.name } in category ${ this.categoryID }`);
+
+                    option.autocomplete = this[option.autocomplete];
+                }
+
+                const method = option.autocomplete;
+
+                option.autocomplete = (interaction) => {
+
+                    return method.call(this, interaction, ApplicationCommand.#parsingArgs(interaction, applicationOptions));
+                };
+            }
         }
     }
 
