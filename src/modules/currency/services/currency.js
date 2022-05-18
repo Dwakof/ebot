@@ -1,30 +1,26 @@
 'use strict';
 
-const { Client }   = require('undici');
 const Lunr         = require('lunr');
 const { DateTime } = require('luxon');
 const CurrencyJS   = require('currency.js');
 
-const { Service }  = require('../../../core');
-const { isNumber } = require('chart.js/helpers');
+const { ServiceApi } = require('../../../core');
+const { isNumber }   = require('chart.js/helpers');
 
-module.exports = class CurrencyService extends Service {
+module.exports = class CurrencyService extends ServiceApi {
+
+    static ENDPOINT = 'https://api.exchangerate.host';
 
     /**
      * @type {Map<CurrencyCode, Currency>}
      */
     #currencies = new Map();
 
-    static ENDPOINT = 'https://api.exchangerate.host';
-
-    #api;
-    #apiKey;
-    #defaultQuery = {};
     #index;
 
     async init() {
 
-        this.#api = new Client(CurrencyService.ENDPOINT);
+        super.init();
 
         const { rates } = await this.getRates();
 
@@ -60,40 +56,6 @@ module.exports = class CurrencyService extends Service {
     }
 
     /**
-     * @param {String} method
-     * @param {String} path
-     * @param {Object} [queryParams={}]
-     *
-     * @return {Promise<Object>}
-     */
-    async #call(method, path, queryParams = {}) {
-
-        const response = await this.#api.request({
-            path : `${ path }?${ new URLSearchParams({ ...this.#defaultQuery, ...queryParams }) }`,
-            method
-        });
-
-        const { body, statusCode } = response;
-
-        if (statusCode >= 400) {
-
-            this.client.logger.error({
-                msg      : `ExchangeRate API error ${ statusCode }`,
-                response : await body.json(),
-                queryParams, method, statusCode
-            });
-
-            const error = new Error(`ExchangeRate API error ${ statusCode }`);
-
-            error.response = response;
-
-            throw error;
-        }
-
-        return body.json();
-    }
-
-    /**
      * @param {CurrencyCode} [currency=USD]
      * @param {Object}       [queryOptions={}]
      *
@@ -101,7 +63,7 @@ module.exports = class CurrencyService extends Service {
      */
     getRates(currency = 'USD', queryOptions = {}) {
 
-        return this.#call('GET', '/latest', { base : currency, ...queryOptions });
+        return this.api.get('/latest', { base : currency, ...queryOptions });
     }
 
     /**
@@ -118,7 +80,7 @@ module.exports = class CurrencyService extends Service {
         const start_date = new DateTime(from ?? DateTime.now().minus({ month : 1 })).toISODate();
         const end_date   = new DateTime(to ?? DateTime.now()).toISODate();
 
-        return this.#call('GET', '/timeseries', { base : currency, start_date, end_date, symbols : currencies, ...queryOptions });
+        return this.api.get('/timeseries', { base : currency, start_date, end_date, symbols : currencies, ...queryOptions });
     }
 
     /**
@@ -226,6 +188,26 @@ module.exports = class CurrencyService extends Service {
     search(query) {
 
         return this.#index.search(query).map(({ ref }) => this.#currencies.get(ref));
+    }
+
+    /**
+     *
+     * @param {String} query
+     *
+     * @return {Currency[]}
+     */
+    autocomplete(query) {
+
+        return this.#index.query((q) => {
+            // exact matches should have the highest boost
+            q.term(query, { boost : 100 });
+
+            // prefix matches should be boosted slightly
+            q.term(query, { boost : 10, usePipeline : false, wildcard : Lunr.Query.wildcard.TRAILING });
+
+            // finally, try a fuzzy search, without any boost
+            q.term(query, { boost : 1, usePipeline : false, editDistance : 1 });
+        }).map(({ ref }) => this.#currencies.get(ref));
     }
 
     /**

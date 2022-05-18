@@ -20,14 +20,16 @@ module.exports = class Currency extends ApplicationCommand {
                 description : 'Convert currency',
                 options     : {
                     from   : {
-                        type        : ApplicationCommand.SubTypes.String,
-                        description : 'Currency to convert from',
-                        required    : true
+                        type         : ApplicationCommand.SubTypes.String,
+                        description  : 'Currency to convert from',
+                        autocomplete : 'autocompleteFrom',
+                        required     : true
                     },
                     to     : {
-                        type        : ApplicationCommand.SubTypes.String,
-                        description : 'Currency to convert to',
-                        required    : true
+                        type         : ApplicationCommand.SubTypes.String,
+                        description  : 'Currency to convert to',
+                        autocomplete : 'autocompleteTo',
+                        required     : true
                     },
                     amount : {
                         type        : ApplicationCommand.SubTypes.Number,
@@ -41,14 +43,16 @@ module.exports = class Currency extends ApplicationCommand {
                 description : 'rate history between two currencies',
                 options     : {
                     from   : {
-                        type        : ApplicationCommand.SubTypes.String,
-                        description : 'Currency to convert from',
-                        required    : true
+                        type         : ApplicationCommand.SubTypes.String,
+                        description  : 'Currency to convert from',
+                        autocomplete : 'autocompleteFrom',
+                        required     : true
                     },
                     to     : {
-                        type        : ApplicationCommand.SubTypes.String,
-                        description : 'Currency to convert to',
-                        required    : true
+                        type         : ApplicationCommand.SubTypes.String,
+                        description  : 'Currency to convert to',
+                        autocomplete : 'autocompleteTo',
+                        required     : true
                     },
                     range  : {
                         type        : ApplicationCommand.SubTypes.String,
@@ -89,6 +93,33 @@ module.exports = class Currency extends ApplicationCommand {
                 options     : {}
             }
         };
+    }
+
+    autocomplete(interaction, query) {
+
+        const { CurrencyService } = this.services();
+
+        const currencies = CurrencyService.autocomplete(query);
+
+        if (currencies.length === 0) {
+
+            return interaction.respond([{ name : 'No result found', value : query }]);
+        }
+
+        const list = currencies.slice(0, 25)
+            .map(({ code, currency, symbol }) => ({ name : `${ code } : ${ currency } (${ symbol })`, value : code }));
+
+        return interaction.respond(list);
+    }
+
+    autocompleteFrom(interaction, { from }) {
+
+        return this.autocomplete(interaction, from);
+    }
+
+    autocompleteTo(interaction, { to }) {
+
+        return this.autocomplete(interaction, to);
     }
 
     search(interaction, { query }) {
