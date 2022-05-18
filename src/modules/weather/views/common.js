@@ -150,7 +150,19 @@ module.exports = class CommonView extends View {
 
     location(location) {
 
-        return `${ location.address.city || location.address.county || location.address.state || location.address.country }, ${ location.address.country }`;
+        let strings = [`${ location.address.county || location.address.state || location.address.region || location.address.country }`];
+
+        if (location.address.village || location.address.city) {
+
+            strings = [`${ location.address.village || location.address.city }`, location.address.postcode, location.address.state];
+        }
+
+        if (strings[0] !== `${ location.address.country }`) {
+
+            strings.push(location.address.country);
+        }
+
+        return strings.filter(Boolean).join(', ');
     }
 
     /**

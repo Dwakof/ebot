@@ -4,7 +4,7 @@ const { Constants } = require('discord.js');
 
 const { ApplicationCommand, Util } = require('../../../core');
 
-module.exports = class Karma extends ApplicationCommand {
+module.exports = class Weather extends ApplicationCommand {
 
     constructor() {
 
@@ -19,7 +19,38 @@ module.exports = class Karma extends ApplicationCommand {
                 location : {
                     type        : ApplicationCommand.SubTypes.String,
                     description : 'Location to get weather information for',
-                    required    : true
+                    required    : true,
+                    async autocomplete(interaction, { location = '' }) {
+
+                        if (location.length === 0) {
+
+                            return interaction.respond([{ name : 'Write something at least (min 3 characters)', value : '' }]);
+                        }
+
+                        if (location.length < 3) {
+
+                            return;
+                        }
+
+                        const { LocationService } = this.services();
+                        const { CommonView }      = this.views();
+
+                        try {
+
+                            const searches = await LocationService.autocomplete(location);
+
+                            return interaction.respond(Util.unique(searches.map(CommonView.location)).map((name) => ({ name, value : name })));
+                        }
+                        catch (error) {
+
+                            if (error?.response?.statusCode === 404) {
+
+                                return interaction.respond([{ name : 'No result found', value : location }]);
+                            }
+
+                            throw error;
+                        }
+                    }
                 }
             }
         };

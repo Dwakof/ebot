@@ -2,7 +2,10 @@
 
 const Hoek = require('@hapi/hoek');
 
-const { ApplicationCommandOptionType, ApplicationCommandPermissionType, ApplicationCommandType } = require('discord-api-types/v9');
+const { ApplicationCommandOptionType, ApplicationCommandType } = require('discord-api-types/v10');
+
+// eslint-disable-next-line no-unused-vars
+const { AutocompleteInteraction, CommandInteraction } = require('discord.js');
 
 const { AkairoModule } = require('discord-akairo');
 
@@ -34,15 +37,14 @@ module.exports = class ApplicationCommand extends AkairoModule {
      */
     #methods = new Map();
 
-    constructor(id, { description, category, global, defaultPermission, type }) {
+    constructor(id, { description, category, global, type }) {
 
         super(id, { description, category });
 
-        this.name              = id;
-        this.description       = description;
-        this.global            = global ?? false;
-        this.defaultPermission = defaultPermission ?? true;
-        this.type              = type ?? ApplicationCommand.Types.SlashCommand;
+        this.name        = id;
+        this.description = description;
+        this.global      = global ?? false;
+        this.type        = type ?? ApplicationCommand.Types.SlashCommand;
 
         Hoek.assert(this.name, 'The application command class must have a name.');
 
@@ -51,17 +53,11 @@ module.exports = class ApplicationCommand extends AkairoModule {
             Hoek.assert(this.description, 'The application command class must have a description.');
         }
 
-        if (this.global) {
-
-            Hoek.assert(!this.permissions, 'permissions() can not be implemented on a global application command');
-        }
-
         this.#command = {
-            name               : this.name,
-            description        : this.description,
-            type               : this.type,
-            default_permission : defaultPermission,
-            root               : RootCommand
+            name        : this.name,
+            description : this.description,
+            type        : this.type,
+            root        : RootCommand
         };
 
         if (this.type !== ApplicationCommand.Types.SlashCommand) {
@@ -189,7 +185,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
 
     /**
      * @param id
-     * @param interaction
+     * @param {CommandInteraction} interaction
      * @return {Promise}
      */
     runCommand(id, interaction) {
@@ -203,12 +199,44 @@ module.exports = class ApplicationCommand extends AkairoModule {
     }
 
     /**
+     * @param id
+     * @param {AutocompleteInteraction} interaction
+     * @return {Promise}
+     */
+    async autocomplete(id, interaction) {
+
+        if (!this.#methods.has(id)) {
+
+            throw new Error(`Command ${ id } not found on ApplicationCommand ${ this.name } in category ${ this.categoryID }`);
+        }
+
+        const { options = {} } = this.#methods.get(id);
+
+        const { name } = interaction.options.getFocused(true);
+
+        if (!options[name]) {
+
+            return Promise.resolve();
+        }
+
+        try {
+
+            await options[name].autocomplete.call(this, interaction, ApplicationCommand.#parsingArgs(interaction, options));
+        }
+        catch (error) {
+
+            this.client.logger.error({ err : error, msg : `Error when replying to autocomplete interaction for command ${ id } on parameter ${ name }` });
+        }
+    }
+
+    /**
      * @typedef {Object} ApplicationOption
      *
      * @property {ApplicationCommandOptionType}    type
      * @property {String}                          description
      * @property {Boolean}                         [required]
      * @property {Object<String, (String|Number)>} [choices]
+     * @property {Function}                        [autocomplete]
      */
 
     /**
@@ -254,7 +282,6 @@ module.exports = class ApplicationCommand extends AkairoModule {
      *
      * @property {String}                   method
      * @property {ApplicationOptions}       [options]
-     * @property {Boolean}                  [defaultPermission=true]
      */
     static command;
 
@@ -290,23 +317,8 @@ module.exports = class ApplicationCommand extends AkairoModule {
             Channel         : ApplicationCommandOptionType.Channel,
             Role            : ApplicationCommandOptionType.Role,
             Mentionable     : ApplicationCommandOptionType.Mentionable,
-            Number          : ApplicationCommandOptionType.Number
-        };
-    }
-
-    static get Permission() {
-
-        return {
-            OWNERS       : 'owners',
-            GUILD_OWNERS : 'guild_owners'
-        };
-    }
-
-    static get PermissionTypes() {
-
-        return {
-            User : ApplicationCommandPermissionType.User,
-            Role : ApplicationCommandPermissionType.Role
+            Number          : ApplicationCommandOptionType.Number,
+            Attachment      : ApplicationCommandOptionType.Attachment
         };
     }
 
@@ -362,6 +374,11 @@ module.exports = class ApplicationCommand extends AkairoModule {
                     result[name] = interaction.options.getMentionable(name);
 
                     break;
+                case ApplicationCommand.SubTypes.Attachment:
+
+                    result[name] = interaction.options.getAttachment(name);
+
+                    break;
             }
 
             result[name] = result[name] ?? defaultValue;
@@ -378,9 +395,25 @@ module.exports = class ApplicationCommand extends AkairoModule {
 
         command.options = [];
 
-        for (const [name, { description, type, required = false, choices }] of Object.entries(applicationOptions)) {
+        for (const [name, { description, type, required = false, choices, autocomplete }] of Object.entries(applicationOptions)) {
 
             const option = { name, description, required, type };
+
+            if (autocomplete && choices) {
+
+                throw new Error(`Choices cannot be used with autocomplete option.`);
+            }
+
+            if (autocomplete) {
+
+                if (![ApplicationCommand.SubTypes.String, ApplicationCommand.SubTypes.Integer, ApplicationCommand.SubTypes.Number].includes(type)) {
+
+                    throw new Error(`Autocomplete are only available for types String, Integer or Number`);
+                }
+
+                option.autocomplete       = true;
+                option.autocompleteMethod = autocomplete;
+            }
 
             if (choices) {
 
@@ -399,40 +432,6 @@ module.exports = class ApplicationCommand extends AkairoModule {
 
             command.options.push(option);
         }
-    }
-
-    async buildPermissions(guild) {
-
-        if (!this.permissions) {
-
-            return [];
-        }
-
-        const permissions = [];
-
-        for (const permission of await this.permissions(guild)) {
-
-            if (permission === ApplicationCommand.Permission.OWNERS) {
-
-                for (const ownerId of this.client.ownerID) {
-
-                    permissions.push({ type : ApplicationCommand.PermissionTypes.User, id : ownerId, permission : true });
-                }
-
-                continue;
-            }
-
-            if (permission === ApplicationCommand.Permission.GUILD_OWNERS) {
-
-                permissions.push({ type : ApplicationCommand.PermissionTypes.User, id : guild.ownerId, permission : true });
-
-                continue;
-            }
-
-            permissions.push(permission);
-        }
-
-        return permissions.flat();
     }
 
     services(module = this.categoryID) {

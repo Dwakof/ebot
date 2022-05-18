@@ -193,6 +193,13 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
         const { applicationCommand, args } = this.commands.get(id);
 
+        if (interaction.isAutocomplete()) {
+
+            await applicationCommand.autocomplete(id, interaction);
+
+            return;
+        }
+
         try {
 
             if (this.client.sentry) {
