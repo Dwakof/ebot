@@ -1,3 +1,10 @@
+## [0.20.1](https://github.com/Dwakof/ebot/compare/v0.20.0...v0.20.1) (2022-05-18)
+
+
+### Bug Fixes
+
+* memberNicknameMention removed from @discordjs/builders ([9f67674](https://github.com/Dwakof/ebot/commit/9f67674bc3056f6f265089842eb773702689e590))
+
 # [0.20.0](https://github.com/Dwakof/ebot/compare/v0.19.3...v0.20.0) (2022-05-18)
 
 
