@@ -36,6 +36,18 @@ module.exports = class LocationService extends ServiceApi {
         return this.api.get('/v1/autocomplete.php', { q : query, ...queryOptions });
     }
 
+    static get caching() {
+
+        return {
+            autocomplete : {
+                generateKey : (query, queryOptions) => `${ query }-${ JSON.stringify(queryOptions || {}) }`
+            },
+            search       : {
+                generateKey : (query, queryOptions) => `${ query }-${ JSON.stringify(queryOptions || {}) }`
+            }
+        };
+    }
+
     /**
      * @typedef {Object} Location
      *

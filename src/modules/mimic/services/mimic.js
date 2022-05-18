@@ -6,7 +6,7 @@ const { Chain } = require('../utils');
 
 module.exports = class MimicService extends Service {
 
-    async mimic(guildId, userId, initialState = '', retry = 5) {
+    async getModel(guildId, userId) {
 
         const { Mimic } = this.providers();
 
@@ -14,7 +14,12 @@ module.exports = class MimicService extends Service {
 
         const { model : json } = await Model.query().findById([guildId, userId]).throwIfNotFound();
 
-        const model = Chain.fromJSON(json);
+        return Chain.fromJSON(json);
+    }
+
+    async mimic(guildId, userId, initialState = '', retry = 5) {
+
+        const model = await this.getModel(guildId, userId);
 
         let i        = 0;
         let response = '';
@@ -33,6 +38,18 @@ module.exports = class MimicService extends Service {
         }
 
         return response;
+    }
+
+    static get caching() {
+
+        return {
+            getModel : {
+                cache : {
+                    ttl : 30e6,
+                    max : 5
+                }
+            }
+        };
     }
 };
 
