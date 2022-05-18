@@ -10,6 +10,7 @@ const Fs   = require('fs/promises');
 
 const { Permissions, Intents } = require('discord.js');
 const { REST }                 = require('@discordjs/rest');
+const { OAuth2Scopes }         = require('discord-api-types/v10');
 
 const { AkairoClient, InhibitorHandler } = require('discord-akairo');
 
@@ -56,7 +57,7 @@ module.exports = class EbotClient extends AkairoClient {
         this.#settings = settings;
 
         this.util = new ClientUtil(this);
-        this.API  = new REST({ version : '9' }).setToken(this.#settings.discord.token);
+        this.API  = new REST({ version : '10' }).setToken(this.#settings.discord.token);
 
         this.#logger = Pino(this.#settings.logger);
 
@@ -246,8 +247,6 @@ module.exports = class EbotClient extends AkairoClient {
 
         this.#started = true;
 
-        this.logInvite();
-
         return this;
     }
 
@@ -346,7 +345,10 @@ module.exports = class EbotClient extends AkairoClient {
             event   : CoreEvents.INVITE_LINK,
             emitter : 'core',
             url     : this.generateInvite({
-                scopes      : ['bot', 'applications.commands'],
+                scopes      : [
+                    OAuth2Scopes.Bot,
+                    OAuth2Scopes.ApplicationsCommands
+                ],
                 permissions : [
                     Permissions.FLAGS.SEND_MESSAGES,
                     Permissions.FLAGS.READ_MESSAGE_HISTORY,

@@ -23,11 +23,6 @@ module.exports = class Rebuild extends ApplicationCommand {
         };
     }
 
-    permissions() {
-
-        return [ApplicationCommand.Permission.OWNERS];
-    }
-
     async build(interaction, { guild : guildId }) {
 
         const { State } = this.providers();

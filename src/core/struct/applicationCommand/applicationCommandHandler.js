@@ -3,7 +3,7 @@
 // eslint-disable-next-line no-unused-vars
 const { Interaction } = require('discord.js');
 
-const { Routes }        = require('discord-api-types/v9');
+const { Routes }        = require('discord-api-types/v10');
 const { AkairoHandler } = require('discord-akairo');
 
 const { CoreEvents } = require('../../constants');
@@ -70,30 +70,14 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
                 continue;
             }
 
-            guildCommands.push({ ...command, default_permission : command.default_permission ?? true });
+            guildCommands.push({ ...command });
         }
 
         try {
 
-            for (const [guildId, guild] of this.client.guilds.cache) {
+            for (const [guildId] of this.client.guilds.cache) {
 
-                const commands = await this.client.API.put(Routes.applicationGuildCommands(this.client.settings.discord.clientId, guildId), { body : guildCommands });
-
-                const bulkPermissions = [];
-
-                for (const command of commands) {
-
-                    const commandPermission = { id : command.id, permissions : [] };
-
-                    for (const perm of await this.modules.get(command.name).buildPermissions(guild)) {
-
-                        commandPermission.permissions.push(perm);
-                    }
-
-                    bulkPermissions.push(commandPermission);
-                }
-
-                await this.client.API.put(Routes.guildApplicationCommandsPermissions(this.client.settings.discord.clientId, guildId), { body : bulkPermissions });
+                await this.client.API.put(Routes.applicationGuildCommands(this.client.settings.discord.clientId, guildId), { body : guildCommands });
             }
 
             this.client.logger.info({
@@ -106,7 +90,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
         }
         catch (err) {
 
-            if (err.status === 400) {
+            if (err.status >= 400) {
 
                 this.client.logger.error({ err, errors : err.rawError.errors, commands : guildCommands, global : false });
             }
@@ -128,7 +112,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
         }
         catch (err) {
 
-            if (err.status === 400) {
+            if (err.status >= 400) {
 
                 this.client.logger.error({ err, errors : err.rawError.errors, commands : globalCommands, global : true });
             }

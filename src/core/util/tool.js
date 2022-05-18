@@ -61,6 +61,11 @@ module.exports = {
         }, []);
     },
 
+    unique(arrayLike) {
+
+        return Array.from(new Set(arrayLike));
+    },
+
     wait : Util.promisify(setTimeout),
 
     debounce(func, timeout = 300) {
