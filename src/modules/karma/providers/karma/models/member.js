@@ -29,7 +29,7 @@ class Member extends Model {
                 giverId   : { type : 'string' },
                 type      : { type : 'string' },
                 value     : { type : 'number' },
-                createdAt : { type : 'object', format : 'date' }
+                createdAt : { type : ['object', 'number', 'string'], format : 'date' }
             }
         };
     }
@@ -37,6 +37,7 @@ class Member extends Model {
     static createValidator() {
 
         return new AjvValidator({
+            options : { allowUnionTypes : true },
             onCreateAjv(ajv) {
 
                 AjvFormat(ajv);

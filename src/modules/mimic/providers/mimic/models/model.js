@@ -31,8 +31,8 @@ class Model extends _Model {
                 guildId   : { type : 'string' },
                 userId    : { type : 'string' },
                 model     : { type : 'object' },
-                createdAt : { type : 'object', format : 'date' },
-                updatedAt : { type : 'object', format : 'date' }
+                createdAt : { type : ['object', 'number', 'string'], format : 'date' },
+                updatedAt : { type : ['object', 'number', 'string'], format : 'date' }
             }
         };
     }
@@ -51,6 +51,7 @@ class Model extends _Model {
     static createValidator() {
 
         return new AjvValidator({
+            options : { allowUnionTypes : true },
             onCreateAjv(ajv) {
 
                 AjvFormat(ajv);

@@ -28,8 +28,8 @@ class Message extends Model {
                 authorId  : { type : 'string' },
                 channelId : { type : 'string' },
                 content   : { type : 'string' },
-                createdAt : { type : 'object', format : 'date' },
-                updatedAt : { type : 'object', format : 'date' }
+                createdAt : { type : ['object', 'number', 'string'], format : 'date' },
+                updatedAt : { type : ['object', 'number', 'string'], format : 'date' }
             }
         };
     }
@@ -37,6 +37,7 @@ class Message extends Model {
     static createValidator() {
 
         return new AjvValidator({
+            options : { allowUnionTypes : true },
             onCreateAjv(ajv) {
 
                 AjvFormat(ajv);

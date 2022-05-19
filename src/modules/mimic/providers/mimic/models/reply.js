@@ -27,7 +27,7 @@ class Reply extends Model {
                 guildId   : { type : 'string' },
                 userId    : { type : 'string' },
                 content   : { type : 'string' },
-                createdAt : { type : 'object', format : 'date' }
+                createdAt : { type : ['object', 'number', 'string'], format : 'date' }
             }
         };
     }
@@ -35,6 +35,7 @@ class Reply extends Model {
     static createValidator() {
 
         return new AjvValidator({
+            options : { allowUnionTypes : true },
             onCreateAjv(ajv) {
 
                 AjvFormat(ajv);

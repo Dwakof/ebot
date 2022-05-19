@@ -32,8 +32,8 @@ class Emoji extends Model {
                 emoji     : { type : 'string' },
                 name      : { type : 'string' },
                 unicode   : { type : 'boolean' },
-                createdAt : { type : 'object', format : 'date' },
-                updatedAt : { type : 'object', format : 'date' }
+                createdAt : { type : ['object', 'number', 'string'], format : 'date' },
+                updatedAt : { type : ['object', 'number', 'string'], format : 'date' }
             }
         };
     }
@@ -55,6 +55,7 @@ class Emoji extends Model {
     static createValidator() {
 
         return new AjvValidator({
+            options : { allowUnionTypes : true },
             onCreateAjv(ajv) {
 
                 AjvFormat(ajv);
