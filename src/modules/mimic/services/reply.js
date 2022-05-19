@@ -8,10 +8,11 @@ module.exports = class ReplyService extends Service {
      *
      * @param {Message} message
      * @param {String}  userId
+     * @param {String}  start
      *
      * @return {Promise}
      */
-    saveReply(message, userId) {
+    saveReply(message, userId, start) {
 
         const { Mimic } = this.providers();
 
@@ -21,8 +22,17 @@ module.exports = class ReplyService extends Service {
             messageId : message.id,
             guildId   : message.guild.id,
             content   : message.cleanContent,
-            userId
+            start, userId
         });
+    }
+
+    findReply(guildId, messageId) {
+
+        const { Mimic } = this.providers();
+
+        const { Reply } = Mimic.models;
+
+        return Reply.query().where({ guildId, messageId }).first();
     }
 
     #baseQuery({ guildId, after, before }) {

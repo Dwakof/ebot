@@ -65,7 +65,9 @@ module.exports = class Mimic extends ApplicationCommand {
 
             const msg = await interaction.editReply({ content : reply, allowedMentions : { users : [] } });
 
-            await ReplyService.saveReply(msg, userId);
+            await ReplyService.saveReply(msg, userId, start);
+
+            await msg.react('🔁');
         }
         catch (err) {
 

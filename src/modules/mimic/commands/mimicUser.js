@@ -77,7 +77,9 @@ module.exports = class MimicUserCommand extends Command {
                     message.channel.send({ content : reply, allowedMentions : { users : [] } })
                 ]);
 
-                await ReplyService.saveReply(msg, userId);
+                await ReplyService.saveReply(msg, userId, initialState);
+
+                await msg.react('🔁');
             }
             catch (err) {
 
