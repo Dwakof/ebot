@@ -1,3 +1,16 @@
+# [0.21.0](https://github.com/Dwakof/ebot/compare/v0.20.1...v0.21.0) (2022-05-19)
+
+
+### Bug Fixes
+
+* Remove annoying ajv message ([3a3e75b](https://github.com/Dwakof/ebot/commit/3a3e75b041ecfb8e96e9731cd86883c797d3ce60))
+
+
+### Features
+
+* **mimic:** add a 🔁 on mimic reply to repeat the same task ([13547e4](https://github.com/Dwakof/ebot/commit/13547e4238d610d35c1deaafcf65690958999c6e)), closes [#225](https://github.com/Dwakof/ebot/issues/225)
+* add basic CRON system for mimic ([691c487](https://github.com/Dwakof/ebot/commit/691c4874385834d2bccf89eb146f743ad32839d4)), closes [#195](https://github.com/Dwakof/ebot/issues/195)
+
 ## [0.20.1](https://github.com/Dwakof/ebot/compare/v0.20.0...v0.20.1) (2022-05-18)
 
 
