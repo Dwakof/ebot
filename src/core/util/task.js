@@ -79,6 +79,16 @@ class Task extends EventEmitter {
         return this;
     }
 
+    took() {
+
+        if (!this.get('done')) {
+
+            return -Infinity;
+        }
+
+        return this.get('endAt') - this.get('startAt');
+    }
+
     get(key) {
 
         return this.#values.get(key);

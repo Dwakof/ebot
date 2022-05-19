@@ -1,8 +1,8 @@
 'use strict';
 
-const { Provider } = require('discord-akairo');
 const Keyv         = require('keyv');
 const { KeyvFile } = require('keyv-file');
+const { Provider } = require('discord-akairo');
 
 const CoreUtil = require('../../util');
 

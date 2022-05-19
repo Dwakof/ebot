@@ -1,6 +1,6 @@
 'use strict';
 
-const { Service } = require('../../../core');
+const { Service, Util } = require('../../../core');
 
 const { Chain } = require('../utils');
 
@@ -45,7 +45,7 @@ module.exports = class MimicService extends Service {
         return {
             getModel : {
                 cache : {
-                    ttl : 30e6,
+                    ttl : 30 * Util.SECOND,
                     max : 5
                 }
             }

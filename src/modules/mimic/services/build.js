@@ -55,9 +55,9 @@ module.exports = class BuildService extends Service {
 
                 const model = new Chain();
 
-                let lastMessageAt = 0;
+                this.client.logger.debug(`[${ this.module }.${ this.id }] Building model guildId=${ guildId } type=${ type } id=${ id }`);
 
-                for await (const { content, createdAt } of messageGenerator(query)) {
+                for await (const { content } of messageGenerator(query)) {
 
                     if (content) {
 
@@ -65,14 +65,14 @@ module.exports = class BuildService extends Service {
                     }
 
                     task.increase('messages');
-
-                    lastMessageAt = Math.max(lastMessageAt, new Date(createdAt).getTime());
                 }
 
                 await Model.query().insert({ guildId, userId : id, model : model.toJSON() })
                     .onConflict(Model.idColumn).merge();
 
                 task.done();
+
+                this.client.logger.debug(`[${ this.module }.${ this.id }] Done building model guildId=${ guildId } type=${ type } id=${ id } took=${ Util.getTimeString(task.took()) }`);
             }
             catch (err) {
 
@@ -206,7 +206,7 @@ module.exports = class BuildService extends Service {
 
                 task.enforceStop();
 
-                await State.set('guild_rebuild', guildId, task);
+                await State.set(BuildService.GUILD_STATE, guildId, task);
             }
         });
     }
@@ -333,5 +333,30 @@ module.exports = class BuildService extends Service {
 
             await send();
         }
+    }
+
+    async cronBuild() {
+
+        for (const guildId of this.client.guilds.cache.map((guild) => guild.id)) {
+
+            try {
+
+                await this.buildAll(guildId);
+            }
+            catch (err) {
+
+                this.client.logger.error({ msg : `Could not build model for guild ${ guildId }`, err });
+            }
+        }
+    }
+
+    static get cron() {
+
+        return {
+            build : {
+                schedule : '0 0 * * * *',
+                job      : 'cronBuild'
+            }
+        };
     }
 };
