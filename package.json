@@ -56,7 +56,7 @@
     "undici": "5.2.0"
   },
   "devDependencies": {
-    "@babel/core": "7.17.12",
+    "@babel/core": "7.18.0",
     "@babel/eslint-parser": "7.17.0",
     "@babel/preset-env": "7.17.12",
     "@hapi/eslint-plugin": "6.0.0",
