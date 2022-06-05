@@ -88,8 +88,6 @@ Ebot is a Discord bot for highly useful and highly useless purposes. We built it
   </br>
   <img width="508" alt="Screen Shot 2022-06-05 at 2 10 43 PM" src="https://user-images.githubusercontent.com/2550945/172049916-ee1cbe03-34b5-4b47-912d-59962d8d4b7a.png">
   </br>
-  <img width="514" alt="Screen Shot 2022-06-05 at 2 13 23 PM" src="https://user-images.githubusercontent.com/2550945/172049919-e03cc582-db72-4263-afc2-e7436db04004.png">
-  </br>
   <img width="524" alt="Screen Shot 2022-06-05 at 2 13 30 PM" src="https://user-images.githubusercontent.com/2550945/172049920-40cddb19-6ee2-4a1b-91d3-e16c1a1e19d6.png">
   </br>
 </details>
