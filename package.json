@@ -56,7 +56,7 @@
     "undici": "5.2.0"
   },
   "devDependencies": {
-    "@babel/core": "7.18.0",
+    "@babel/core": "7.18.5",
     "@babel/eslint-parser": "7.17.0",
     "@babel/preset-env": "7.18.0",
     "@hapi/eslint-plugin": "6.0.0",
@@ -70,7 +70,7 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-security": "1.5.0",
     "pino-pretty": "7.6.1",
-    "semantic-release": "19.0.2"
+    "semantic-release": "19.0.3"
   },
   "optionalDependencies": {
     "bufferutil": "4.0.6",
