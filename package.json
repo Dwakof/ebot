@@ -34,7 +34,7 @@
     "chroma-js": "2.4.2",
     "currency.js": "2.0.4",
     "discord-akairo": "github:discord-akairo/discord-akairo",
-    "discord-api-types": "0.33.0",
+    "discord-api-types": "0.34.0",
     "discord-markdown": "2.5.1",
     "discord.js": "13.7.0",
     "dotenv": "16.0.1",
@@ -70,7 +70,7 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-security": "1.5.0",
     "pino-pretty": "7.6.1",
-    "semantic-release": "19.0.2"
+    "semantic-release": "19.0.3"
   },
   "optionalDependencies": {
     "bufferutil": "4.0.6",
