@@ -52,7 +52,7 @@
     "pg-query-stream": "4.2.3",
     "pino": "7.11.0",
     "pug": "3.0.2",
-    "puppeteer": "14.1.1",
+    "puppeteer": "14.4.0",
     "undici": "5.2.0"
   },
   "devDependencies": {
@@ -70,7 +70,7 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-security": "1.5.0",
     "pino-pretty": "7.6.1",
-    "semantic-release": "19.0.2"
+    "semantic-release": "19.0.3"
   },
   "optionalDependencies": {
     "bufferutil": "4.0.6",
