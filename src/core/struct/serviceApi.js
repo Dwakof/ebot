@@ -27,16 +27,18 @@ class ServiceApi extends Service {
         this.#api = new Client(this.constructor.ENDPOINT);
     }
 
-    async #call(method, _path, queryParams = {}, options = {}) {
-
-        const path = `${ _path }?${ new URLSearchParams({ ...this.defaultQueryParams, ...queryParams }) }`;
+    async #call(method, path, queryParams = {}, options = {}) {
 
         let body;
         let response;
 
         try {
 
-            response = await this.#api.request({ ...options, path, method, headers : { ...this.defaultHeaders, ...(options.headers ?? {}) } });
+            response = await this.#api.request({
+                ...options, path, method,
+                headers : { ...this.defaultHeaders, ...(options.headers ?? {}) },
+                query   : { ...this.defaultQueryParams, ...queryParams }
+            });
         }
         catch (err) {
 
