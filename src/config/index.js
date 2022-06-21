@@ -156,7 +156,17 @@ const store = new Confidence.Store({
         },
         weather      : {
             openWeatherApiKey : { $env : 'OPEN_WEATHER_API_KEY' },
-            LocationIQApiKey  : { $env : 'LOCATION_IQ_API_KEY' }
+            LocationIQApiKey  : { $env : 'LOCATION_IQ_API_KEY' },
+            knex              : {
+                client     : 'pg',
+                connection : {
+                    host     : { $env : 'WEATHER_POSTGRES_HOST', $default : knexDefault.host },
+                    user     : { $env : 'WEATHER_POSTGRES_USER', $default : knexDefault.user },
+                    password : { $env : 'WEATHER_POSTGRES_PASS', $default : knexDefault.password },
+                    database : { $env : 'WEATHER_POSTGRES_DB', $default : 'weather' },
+                    port     : { $env : 'WEATHER_POSTGRES_PORT', $coerce : 'number', $default : knexDefault.port }
+                }
+            }
         },
         tool         : {
             googleImages   : {

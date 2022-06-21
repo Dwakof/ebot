@@ -23,5 +23,5 @@ services:
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASS}
-      - POSTGRES_MULTIPLE_DATABASES=karma,reaction_role,mimic,history
+      - POSTGRES_MULTIPLE_DATABASES=karma,reaction_role,mimic,history,weather
     restart: unless-stopped
