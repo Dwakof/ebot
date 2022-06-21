@@ -31,7 +31,7 @@ module.exports = class Weather extends ApplicationCommand {
         const { LocationService, HistoryService } = this.services();
         const { CommonView }                      = this.views();
 
-        if (location.length === 0) {
+        if (location.length < 3) {
 
             const history = await HistoryService.get(interaction.guildId, interaction.user.id);
 
@@ -40,12 +40,7 @@ module.exports = class Weather extends ApplicationCommand {
                 return interaction.respond(history.map(({ search }) => ({ name : search, value : search })));
             }
 
-            return interaction.respond([{ name : 'Write something at least (min 3 characters)', value : '' }]);
-        }
-
-        if (location.length < 3) {
-
-            return;
+            return interaction.respond([{ name : 'ℹ Write something at least (min 3 characters)', value : '' }]);
         }
 
         try {
@@ -58,7 +53,7 @@ module.exports = class Weather extends ApplicationCommand {
 
             if (error?.response?.statusCode === 404) {
 
-                return interaction.respond([{ name : 'No result found', value : location }]);
+                return interaction.respond([{ name : '⚠ No result found', value : location }]);
             }
 
             throw error;
@@ -89,7 +84,7 @@ module.exports = class Weather extends ApplicationCommand {
 
             this.client.logger.error({ err : error });
 
-            return interaction.editReply({ content : `Unable to find location "${ query }"`, ephemeral : true });
+            return interaction.editReply({ content : `⚠ Unable to find location "${ query }"`, ephemeral : true });
         }
 
         const historyPromise = HistoryService.save(interaction.guildId, interaction.user.id, location);
@@ -125,7 +120,7 @@ module.exports = class Weather extends ApplicationCommand {
 
             this.client.logger.error({ err : error });
 
-            await interaction.editReply({ content : `Unable to get weather information for location "${ location }"`, ephemeral : true });
+            await interaction.editReply({ content : `⚠ Unable to get weather information for location "${ location }"`, ephemeral : true });
         }
         finally {
 
