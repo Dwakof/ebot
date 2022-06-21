@@ -1,3 +1,15 @@
+# [0.22.0](https://github.com/Dwakof/ebot/compare/v0.21.0...v0.22.0) (2022-06-21)
+
+
+### Bug Fixes
+
+* add a message to some logged event ([9018c08](https://github.com/Dwakof/ebot/commit/9018c0885078186165134284316915bff797490a))
+
+
+### Features
+
+* Store previous /weather search by user to suggest them when using /weather later. ([86c847b](https://github.com/Dwakof/ebot/commit/86c847b9add2423cc73078366b570c3f17e10c9c)), closes [#441](https://github.com/Dwakof/ebot/issues/441)
+
 # [0.21.0](https://github.com/Dwakof/ebot/compare/v0.20.1...v0.21.0) (2022-05-19)
 
 
