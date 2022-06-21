@@ -17,6 +17,7 @@ module.exports = class MessageDeleteBulkListener extends Listener {
     exec(messages) {
 
         this.client.logger.debug({
+            msg      : `${ messages.length } messages were deleted`,
             event    : this.event,
             emitter  : this.emitter,
             messages : messages.map(([id, message]) => ({

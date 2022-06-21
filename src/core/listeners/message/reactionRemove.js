@@ -17,6 +17,7 @@ module.exports = class MessageReactionRemoveListener extends Listener {
     exec(reaction, user) {
 
         this.client.logger.debug({
+            msg      : `User "${ user.username }" removed their reaction "${ reaction.emoji.name }" on message "${ reaction.message.id }" in channel "${ reaction.message?.channel?.name }" in guild "${ reaction.message?.guild?.name }"`,
             event    : this.event,
             emitter  : this.emitter,
             reaction : {

@@ -14,8 +14,8 @@ module.exports = class ClientWarningListener extends Listener {
         });
     }
 
-    exec(message) {
+    exec(msg) {
 
-        this.client.logger.warn({ event : this.event, emitter : this.emitter, message });
+        this.client.logger.warn({ event : this.event, emitter : this.emitter, msg });
     }
 };

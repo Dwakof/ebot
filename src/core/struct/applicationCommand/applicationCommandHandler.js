@@ -80,12 +80,15 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
                 await this.client.API.put(Routes.applicationGuildCommands(this.client.settings.discord.clientId, guildId), { body : guildCommands });
             }
 
+            const commands = this.getCommandsArray(false);
+
             this.client.logger.info({
-                event    : CoreEvents.GUILD_APPLICATION_COMMANDS_REGISTERED,
-                emitter  : 'core',
-                global   : false,
-                module   : 'ApplicationCommandHandler',
-                commands : this.getCommandsArray(false)
+                msg     : `${ commands.length } application commands were registered per Guild`,
+                event   : CoreEvents.GUILD_APPLICATION_COMMANDS_REGISTERED,
+                emitter : 'core',
+                global  : false,
+                module  : 'ApplicationCommandHandler',
+                commands
             });
         }
         catch (err) {
@@ -102,12 +105,15 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
             await this.client.API.put(Routes.applicationCommands(this.client.settings.discord.clientId), { body : globalCommands });
 
+            const commands = this.getCommandsArray(true);
+
             this.client.logger.info({
-                event    : CoreEvents.GLOBAL_APPLICATION_COMMANDS_REGISTERED,
-                emitter  : 'core',
-                global   : true,
-                module   : 'ApplicationCommandHandler',
-                commands : this.getCommandsArray(true)
+                msg     : `${ commands.length } application commands were registered globally`,
+                event   : CoreEvents.GLOBAL_APPLICATION_COMMANDS_REGISTERED,
+                module  : 'ApplicationCommandHandler',
+                emitter : 'core',
+                global  : true,
+                commands
             });
         }
         catch (err) {

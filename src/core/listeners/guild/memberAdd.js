@@ -17,6 +17,7 @@ module.exports = class MemberAddListener extends Listener {
     exec(member) {
 
         this.client.logger.debug({
+            msg     : `User "${ member?.author?.name }" (${ member?.author?.id }) joined the guild "${ member?.guild?.name }" (${ member?.guild?.id })`,
             event   : this.event,
             emitter : this.emitter,
             message : {

@@ -17,6 +17,7 @@ module.exports = class MessageReactionAddListener extends Listener {
     exec(reaction, user) {
 
         this.client.logger.debug({
+            msg      : `Message "${ reaction.message.id }" was reacted with "${ reaction.emoji.name }" by "${ user.username }" in channel "${ reaction.message?.channel?.name }" in guild "${ reaction.message?.guild?.name }"`,
             event    : this.event,
             emitter  : this.emitter,
             reaction : {

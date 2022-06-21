@@ -87,7 +87,7 @@ const store = new Confidence.Store({
             enabled : { $env : 'EBOT_SENTRY_ENABLED', $coerce : 'boolean', $default : false }
         },
         production  : {
-            enabled : true
+            enabled : { $env : 'EBOT_SENTRY_ENABLED', $coerce : 'boolean', $default : true }
         }
     },
     plugins : {

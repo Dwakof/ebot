@@ -17,6 +17,7 @@ module.exports = class GuildUnavailableListener extends Listener {
     exec(guild) {
 
         this.client.logger.debug({
+            msg     : `Guild "${ guild?.name }" (${ guild?.id }) is now unavailable`,
             event   : this.event,
             emitter : this.emitter,
             message : {

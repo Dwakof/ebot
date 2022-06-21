@@ -14,8 +14,8 @@ module.exports = class ClientDebugListener extends Listener {
         });
     }
 
-    exec(message) {
+    exec(msg) {
 
-        this.client.logger.trace({ event : this.event, emitter : this.emitter, message });
+        this.client.logger.trace({ event : this.event, emitter : this.emitter, msg });
     }
 };

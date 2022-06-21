@@ -17,6 +17,7 @@ module.exports = class MessageUpdateListener extends Listener {
     exec(oldMessage, newMessage) {
 
         this.client.logger.debug({
+            msg        : `User "${ newMessage?.author?.username }" updated the message "${ newMessage.id }" in channel "${ newMessage?.channel?.name }" in guild "${ newMessage?.guild?.name }"`,
             event      : this.event,
             emitter    : this.emitter,
             oldMessage : {

@@ -17,9 +17,9 @@ module.exports = class ShardDisconnectListener extends Listener {
     exec(wsEvent, shardId) {
 
         this.client.logger.warn({
+            msg     : 'Shard was disconnected',
             event   : this.event,
             emitter : this.emitter,
-            msg : 'Shard was disconnected',
             shardId, wsEvent
         });
     }

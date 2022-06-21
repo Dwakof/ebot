@@ -16,9 +16,10 @@ module.exports = class CommandFinishedListener extends Listener {
     exec(interaction, command) {
 
         this.client.logger.info({
-            event   : this.event,
-            emitter : this.emitter,
-            command : {
+            msg         : `ApplicationCommand "${ command.categoryID }${ command.id }" was triggered by user "${ interaction?.user?.username }" in guild "${ interaction?.member?.guild?.name }"`,
+            event       : this.event,
+            emitter     : this.emitter,
+            command     : {
                 id       : command.id,
                 category : command.categoryID
             },

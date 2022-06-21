@@ -17,6 +17,7 @@ module.exports = class MessageDeleteListener extends Listener {
     exec(message) {
 
         this.client.logger.debug({
+            msg     : `Message ${ message.id } in channel "${ message?.channel?.name }" in guild "${ message?.guild?.name }" was deleted`,
             event   : this.event,
             emitter : this.emitter,
             message : {
