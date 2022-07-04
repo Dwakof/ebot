@@ -47,7 +47,7 @@
     "luxon": "2.4.0",
     "node-cron": "3.0.1",
     "objection": "3.0.1",
-    "p-queue-compat": "1.0.134",
+    "p-queue-compat": "1.0.141",
     "pg": "8.7.3",
     "pg-query-stream": "4.2.3",
     "pino": "8.0.0",
