@@ -52,7 +52,7 @@
     "pg-query-stream": "4.2.3",
     "pino": "8.0.0",
     "pug": "3.0.2",
-    "puppeteer": "14.4.1",
+    "puppeteer": "15.4.0",
     "undici": "5.5.1"
   },
   "devDependencies": {
