@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 const Util = require('../util');
 
@@ -32,7 +32,7 @@ class View {
     /**
      * @param [data]
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     embed(data) {
 
@@ -97,7 +97,7 @@ class View {
             lines.push(cells.join(Util.BLANK_CHAR_SPACE + Util.BLANK_CHAR_SPACE));
         }
 
-        embed.addField(title, lines.join('\n'), false);
+        embed.addFields([{ name : title, value : lines.join('\n'), inline : false }]);
 
         return embed;
     }
@@ -130,7 +130,7 @@ class View {
             lines.push(cells.join(Util.BLANK_CHAR_SPACE + Util.BLANK_CHAR_SPACE));
         }
 
-        embed.addField(title, lines.join('\n') || Util.BLANK_CHAR, true);
+        embed.addFields([{ name : title, value : lines.join('\n') || Util.BLANK_CHAR, inline : true }]);
 
         return embed;
     }
@@ -148,7 +148,7 @@ class View {
             lines.push(callback(value, columns1, i, 0));
         }
 
-        embed.addField(title, lines.join('\n'), true);
+        embed.addFields([{ name : title, value : lines.join('\n'), inline : true }]);
 
         this.emptyRow(embed);
 
@@ -159,7 +159,7 @@ class View {
             lines.push(callback(value, columns2, i, 0));
         }
 
-        embed.addField(Util.BLANK_CHAR, lines.join('\n'), true);
+        embed.addFields([{ name : Util.BLANK_CHAR, value : lines.join('\n'), inline : true }]);
 
         return embed;
     }
@@ -177,7 +177,7 @@ class View {
             lines.push(callback(value, columns1, i, 0));
         }
 
-        embed.addField(title, lines.join('\n'), true);
+        embed.addFields([{ name : title, value : lines.join('\n'), inline : true }]);
 
         lines = [];
 
@@ -186,7 +186,7 @@ class View {
             lines.push(callback(value, columns2, i, 0));
         }
 
-        embed.addField(Util.BLANK_CHAR, lines.join('\n'), true);
+        embed.addFields([{ name : Util.BLANK_CHAR, value : lines.join('\n'), inline : true }]);
         this.emptyRow(embed);
 
         return embed;
@@ -194,7 +194,7 @@ class View {
 
     emptyRow(embed) {
 
-        return embed.addField(Util.BLANK_CHAR, Util.BLANK_CHAR, true);
+        return embed.addFields([{ name : Util.BLANK_CHAR, value : Util.BLANK_CHAR, inline : true }]);
     }
 }
 

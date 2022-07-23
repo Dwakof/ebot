@@ -8,9 +8,9 @@ const Pino = require('pino');
 const Hoek = require('@hapi/hoek');
 const Fs   = require('fs/promises');
 
-const { Permissions, Intents } = require('discord.js');
-const { REST }                 = require('@discordjs/rest');
-const { OAuth2Scopes }         = require('discord-api-types/v10');
+const { GatewayIntentBits, PermissionsBitField } = require('discord.js');
+const { REST }                                   = require('@discordjs/rest');
+const { OAuth2Scopes }                           = require('discord-api-types/v10');
 
 const { AkairoClient, InhibitorHandler } = require('discord-akairo');
 
@@ -47,10 +47,10 @@ module.exports = class EbotClient extends AkairoClient {
         super({ ownerID : settings.discord.ownerID }, {
             ...settings.discord,
             intents : [
-                Intents.FLAGS.GUILDS,
-                Intents.FLAGS.GUILD_MEMBERS,
-                Intents.FLAGS.GUILD_MESSAGES,
-                Intents.FLAGS.GUILD_MESSAGE_REACTIONS
+                GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildMembers,
+                GatewayIntentBits.GuildMessages,
+                GatewayIntentBits.GuildMessageReactions
             ]
         });
 
@@ -73,11 +73,7 @@ module.exports = class EbotClient extends AkairoClient {
 
             this.#sentry = Sentry;
 
-            this.logger.info({
-                emitter : 'core',
-                event   : CoreEvents.SENTRY_INITIALIZED,
-                msg     : 'Sentry is initialized'
-            });
+            this.logger.info({ msg : 'Sentry is initialized', event : CoreEvents.SENTRY_INITIALIZED, emitter : 'core' });
         }
     }
 
@@ -90,7 +86,7 @@ module.exports = class EbotClient extends AkairoClient {
             this.#coreListenerHandlers.set(handler, new ListenerHandler(this, { directory : Path.join(rootPath, handler) }));
         }
 
-        this.#coreListenerHandlers.get('process').setEmitters({ process });
+        this.#coreListenerHandlers.get('process').setEmitters({ process, api : this.API, rest : this.rest });
     }
 
     registerCommandHandler(settings) {
@@ -119,9 +115,9 @@ module.exports = class EbotClient extends AkairoClient {
         this.#coreListenerHandlers.get('command').setEmitters({ handler : this.#commandHandler });
 
         this.logger.trace({
-            emitter : 'core',
+            msg     : 'Ebot Command Handler is registered',
             event   : CoreEvents.COMMAND_HANDLER_REGISTERED,
-            msg     : 'Ebot Command Handler is registered'
+            emitter : 'core'
         });
     }
 
@@ -132,9 +128,9 @@ module.exports = class EbotClient extends AkairoClient {
         this.#coreListenerHandlers.get('applicationCommand').setEmitters({ handler : this.#applicationCommandHandler });
 
         this.logger.trace({
-            emitter : 'core',
+            msg     : 'Ebot Application Command Handler is registered',
             event   : CoreEvents.APPLICATION_COMMAND_HANDLER_REGISTERED,
-            msg     : 'Ebot Application Command Handler is registered'
+            emitter : 'core'
         });
     }
 
@@ -142,22 +138,14 @@ module.exports = class EbotClient extends AkairoClient {
 
         this.#listenerHandler = new ListenerHandler(this, Hoek.merge({}, settings));
 
-        this.logger.trace({
-            emitter : 'core',
-            event   : CoreEvents.LISTENER_HANDLER_REGISTERED,
-            msg     : 'Ebot Listener Handler is registered'
-        });
+        this.logger.trace({ msg : 'Ebot Listener Handler is registered', event : CoreEvents.LISTENER_HANDLER_REGISTERED, emitter : 'core' });
     }
 
     registerInhibitorHandler(settings) {
 
         this.#inhibitorHandler = new InhibitorHandler(this, Hoek.merge({}, settings));
 
-        this.logger.trace({
-            emitter : 'core',
-            event   : CoreEvents.INHIBITOR_HANDLER_REGISTERED,
-            msg     : 'Ebot Inhibitor Handler is registered'
-        });
+        this.logger.trace({ msg : 'Ebot Inhibitor Handler is registered', event : CoreEvents.INHIBITOR_HANDLER_REGISTERED, emitter : 'core' });
     }
 
     async registerModules(modulesPath) {
@@ -182,11 +170,7 @@ module.exports = class EbotClient extends AkairoClient {
 
             this.#modules.set(name, { path, module });
 
-            this.logger.debug({
-                emitter : 'core',
-                event   : CoreEvents.MODULE_LOADED,
-                msg     : `Module ${ name } loaded from ${ path }`
-            });
+            this.logger.debug({ msg : `Module ${ name } loaded from ${ path }`, emitter : 'core', event : CoreEvents.MODULE_LOADED });
         }
     }
 
@@ -206,11 +190,7 @@ module.exports = class EbotClient extends AkairoClient {
 
         this.#initialized = true;
 
-        this.logger.debug({
-            emitter : 'core',
-            event   : 'initialized',
-            msg     : 'Ebot core is initialized'
-        });
+        this.logger.debug({ msg : 'Ebot core is initialized', event : 'initialized', emitter : 'core' });
 
         return this;
     }
@@ -236,18 +216,18 @@ module.exports = class EbotClient extends AkairoClient {
             });
 
             this.logger.trace({
-                emitter : 'core',
+                msg     : 'Ebot Command Handler is loaded',
                 event   : CoreEvents.COMMAND_HANDLER_LOADED,
-                msg     : 'Ebot Command Handler is loaded'
+                emitter : 'core'
             });
         }
 
         if (this.#inhibitorHandler) {
 
             this.logger.trace({
-                emitter : 'core',
+                msg     : 'Ebot Inhibitor Handler is loaded',
                 event   : CoreEvents.INHIBITOR_HANDLER_LOADED,
-                msg     : 'Ebot Inhibitor Handler is loaded'
+                emitter : 'core'
             });
         }
 
@@ -264,18 +244,18 @@ module.exports = class EbotClient extends AkairoClient {
             }
 
             this.logger.trace({
-                emitter : 'core',
+                msg     : 'Ebot Listener Handler is loaded',
                 event   : CoreEvents.LISTENER_HANDLER_LOADED,
-                msg     : 'Ebot Listener Handler is loaded'
+                emitter : 'core'
             });
         }
 
         if (this.#applicationCommandHandler) {
 
             this.logger.trace({
-                emitter : 'core',
+                msg     : 'Ebot Application Command Handler is loaded',
                 event   : CoreEvents.APPLICATION_COMMAND_HANDLER_LOADED,
-                msg     : 'Ebot Application Command Handler is loaded'
+                emitter : 'core'
             });
         }
 
@@ -363,9 +343,9 @@ module.exports = class EbotClient extends AkairoClient {
     async warmupCache() {
 
         this.logger.info({
-            emitter : 'core',
+            msg     : 'Starting warming up guilds/users cache',
             event   : CoreEvents.CACHE_WARMUP_STARTED,
-            msg     : 'Starting warming up guilds/users cache'
+            emitter : 'core'
         });
 
         for (const id of this.#settings.ebot.cacheWarmup.guilds) {
@@ -381,9 +361,9 @@ module.exports = class EbotClient extends AkairoClient {
         }
 
         this.logger.info({
-            emitter : 'core',
+            msg     : 'Done warming up guilds/users cache',
             event   : CoreEvents.CACHE_WARMUP_FINISHED,
-            msg     : 'Done warming up guilds/users cache'
+            emitter : 'core'
         });
     }
 
@@ -395,18 +375,17 @@ module.exports = class EbotClient extends AkairoClient {
                 OAuth2Scopes.ApplicationsCommands
             ],
             permissions : [
-                Permissions.FLAGS.SEND_MESSAGES,
-                Permissions.FLAGS.READ_MESSAGE_HISTORY,
-                Permissions.FLAGS.ADD_REACTIONS,
-                Permissions.FLAGS.VIEW_CHANNEL
+                PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ReadMessageHistory,
+                PermissionsBitField.Flags.AddReactions,
+                PermissionsBitField.Flags.ViewChannel
             ]
         });
 
         this.logger.info({
-            msg     : `You can add the bot to your service with this link : "${ url }"`,
+            msg     : `You can add the bot to your service with this link : ${ url }`,
             event   : CoreEvents.INVITE_LINK,
-            emitter : 'core',
-            url
+            emitter : 'core'
         });
     }
 

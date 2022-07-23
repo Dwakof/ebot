@@ -24,9 +24,9 @@ module.exports = class UploadService extends Service {
 
         const command = new PutObjectCommand({
             ACL          : 'public-read',
-            StorageClass : 'ONEZONE_IA',
-            ContentType  : options.contentType,
+            StorageClass : this.client.settings.plugins.tooling.upload.storageClass,
             Bucket       : this.client.settings.plugins.tooling.upload.bucket,
+            ContentType  : options.contentType,
             Body         : file,
             Key          : key
         });
@@ -38,7 +38,7 @@ module.exports = class UploadService extends Service {
             throw new Error(`Failed to upload file to S3: ${ $metadata.httpStatusCode } ${ $metadata.requestId || $metadata.extendedRequestId }`);
         }
 
-        this.client.logger.info(`Uploaded file to S3: ${ this.bucketUrl }/${ key }`);
+        this.client.logger.info({ msg : `Uploaded file to S3: ${ this.bucketUrl }/${ key }`, event : 'fileUpload', emitter : 'tooling' });
 
         return `${ this.bucketUrl }/${ key }`;
     }

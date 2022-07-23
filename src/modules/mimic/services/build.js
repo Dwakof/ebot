@@ -1,7 +1,7 @@
 'use strict';
 
-const { Constants }   = require('discord.js');
-const { userMention } = require('@discordjs/builders');
+const { Colors }      = require('discord.js');
+const { userMention } = require('discord.js');
 
 const { DateTime } = require('luxon');
 
@@ -214,7 +214,7 @@ module.exports = class BuildService extends Service {
     /**
      * @param guildId
      * @param {Util.Task} task
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     progressBuild(guildId, task) {
 
@@ -228,16 +228,16 @@ module.exports = class BuildService extends Service {
             .setAuthor(guild.name, guild.iconURL({ dynamic : false, size : 32 }))
             .setThumbnail(guild.iconURL({ dynamic : false, size : 128 }))
             .setTimestamp()
-            .setColor(Constants.Colors.BLUE);
+            .setColor(Colors.Blue);
 
         if (messages) {
 
-            embed.addField('Messages', `${ messages }`, true);
+            embed.addFields([{ name : 'Messages', value : `${ messages }`, inline : true }]);
         }
 
         if (total) {
 
-            embed.addField('Users', `${ total }`, true);
+            embed.addFields([{ name : 'Users', value : `${ total }`, inline : true }]);
         }
 
         if (doing && user) {
@@ -245,18 +245,18 @@ module.exports = class BuildService extends Service {
             switch (user) {
                 case 'ebot' :
 
-                    embed.addField('User', userMention(this.client.user.id), true)
+                    embed.addFields([{ name : 'User', value : userMention(this.client.user.id), inline : true }])
                         .setThumbnail(this.client.user.avatarURL({ dynamic : false, size : 128 }));
                     break;
                 case 'guild' :
 
-                    embed.addField('User', 'Guild', true);
+                    embed.addFields([{ name : 'User', value : 'Guild', inline : true }]);
                     break;
                 default:
 
                     const member = guild.members.cache.get(user);
 
-                    embed.addField('User', userMention(member.id), true)
+                    embed.addFields([{ name : 'User', value : userMention(member.id), inline : true }])
                         .setThumbnail(member.user.avatarURL({ dynamic : false, size : 128 }));
                     break;
             }
@@ -264,29 +264,29 @@ module.exports = class BuildService extends Service {
 
         if (total) {
 
-            embed.addField('Progress', this.client.util.progressBar(count, total));
+            embed.addFields([{ name : 'Progress', value : this.client.util.progressBar(count, total) }]);
         }
 
         if (startAt) {
 
-            embed.setFooter(`Running for ${ new DateTime(startAt).toRelative() }`);
+            embed.setFooter({ text : `Running for ${ new DateTime(startAt).toRelative() }` });
         }
 
         if (startAt && !doing) {
 
-            embed.setFooter(`Took ${ new DateTime(startAt).diff(new DateTime(endAt)).toHuman() }`);
+            embed.setFooter({ text : `Took ${ new DateTime(startAt).diff(new DateTime(endAt)).toHuman() }` });
         }
 
         if (done) {
 
             embed.setTitle(`Finished building guild's mimic model`)
-                .setColor(Constants.Colors.GREEN);
+                .setColor(Colors.Green);
         }
 
         if (failed) {
 
             embed.setTitle(`Failed to build guild's mimic model`)
-                .setColor(Constants.Colors.RED);
+                .setColor(Colors.Red);
         }
 
         return embed;

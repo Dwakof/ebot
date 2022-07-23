@@ -1,6 +1,6 @@
 'use strict';
 
-const { Permissions } = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 
 const { Command } = require('../../../core');
 
@@ -10,7 +10,7 @@ class AvatarCommand extends Command {
 
         super('icon', {
             aliases           : ['icon'],
-            clientPermissions : [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.EMBED_LINKS],
+            clientPermissions : [PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.EmbedLinks],
             channel           : 'guild',
             description       : {
                 content : 'Show icon of the server'

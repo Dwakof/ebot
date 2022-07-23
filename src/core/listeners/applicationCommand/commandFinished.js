@@ -6,11 +6,7 @@ module.exports = class CommandFinishedListener extends Listener {
 
     constructor() {
 
-        super(ApplicationCommandHandler.Events.COMMAND_FINISHED, {
-            category : 'core',
-            emitter  : 'handler',
-            event    : ApplicationCommandHandler.Events.COMMAND_FINISHED
-        });
+        super(ApplicationCommandHandler.Events.COMMAND_FINISHED, { category : 'core', emitter : 'handler' });
     }
 
     exec(interaction, command) {

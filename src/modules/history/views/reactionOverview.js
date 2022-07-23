@@ -1,8 +1,8 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed, MessageAttachment, Guild, User, GuildMember, TextChannel } = require('discord.js');
-const { hyperlink, userMention, inlineCode }                                     = require('@discordjs/builders');
+const { EmbedBuilder, AttachmentBuilder, Guild, User, GuildMember, TextChannel } = require('discord.js');
+const { hyperlink, userMention, inlineCode }                                     = require('discord.js');
 
 const { View, Util } = require('../../../core');
 
@@ -12,7 +12,7 @@ module.exports = class ReactionOverviewView extends View {
      * @param {Guild}  guild
      * @param {Object} stats
      *
-     * @return {Promise<MessageEmbed>}
+     * @return {Promise<EmbedBuilder>}
      */
     async guild(guild, stats) {
 
@@ -36,7 +36,7 @@ module.exports = class ReactionOverviewView extends View {
      * @param {TextChannel} channel
      * @param {Object}      stats
      *
-     * @return {Promise<MessageEmbed>}
+     * @return {Promise<EmbedBuilder>}
      */
     async channel(channel, stats) {
 
@@ -60,7 +60,7 @@ module.exports = class ReactionOverviewView extends View {
      * @param {GuildMember|User} user
      * @param {Object}           stats
      *
-     * @return {Promise<MessageEmbed>}
+     * @return {Promise<EmbedBuilder>}
      */
     async user(user, stats) {
 
@@ -83,16 +83,20 @@ module.exports = class ReactionOverviewView extends View {
 
         const { countReceivedReactionEmoji, countGivenReactionEmoji } = stats;
 
-        embed.addField('Given reactions', `${ this.client.util.code(countGivenReactionEmoji) }`, true);
-        embed.addField(Util.BLANK_CHAR, Util.BLANK_CHAR, true);
+        embed.addFields([
+            { name : 'Given reactions', value : `${ this.client.util.code(countGivenReactionEmoji) }`, inline : true },
+            { name : Util.BLANK_CHAR, value : Util.BLANK_CHAR, inline : true }
+        ]);
 
         if (countReceivedReactionEmoji) {
 
-            embed.addField('Received reactions', `${ this.client.util.code(countReceivedReactionEmoji) }`, true);
+            embed.addFields([
+                { name : 'Received reactions', value : `${ this.client.util.code(countReceivedReactionEmoji) }`, inline : true }
+            ]);
         }
         else {
 
-            embed.addField(Util.BLANK_CHAR, Util.BLANK_CHAR, true);
+            embed.addFields([{ name : Util.BLANK_CHAR, value : Util.BLANK_CHAR, inline : true }]);
         }
 
         return embed;
@@ -111,7 +115,7 @@ module.exports = class ReactionOverviewView extends View {
             }
         });
 
-        embed.addField(Util.BLANK_CHAR, Util.BLANK_CHAR, true);
+        embed.addFields([{ name : Util.BLANK_CHAR, value : Util.BLANK_CHAR, inline : true }]);
 
         this.multiColumnSingleField(embed, mostReceivedReactionEmoji, 'Top received reaction', {
             callback : (value, column) => {
@@ -161,16 +165,22 @@ module.exports = class ReactionOverviewView extends View {
     }
 
     /**
-     * @param {MessageEmbed} embed
+     * @param {EmbedBuilder} embed
      * @param stats
      *
-     * @return {Promise<MessageEmbed>}
+     * @return {Promise<EmbedBuilder>}
      */
     async mostReactedMessage(embed, stats) {
 
         const { mostReactedMessage : { messageId, channelId, guildId } } = stats;
 
-        embed.addField('Most reacted message', hyperlink('<link message>', Util.linkUrl({ guildId, channelId, messageId })), false);
+        embed.addFields([
+            {
+                name   : 'Most reacted message',
+                value  : hyperlink('<link message>', Util.linkUrl({ guildId, channelId, messageId })),
+                inline : false
+            }
+        ]);
 
         const { ScreenshotService } = this.services('tools');
 

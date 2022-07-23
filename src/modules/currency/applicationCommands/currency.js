@@ -1,6 +1,6 @@
 'use strict';
 
-const { inlineCode }         = require('@discordjs/builders');
+const { inlineCode }         = require('discord.js');
 const { DateTime, Duration } = require('luxon');
 
 const { ApplicationCommand, Util } = require('../../../core');

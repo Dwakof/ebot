@@ -4,12 +4,12 @@ const { ClientUtil : Base } = require('discord-akairo');
 
 const Util = require('util');
 
-const { Message, Interaction } = require('discord.js');
+const { Message, BaseInteraction, EmbedBuilder, AttachmentBuilder } = require('discord.js');
 
 // eslint-disable-next-line no-unused-vars
-const { MessagePayload, MessageOptions, WebhookEditMessageOptions, MessageEmbed } = require('discord.js');
+const { MessagePayload, MessageOptions, WebhookEditMessageOptions, BufferResolvable } = require('discord.js');
 
-const { userMention, codeBlock, inlineCode } = require('@discordjs/builders');
+const { userMention, codeBlock, inlineCode } = require('discord.js');
 
 const CoreUtil = require('./util');
 
@@ -67,10 +67,10 @@ module.exports = class ClientUtil extends Base {
 
         const { size = 20, progress = '⣿', half = '⣇', empty = '⣀', start = '', end = '', text = true, code = false, raw = false } = options;
 
-        const percentage = Math.min(value / maxValue, 1);          // Calculate the percentage of the bar
+        const percentage = Math.min(value / maxValue, 1);           // Calculate the percentage of the bar
         const current    = Math.floor((size * percentage));              // Calculate the number of progress characters to fill the progress side.
         const between    = Math.round(size * percentage) - current;    // Calculate the number of half characters (should be 0 or 1)
-        let left         = Math.max(size - current - between, 0);  // Calculate the number of empty characters to fill the empty progress side.
+        let left         = Math.max(size - current - between, 0);   // Calculate the number of empty characters to fill the empty progress side.
 
         if (Math.floor(size * percentage) > current) {
             left--;
@@ -140,20 +140,20 @@ module.exports = class ClientUtil extends Base {
 
     /**
      *
-     * @param {Message|Interaction}                                                         obj
-     * @param {String|MessagePayload|MessageOptions|WebhookEditMessageOptions|MessageEmbed} payload
+     * @param {Message|BaseInteraction}                                                         obj
+     * @param {String|MessagePayload|MessageOptions|WebhookEditMessageOptions|EmbedBuilder} payload
      */
     send(obj, payload) {
 
         let _payload = payload;
 
-        if (payload instanceof MessageEmbed) {
+        if (payload instanceof EmbedBuilder) {
 
             _payload = { embeds : [payload] };
         }
 
 
-        if (obj instanceof Interaction) {
+        if (obj instanceof BaseInteraction) {
 
             if (obj.deferred || obj.replied) {
 
@@ -174,5 +174,29 @@ module.exports = class ClientUtil extends Base {
         }
 
         throw new Error(`Could not send a message using object ${ typeof obj }`);
+    }
+
+    /**
+     * Makes a EmbedBuilder.
+     *
+     * @param {Object} [data] - Embed data.
+     *
+     * @returns {EmbedBuilder}
+     */
+    embed(data) {
+
+        return new EmbedBuilder(data);
+    }
+
+    /**
+     * Makes a AttachmentBuilder.
+     * @param {BufferResolvable | Stream} file - The file.
+     * @param {string} [name] - The filename.
+     *
+     * @returns {AttachmentBuilder}
+     */
+    attachment(file, name) {
+
+        return new AttachmentBuilder(file, { name });
     }
 };

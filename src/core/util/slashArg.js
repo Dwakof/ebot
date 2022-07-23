@@ -1,6 +1,6 @@
 'use strict';
 
-const { GuildMember, Guild, Role, User, Channel, Message } = require('discord.js');
+const { GuildMember, Guild, Role, User, GuildChannel, Message } = require('discord.js');
 
 const { isString }    = require('./is');
 const { flattenKeys } = require('./tool');
@@ -48,7 +48,7 @@ module.exports = {
             return { type : 'user', id : arg.id, username : `${ arg.username }#${ arg.discriminator }` };
         }
 
-        if (arg instanceof Channel) {
+        if (arg instanceof GuildChannel) {
 
             return { type : 'channel', id : arg.id, name : arg.name };
         }

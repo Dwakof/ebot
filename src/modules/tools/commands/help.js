@@ -1,6 +1,6 @@
 'use strict';
 
-const { Permissions } = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 
 const { Command } = require('../../../core');
 
@@ -14,7 +14,7 @@ class HelpCommand extends Command {
                 content : 'Get help',
                 usage   : '[command]'
             },
-            clientPermissions : [Permissions.FLAGS.EMBED_LINKS, Permissions.FLAGS.SEND_MESSAGES],
+            clientPermissions : [PermissionsBitField.Flags.EmbedLinks, PermissionsBitField.Flags.SendMessages],
             ratelimit         : 2,
             args              : [
                 {
@@ -37,16 +37,18 @@ class HelpCommand extends Command {
 
             embed.setTitle(`Command ${ util.code(command.description?.name || command.aliases[0]) }`);
 
-            embed.addField('Usage', util.code(prefix + command.description?.usage) || 'Unavailable');
-            embed.addField('Description', command.description?.content || 'Unavailable');
-            embed.addField('Usable by', command.description?.permissions || 'Everyone');
+            embed.addFields([
+                { name : 'Usage', value : util.code(prefix + command.description?.usage) || 'Unavailable' },
+                { name : 'Description', value : command.description?.content || 'Unavailable' },
+                { name : 'Usable by', value : command.description?.permissions || 'Everyone' }
+            ]);
 
             if (command.aliases.length > 1) {
-                embed.addField('Alias', `${ util.code(command.aliases.join('` • `')) }`);
+                embed.addFields([{ name : 'Alias', value : `${ util.code(command.aliases.join('` • `')) }` }]);
             }
 
             if (command.description?.examples?.length) {
-                embed.addField('Examples', `${ util.code(prefix + command.description.examples.join(`\` • \`${ prefix }`)) }`);
+                embed.addFields([{ name : 'Examples', value : `${ util.code(prefix + command.description.examples.join(`\` • \`${ prefix }`)) }` }]);
             }
         }
         else {
@@ -58,7 +60,7 @@ class HelpCommand extends Command {
 
             for (const category of this.handler.categories.values()) {
 
-                embed.addField(`${ this.client.util.capitalize(category.id) }`, category.map((cmd) => util.code(cmd.aliases[0])).join(' • '));
+                embed.addFields([{ name : `${ this.client.util.capitalize(category.id) }`, value : category.map((cmd) => util.code(cmd.aliases[0])).join(' • ') }]);
             }
         }
 

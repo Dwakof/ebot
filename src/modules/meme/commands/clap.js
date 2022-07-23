@@ -1,6 +1,6 @@
 'use strict';
 
-const { Permissions } = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 
 const { Command } = require('../../../core');
 
@@ -10,7 +10,7 @@ module.exports = class ClapCommand extends Command {
 
         super('clap', {
             aliases           : ['clap'],
-            clientPermissions : [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.MANAGE_MESSAGES],
+            clientPermissions : [PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ManageMessages],
             args              : [
                 {
                     id     : 'text',

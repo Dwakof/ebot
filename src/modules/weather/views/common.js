@@ -1,7 +1,7 @@
 'use strict';
 
 const { View }       = require('../../../core');
-const { inlineCode } = require('@discordjs/builders');
+const { inlineCode } = require('discord.js');
 
 module.exports = class CommonView extends View {
 
@@ -183,16 +183,22 @@ module.exports = class CommonView extends View {
 
 
     /**
-     * @param {MessageEmbed}            embed
+     * @param {EmbedBuilder}            embed
      * @param {Array<WeatherCondition>} conditions
      * @param {Boolean}                 [day=true]
      * @param {String}                  [title='Weather]
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     condition(embed, conditions = [], day = true, title = 'Weather') {
 
-        return embed.addField(title, conditions.map((w) => `${ this.conditionToEmoji(w, day) } ${ inlineCode(w.description) }`).join('\n'), true);
+        return embed.addFields([
+            {
+                name   : title,
+                value  : conditions.map((w) => `${ this.conditionToEmoji(w, day) } ${ inlineCode(w.description) }`).join('\n'),
+                inline : true
+            }
+        ]);
     }
 
     /**

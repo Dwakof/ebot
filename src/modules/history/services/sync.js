@@ -1,7 +1,7 @@
 'use strict';
 
-const { SnowflakeUtil, Constants, Permissions } = require('discord.js');
-const { channelMention }                        = require('@discordjs/builders');
+const { SnowflakeUtil, Colors, PermissionsBitField } = require('discord.js');
+const { channelMention }                             = require('discord.js');
 
 const { DateTime } = require('luxon');
 
@@ -14,7 +14,7 @@ module.exports = class SyncService extends Service {
     static FIRST_MESSAGE_ID = SnowflakeUtil.generate(SnowflakeUtil.EPOCH);
     static CHANNEL_STATE    = 'channel_import';
     static GUILD_STATE      = 'guild_import';
-    static REQUIRED_PERMS   = [Permissions.FLAGS.READ_MESSAGE_HISTORY, Permissions.FLAGS.VIEW_CHANNEL];
+    static REQUIRED_PERMS   = [PermissionsBitField.Flags.ReadMessageHistory, PermissionsBitField.Flags.ViewChannel];
 
     async * fetchAllMessages(channel, limit = 100) {
 
@@ -281,43 +281,49 @@ module.exports = class SyncService extends Service {
             .setAuthor(guild.name, guild.iconURL({ dynamic : false, size : 32 }))
             .setThumbnail(guild.iconURL({ dynamic : false, size : 128 }))
             .setTimestamp()
-            .setColor(Constants.Colors.BLUE);
+            .setColor(Colors.Blue);
 
         if (doing && channels) {
 
-            embed.addField('Channels', this.client.util.chunk(Array.from(channels).map(channelMention), 3).map((ids) => ids.join(' ')).flat().join('\n'), true);
+            embed.addFields([
+                {
+                    name   : 'Channels',
+                    value  : this.client.util.chunk(Array.from(channels).map(channelMention), 3).map((ids) => ids.join(' ')).flat().join('\n'),
+                    inline : true
+                }
+            ]);
         }
 
         if (doing) {
 
-            embed.addField('Messages', `${ messages }`, true);
+            embed.addFields([{ name : 'Messages', value : `${ messages }`, inline : true }]);
         }
 
         if (doing && current) {
 
-            embed.addField('Progress', this.client.util.progressBar(current, total));
+            embed.addFields([{ name : 'Progress', value : this.client.util.progressBar(current, total), inline : false }]);
         }
 
         if (startAt) {
 
-            embed.setFooter(`Running for ${ new DateTime(startAt).toRelative() }`);
+            embed.setFooter({ text : `Running for ${ new DateTime(startAt).toRelative() }` });
         }
 
         if (startAt && !doing) {
 
-            embed.setFooter(`Took ${ new DateTime(startAt).diff(new DateTime(endAt)).toHuman() }`);
+            embed.setFooter({ text : `Took ${ new DateTime(startAt).diff(new DateTime(endAt)).toHuman() }` });
         }
 
         if (done) {
 
             embed.setTitle(`Finished syncing guild ${ guild.name }`)
-                .setColor(Constants.Colors.GREEN);
+                .setColor(Colors.Green);
         }
 
         if (failed) {
 
             embed.setTitle(`Failed to sync guild ${ guild.name }`)
-                .setColor(Constants.Colors.RED);
+                .setColor(Colors.Red);
         }
 
         return embed;
@@ -336,30 +342,30 @@ module.exports = class SyncService extends Service {
             .setAuthor(guild.name, guild.iconURL({ dynamic : false, size : 32 }))
             .setThumbnail(channel.guild.iconURL({ dynamic : false, size : 128 }))
             .setTimestamp()
-            .setColor(Constants.Colors.BLUE);
+            .setColor(Colors.Blue);
 
         embed.setDescription(`${ messages || 0 } messages`);
 
         if (startAt) {
 
-            embed.setFooter(`Running for ${ new DateTime(startAt).toRelative() }`);
+            embed.setFooter({ text : `Running for ${ new DateTime(startAt).toRelative() }` });
         }
 
         if (startAt && !doing) {
 
-            embed.setFooter(`Took ${ new DateTime(startAt).diff(new DateTime(endAt)).toHuman() }`);
+            embed.setFooter({ text : `Took ${ new DateTime(startAt).diff(new DateTime(endAt)).toHuman() }` });
         }
 
         if (done) {
 
             embed.setTitle(`Finished syncing channel ${ channel.name }`)
-                .setColor(Constants.Colors.GREEN);
+                .setColor(Colors.Green);
         }
 
         if (failed) {
 
             embed.setTitle(`Failed to sync channel ${ channel.name }`)
-                .setColor(Constants.Colors.RED);
+                .setColor(Colors.Red);
         }
 
         return embed;

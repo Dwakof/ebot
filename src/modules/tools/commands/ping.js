@@ -1,6 +1,6 @@
 'use strict';
 
-const { Constants } = require('discord.js');
+const { Colors } = require('discord.js');
 
 const { Command } = require('../../../core');
 
@@ -13,27 +13,27 @@ class PingCommand extends Command {
 
     async exec(message, args) {
 
-        const embed = this.client.util.embed()
-            .setTitle('Pong!');
+        const embed = this.client.util.embed().setTitle('Pong!');
 
         const sent = await message.util.send({ embeds : [embed] });
 
         const timeDiff = (sent.editedAt || sent.createdAt) - (message.editedAt || message.createdAt);
 
-        embed.addField(':repeat_one: **RTT**', `${ timeDiff } ms`, true)
-            .addField(':heart_decoration: **Heartbeat**', `${ Math.round(this.client.ws.ping) } ms`, true)
-            .setTimestamp();
-
-        embed.setColor(Constants.Colors.GREEN);
+        embed.setTimestamp()
+            .setColor(Colors.Green)
+            .addFields([
+                { name : ':repeat_one: **RTT**', value : `${ timeDiff } ms`, inline : true },
+                { name : ':heart_decoration: **Heartbeat**', value : `${ Math.round(this.client.ws.ping) } ms`, inline : true }
+            ]);
 
         if (timeDiff > 80 || this.client.ws.ping > 80) {
 
-            embed.setColor(Constants.Colors.YELLOW);
+            embed.setColor(Colors.Yellow);
         }
 
         if (timeDiff > 100 || this.client.ws.ping > 100) {
 
-            embed.setColor(Constants.Colors.RED);
+            embed.setColor(Colors.Red);
         }
 
         return message.util.send({ embeds : [embed] });

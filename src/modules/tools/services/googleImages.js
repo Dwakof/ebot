@@ -3,7 +3,7 @@
 // const Got = require('got');
 
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 const { ServiceApi } = require('../../../core');
 
@@ -63,7 +63,7 @@ module.exports = class GoogleImagesService extends ServiceApi {
     /**
      * @param {ResultObject} result
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     toEmbed(result) {
 
@@ -74,7 +74,7 @@ module.exports = class GoogleImagesService extends ServiceApi {
     }
 
     /**
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     embed() {
 

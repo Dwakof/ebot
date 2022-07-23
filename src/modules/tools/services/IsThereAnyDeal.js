@@ -1,9 +1,7 @@
 'use strict';
 
-const { Client } = require('undici');
-
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 const { ServiceApi } = require('../../../core');
 
@@ -122,7 +120,7 @@ module.exports = class IsThereAnyDealService extends ServiceApi {
     /**
      * @param {GameResultObject} game
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     resultEmbed(game) {
 
@@ -152,7 +150,7 @@ module.exports = class IsThereAnyDealService extends ServiceApi {
      * @param {String} title
      * @param {String} message
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     messageEmbed(title, message) {
 
@@ -166,7 +164,7 @@ module.exports = class IsThereAnyDealService extends ServiceApi {
     }
 
     /**
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     baseEmbed() {
 

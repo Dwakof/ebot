@@ -34,5 +34,11 @@ exports.CoreEvents = {
     GUILD_APPLICATION_COMMANDS_REGISTERED : 'guildApplicationCommandRegistered',
 
     GLOBAL_APPLICATION_COMMAND_BUILT       : 'globalApplicationCommandBuilt',
-    GLOBAL_APPLICATION_COMMANDS_REGISTERED : 'globalApplicationCommandRegistered'
+    GLOBAL_APPLICATION_COMMANDS_REGISTERED : 'globalApplicationCommandRegistered',
+
+    SCHEDULE_CREATED      : 'scheduleCreated',
+    SCHEDULE_STARTED      : 'scheduleStarted',
+    SCHEDULE_ENDED        : 'scheduleEnded',
+    SCHEDULE_FAILED       : 'scheduleFailed',
+    CACHE_SEGMENT_CREATED : 'cacheSegmentCreated'
 };

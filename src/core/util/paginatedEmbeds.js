@@ -2,7 +2,7 @@
 
 const Hoek = require('@hapi/hoek');
 
-const { MessageActionRow, MessageButton, Constants, Message, Interaction, MessageEmbed } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, BaseInteraction, EmbedBuilder } = require('discord.js');
 
 const internals = {
     defaults : {
@@ -12,7 +12,7 @@ const internals = {
         buttons : {
             previous : {
                 label   : 'Previous',
-                style   : Constants.MessageButtonStyles.SECONDARY,
+                style   : ButtonStyle.Secondary,
                 onReply : function (button) {
 
                     button.setDisabled(false);
@@ -29,7 +29,7 @@ const internals = {
             },
             next     : {
                 label   : 'Next',
-                style   : Constants.MessageButtonStyles.SECONDARY,
+                style   : ButtonStyle.Secondary,
                 onReply : function (button) {
 
                     button.setDisabled(false);
@@ -59,7 +59,7 @@ class PaginatedEmbeds {
     #hooks = { onClick : {}, onReply : {}, label : {} };
 
     /**
-     * @type {Map<String, MessageButton>}
+     * @type {Map<String, ButtonBuilder>}
      */
     #components = new Map();
 
@@ -71,8 +71,8 @@ class PaginatedEmbeds {
     #collector;
 
     /**
-     * @param {Message|Interaction} interaction
-     * @param {Array<MessageEmbed|Function<MessageEmbed>|Promise<MessageEmbed>>} pages
+     * @param {Message|BaseInteraction} interaction
+     * @param {Array<EmbedBuilder|Function<EmbedBuilder>|Promise<EmbedBuilder>>} pages
      * @param {Object} options
      */
     constructor(interaction, pages, options = {}) {
@@ -106,7 +106,7 @@ class PaginatedEmbeds {
 
         if (this.#options.cache && this.#cache.has(index)) {
 
-            return { ...this.#cache.get(index), components : [new MessageActionRow({ components : Array.from(this.#components.values()) })] };
+            return { ...this.#cache.get(index), components : [new ActionRowBuilder({ components : Array.from(this.#components.values()) })] };
         }
 
         let page = this.#pages[index];
@@ -121,7 +121,7 @@ class PaginatedEmbeds {
             page = await page(index);
         }
 
-        if (page instanceof MessageEmbed) {
+        if (page instanceof EmbedBuilder) {
 
             page = { embeds : [page] };
         }
@@ -139,12 +139,12 @@ class PaginatedEmbeds {
             }
         }
 
-        return { ...page, components : [new MessageActionRow({ components : Array.from(this.#components.values()) })] };
+        return { ...page, components : [new ActionRowBuilder({ components : Array.from(this.#components.values()) })] };
     }
 
     async send() {
 
-        if (this.#interaction instanceof Interaction && !this.#interaction.deferred) {
+        if (this.#interaction instanceof BaseInteraction && !this.#interaction.deferred) {
 
             await this.#interaction.deferReply();
         }
@@ -160,7 +160,7 @@ class PaginatedEmbeds {
 
     _reply(payload) {
 
-        if (this.#interaction instanceof Interaction) {
+        if (this.#interaction instanceof BaseInteraction) {
 
             if (this.#interaction.deferred || this.#interaction.replied) {
 
@@ -233,11 +233,11 @@ class PaginatedEmbeds {
     }
 
     /**
-     * @param {Object<{ embeds : Array<MessageEmbed>, attachments : Array }>|MessageEmbed} reply
+     * @param {Object<{ embeds : Array<EmbedBuilder>, attachments : Array }>|EmbedBuilder} reply
      */
     setFooter(reply) {
 
-        if (reply instanceof MessageEmbed) {
+        if (reply instanceof EmbedBuilder) {
 
             reply.setFooter({ text : this.#options.footer(reply, this.index, this.length) });
         }
@@ -264,7 +264,7 @@ class PaginatedEmbeds {
                     label = this.#hooks.label[id](this.index, this.length);
                 }
 
-                this.#components.set(id, new MessageButton({ customId : id, style, disabled, label }));
+                this.#components.set(id, new ButtonBuilder({ customId : id, style, disabled, label }));
 
                 if (typeof onReply === 'function') {
 
@@ -342,7 +342,7 @@ class DashboardPaginatedEmbeds extends PaginatedEmbeds {
 
         for (const [index, { id, label, embed, style = {} }] of dashboards.entries()) {
 
-            const { selected = Constants.MessageButtonStyles.PRIMARY, unselected = Constants.MessageButtonStyles.SECONDARY } = style;
+            const { selected = ButtonStyle.Primary, unselected = ButtonStyle.Secondary } = style;
 
             pages.push(embed);
             buttons[id] = {

@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { Snowflake, ReactionEmoji, GuildEmoji } = require('discord.js');
+const { Snowflake, ReactionEmoji, GuildEmoji, EmbedBuilder } = require('discord.js');
 
 const { isString } = require('./is');
 
@@ -79,5 +79,14 @@ module.exports = {
         }
 
         throw new Error(`Could not get an URL out of this emoji : "${ emoji }"`);
+    },
+
+    /**
+     * @param {EmbedBuilder} embed
+     * @returns {string|null}
+     */
+    embedHexColor(embed) {
+
+        return embed?.data?.color ? `#${ embed.data.color.toString(16).padStart(6, '0') }` : null;
     }
 };

@@ -1,9 +1,9 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed, Guild, User, GuildMember, TextChannel } = require('discord.js');
+const { EmbedBuilder, Guild, User, GuildMember, TextChannel } = require('discord.js');
 
-const { time : Time } = require('@discordjs/builders');
+const { time : Time } = require('discord.js');
 
 const { View, Util } = require('../../../core');
 
@@ -13,7 +13,7 @@ module.exports = class DailyActivityView extends View {
      * @param {Guild} guild
      * @param stats
      *
-     * @return {Promise<MessageEmbed>}
+     * @return {Promise<EmbedBuilder>}
      */
     async guild(guild, stats) {
 
@@ -32,7 +32,7 @@ module.exports = class DailyActivityView extends View {
      * @param {TextChannel} channel
      * @param stats
      *
-     * @return {Promise<MessageEmbed>}
+     * @return {Promise<EmbedBuilder>}
      */
     async channel(channel, stats) {
 
@@ -51,7 +51,7 @@ module.exports = class DailyActivityView extends View {
      * @param {User|GuildMember} [user]
      * @param stats
      *
-     * @return {Promise<MessageEmbed>}
+     * @return {Promise<EmbedBuilder>}
      */
     async user(user, stats) {
 
@@ -70,8 +70,10 @@ module.exports = class DailyActivityView extends View {
 
         const { averageMessagePerPeriod, mostActivePeriod } = stats;
 
-        embed.addField('Average per day', `${ averageMessagePerPeriod.toFixed(2) } messages`, true)
-            .addField('Most active day', `${ Time(mostActivePeriod.time, 'R') } with ${ mostActivePeriod.message } messages`, true);
+        embed.addFields([
+            { name : 'Average per day', value : `${ averageMessagePerPeriod.toFixed(2) } messages`, inline : true },
+            { name : 'Most active day', value : `${ Time(mostActivePeriod.time, 'R') } with ${ mostActivePeriod.message } messages`, inline : true }
+        ]);
     }
 
     async chart(embed, stats) {
@@ -142,7 +144,7 @@ module.exports = class DailyActivityView extends View {
             }
         });
 
-        embed.addField('Daily activity', Util.BLANK_CHAR, false);
+        embed.addFields([{ name : 'Daily activity', value : Util.BLANK_CHAR, inline : false }]);
 
         embed.setImage(url);
 
