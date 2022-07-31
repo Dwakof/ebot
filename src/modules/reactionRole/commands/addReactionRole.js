@@ -1,6 +1,6 @@
 'use strict';
 
-const { Permissions } = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 
 const { Command } = require('../../../core');
 
@@ -10,8 +10,8 @@ module.exports = class AddReactionRoleCommand extends Command {
 
         super('add reaction role', {
             aliases           : ['add reactionRole', 'addReactionRole', 'add reaction role'],
-            userPermissions   : [Permissions.FLAGS.ADMINISTRATOR],
-            clientPermissions : [Permissions.FLAGS.MANAGE_MESSAGES],
+            userPermissions   : [PermissionsBitField.Flags.Administrator],
+            clientPermissions : [PermissionsBitField.Flags.ManageMessages],
             channel           : 'guild',
             editable          : true,
             args              : [

@@ -257,7 +257,7 @@ class PaginatedEmbeds {
 
                 let { label, style, disabled, onClick, onReply } = button;
 
-                if (typeof embed === 'function') {
+                if (typeof label === 'function') {
 
                     this.#hooks.label[id] = label.bind(this);
 

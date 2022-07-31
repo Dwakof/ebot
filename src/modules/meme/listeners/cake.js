@@ -1,6 +1,6 @@
 'use strict';
 
-const { Constants } = require('discord.js');
+const { Events } = require('discord.js');
 
 const { Listener } = require('../../../core');
 
@@ -8,7 +8,7 @@ module.exports = class CakeMessageListener extends Listener {
 
     constructor() {
 
-        super('cake', { emitter : 'client', event : Constants.Events.MESSAGE_CREATE });
+        super('cake', { emitter : 'client', event : Events.MessageCreate });
     }
 
     async exec(message) {

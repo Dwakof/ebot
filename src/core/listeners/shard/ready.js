@@ -1,17 +1,13 @@
 'use strict';
 
-const { Constants } = require('discord.js');
-const { Listener }  = require('../../');
+const { Events }   = require('discord.js');
+const { Listener } = require('../../');
 
 module.exports = class ShardReadyListener extends Listener {
 
     constructor() {
 
-        super(Constants.Events.SHARD_READY, {
-            category : 'core',
-            emitter  : 'client',
-            event    : Constants.Events.SHARD_READY
-        });
+        super(Events.ShardReady, { category : 'core', emitter : 'client' });
     }
 
     exec(shardId) {

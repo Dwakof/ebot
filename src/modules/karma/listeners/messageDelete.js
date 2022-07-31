@@ -1,6 +1,6 @@
 'use strict';
 
-const { Constants } = require('discord.js');
+const { Events } = require('discord.js');
 
 const { Listener } = require('../../../core');
 
@@ -8,7 +8,7 @@ module.exports = class KarmaMessageDeletedListener extends Listener {
 
     constructor() {
 
-        super('karmaMessageDeleted', { emitter : 'client', event : Constants.Events.MESSAGE_DELETE });
+        super('karmaMessageDeleted', { emitter : 'client', event : Events.MessageDelete });
     }
 
     async exec(message) {

@@ -6,11 +6,7 @@ module.exports = class ProcessUncaughtExceptionListener extends Listener {
 
     constructor() {
 
-        super('uncaughtException', {
-            category : 'core',
-            emitter  : 'process',
-            event    : 'uncaughtException'
-        });
+        super('uncaughtException', { category : 'core', emitter : 'process' });
     }
 
     exec(err) {

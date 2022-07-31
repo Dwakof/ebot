@@ -1,6 +1,6 @@
 'use strict';
 
-const { Constants } = require('discord.js');
+const { Events } = require('discord.js');
 
 const { Listener } = require('../../../core');
 
@@ -8,7 +8,7 @@ module.exports = class ReactionRoleMessageListener extends Listener {
 
     constructor() {
 
-        super('reactionRoleMessage', { emitter : 'client', event : Constants.Events.MESSAGE_CREATE });
+        super('reactionRoleMessage', { emitter : 'client', event : Events.MessageCreate });
     }
 
     async exec(message) {

@@ -397,6 +397,8 @@ module.exports = class EbotClient extends AkairoClient {
      */
     handleError(module, error, message, extraData = {}) {
 
+        console.log({ module, error, message, extraData });
+
         this.logger.error({
             event        : CoreEvents.MODULE_ERROR,
             emitter      : module.id,
