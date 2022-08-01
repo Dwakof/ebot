@@ -50,7 +50,7 @@
     "p-queue-compat": "1.0.134",
     "pg": "8.7.3",
     "pg-query-stream": "4.2.3",
-    "pino": "8.0.0",
+    "pino": "8.3.1",
     "pug": "3.0.2",
     "puppeteer": "14.4.1",
     "undici": "5.5.1"
