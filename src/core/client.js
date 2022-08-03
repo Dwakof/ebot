@@ -267,6 +267,15 @@ module.exports = class EbotClient extends AkairoClient {
 
         this.#started = true;
 
+        this.rest.on('response', ({ method, route }, { statusCode }) => {
+
+            this.logger.trace({
+                msg     : `${ method } ${ route } (${ statusCode }`,
+                event   : 'apiResponse',
+                emitter : 'client'
+            });
+        });
+
         return this;
     }
 
