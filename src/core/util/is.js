@@ -1,5 +1,7 @@
 'use strict';
 
+const { ChannelType } = require('discord.js');
+
 module.exports = {
 
     isString(string) {
@@ -32,5 +34,15 @@ module.exports = {
         const hasKeys  = !!Object.keys(value).length;
 
         return !isArray && !isBuffer && isObject && hasKeys;
+    },
+
+    isTextChannel(channel) {
+
+        return channel.type === ChannelType.GuildText;
+    },
+
+    isVoiceChannel(channel) {
+
+        return channel.type === ChannelType.GuildVoice;
     }
 };

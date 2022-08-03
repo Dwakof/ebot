@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { Constants, MessageReaction, User } = require('discord.js');
+const { Events, MessageReaction, User } = require('discord.js');
 
 const { Listener } = require('../../../core');
 
@@ -10,7 +10,7 @@ module.exports = class RepeatMimicListener extends Listener {
 
     constructor() {
 
-        super('repeatMimicListener', { emitter : 'client', event : Constants.Events.MESSAGE_REACTION_ADD });
+        super('repeatMimicListener', { emitter : 'client', event : Events.MessageReactionAdd });
     }
 
     /**

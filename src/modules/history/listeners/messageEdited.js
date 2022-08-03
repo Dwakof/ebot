@@ -1,6 +1,6 @@
 'use strict';
 
-const { Constants } = require('discord.js');
+const { Events } = require('discord.js');
 
 const { Listener } = require('../../../core');
 
@@ -8,7 +8,7 @@ module.exports = class HistoryMessageEditedListener extends Listener {
 
     constructor() {
 
-        super('historyMessageEdited', { emitter : 'client', event : Constants.Events.MESSAGE_UPDATE });
+        super('historyMessageEdited', { emitter : 'client', event : Events.MessageUpdate });
     }
 
     async exec(oldMessage, newMessage) {

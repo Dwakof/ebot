@@ -18,6 +18,11 @@ module.exports = class Listener extends AkairoListener {
      */
     client;
 
+    constructor(id, options) {
+
+        super(id, { event : id, ...options });
+    }
+
     services(module = this.categoryID) {
 
         return this.client.services(module);

@@ -1,17 +1,13 @@
 'use strict';
 
-const { Constants } = require('discord.js');
-const { Listener }  = require('../../');
+const { Events }   = require('discord.js');
+const { Listener } = require('../../');
 
 module.exports = class MessageReactionAddListener extends Listener {
 
     constructor() {
 
-        super(Constants.Events.MESSAGE_REACTION_ADD, {
-            category : 'core',
-            emitter  : 'client',
-            event    : Constants.Events.MESSAGE_REACTION_ADD
-        });
+        super(Events.MessageReactionAdd, { category : 'core', emitter : 'client' });
     }
 
     exec(reaction, user) {

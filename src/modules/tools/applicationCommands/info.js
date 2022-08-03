@@ -26,13 +26,15 @@ class InfoCommand extends ApplicationCommand {
             .reduce((acc, x) => (acc + x), 0);
 
         const embed = this.client.util.embed()
-            .setAuthor('Statistics of Ebot', this.client.user.avatarURL({ dynamic : true }))
-            .addField('Version', this.client.settings.version, true)
-            .addField('Memory', `${ (process.memoryUsage().rss / 1024 / 1024).toFixed(2) } MB`, true)
-            .addField('Uptime', Duration.fromObject({ milliseconds : this.client.uptime }).toHuman(), true)
-            .addField('Commands', totalCommands.toString(), true)
-            .addField('Admins', this.client.util.ownerIds(), true)
-            .setFooter(`Asked by ${ interaction.user.username }`)
+            .setAuthor({ name : 'Statistics of Ebot', icon_url : this.client.user.avatarURL({ dynamic : true }) })
+            .addFields([
+                { name : 'Version', value : this.client.settings.version, inline : true },
+                { name : 'Memory', value : `${ (process.memoryUsage().rss / 1024 / 1024).toFixed(2) } MB`, inline : true },
+                { name : 'Uptime', value : Duration.fromObject({ milliseconds : this.client.uptime }).toHuman(), inline : true },
+                { name : 'Commands', value : totalCommands.toString(), inline : true },
+                { name : 'Admins', value : this.client.util.ownerIds(), inline : true }
+            ])
+            .setFooter({ text : `Asked by ${ interaction.user.username }` })
             .setTimestamp();
 
         return interaction.reply({ embeds : [embed] });

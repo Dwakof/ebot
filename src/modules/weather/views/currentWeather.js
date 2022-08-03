@@ -2,7 +2,7 @@
 
 const { View, Util } = require('../../../core');
 
-const { time : Time, TimestampStyles, inlineCode } = require('@discordjs/builders');
+const { time : Time, TimestampStyles, inlineCode } = require('discord.js');
 const { isNumber }                                 = require('chart.js/helpers');
 
 module.exports = class CurrentWeatherView extends View {
@@ -46,11 +46,11 @@ module.exports = class CurrentWeatherView extends View {
     }
 
     /**
-     * @param {MessageEmbed}          embed
+     * @param {EmbedBuilder}          embed
      * @param {WeatherCondition}      condition
      * @param {Boolean}               [day=true]
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     weatherIcon(embed, condition, day = true) {
 
@@ -60,42 +60,54 @@ module.exports = class CurrentWeatherView extends View {
     }
 
     /**
-     * @param {MessageEmbed}          embed
+     * @param {EmbedBuilder}          embed
      * @param {OneCallCurrentWeather} current
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     sun(embed, current) {
 
         const { sunrise, sunset } = current;
 
-        return embed.addField('Sunrise/Sunset', [
-            `:city_sunrise: ${ Time(sunrise, TimestampStyles.RelativeTime) }`,
-            `:night_with_stars: ${ Time(sunset, TimestampStyles.RelativeTime) }`
-        ].join('\n'), true);
+        return embed.addFields([
+            {
+                name   : 'Sunrise/Sunset',
+                value  : [
+                    `:city_sunrise: ${ Time(sunrise, TimestampStyles.RelativeTime) }`,
+                    `:night_with_stars: ${ Time(sunset, TimestampStyles.RelativeTime) }`
+                ].join('\n'),
+                inline : true
+            }
+        ]);
     }
 
     /**
-     * @param {MessageEmbed}          embed
+     * @param {EmbedBuilder}          embed
      * @param {OneCallCurrentWeather} current
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     temperature(embed, current) {
 
         const { CommonView } = this.views();
 
-        return embed.addField('Temps/Feels like', [
-            `:thermometer: ${ CommonView.temperature(current.temp) }`,
-            `:dash: ${ CommonView.temperature(current.feels_like) }`
-        ].join('\n'), true);
+        return embed.addFields([
+            {
+                name   : 'Temps/Feels like',
+                value  : [
+                    `:thermometer: ${ CommonView.temperature(current.temp) }`,
+                    `:dash: ${ CommonView.temperature(current.feels_like) }`
+                ].join('\n'),
+                inline : true
+            }
+        ]);
     }
 
     /**
-     * @param {MessageEmbed}          embed
+     * @param {EmbedBuilder}          embed
      * @param {OneCallCurrentWeather} current
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     wind(embed, current) {
 
@@ -104,35 +116,53 @@ module.exports = class CurrentWeatherView extends View {
 
         if (current.wind_speed === 0) {
 
-            return embed.addField('Wind/Gust', `:wind_chime: ${ inlineCode('no wind') }`, true);
+            return embed.addFields([{ name : 'Wind/Gust', value : `:wind_chime: ${ inlineCode('no wind') }`, inline : true }]);
         }
 
-        return embed.addField('Wind/Gust', [
-            [`:wind_chime:`, inlineCode(`${ CommonView.speed(current.wind_speed ?? 0) } ${ WeatherService.toDirection(current.wind_deg) }`)].join(' '),
-            [`:dash:`, inlineCode(`${ CommonView.speed(current.wind_gust ?? 0) }`)].join(' ')
-        ].join('\n'), true);
+        return embed.addFields([
+            {
+                name   : 'Wind/Gust',
+                inline : true,
+                value  : [
+                    [
+                        `:wind_chime:`,
+                        inlineCode(`${ CommonView.speed(current.wind_speed ?? 0) } ${ WeatherService.toDirection(current.wind_deg) }`)
+                    ].join(' '),
+                    [
+                        `:dash:`,
+                        inlineCode(`${ CommonView.speed(current.wind_gust ?? 0) }`)
+                    ].join(' ')
+                ].join('\n')
+            }
+        ]);
     }
 
     /**
-     * @param {MessageEmbed}          embed
+     * @param {EmbedBuilder}          embed
      * @param {OneCallCurrentWeather} current
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     humidityPressure(embed, current) {
 
-        return embed.addField('Humidity/Pressure', [
-            [`:droplet:`, inlineCode(`${ current.humidity } %`)].join(' '),
-            [`:dash:`, inlineCode(`${ current.pressure } hPa`)].join(' ')
-        ].join('\n'), true);
+        return embed.addFields([
+            {
+                name   : 'Humidity/Pressure',
+                inline : true,
+                value  : [
+                    [`:droplet:`, inlineCode(`${ current.humidity } %`)].join(' '),
+                    [`:dash:`, inlineCode(`${ current.pressure } hPa`)].join(' ')
+                ].join('\n')
+            }
+        ]);
     }
 
     /**
-     * @param {MessageEmbed}          embed
+     * @param {EmbedBuilder}          embed
      * @param {OneCallCurrentWeather} current
      * @param {AirQuality}            airQuality
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     airQualityUVIndex(embed, current, airQuality) {
 
@@ -165,6 +195,6 @@ module.exports = class CurrentWeatherView extends View {
             rows.push(`:sunny: ${ inlineCode(`${ current.uvi }`) }`);
         }
 
-        return embed.addField(title.join('/'), rows.join('\n'), true);
+        return embed.addFields([{ name : title.join('/'), value : rows.join('\n'), inline : true }]);
     }
 };

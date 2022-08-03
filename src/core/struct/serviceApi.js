@@ -63,7 +63,7 @@ class ServiceApi extends Service {
 
         if (statusCode >= 400) {
 
-            this.client.logger.error({ msg : `${ this.id } : API error ${ statusCode }`, body, path, queryParams, statusCode, method });
+            this.client.logger.error({ msg : `${ this.id } : API error ${ statusCode }`, response : body, body : options.body, path, queryParams, statusCode, method });
 
             const error = new Error(`${ this.id } : API error ${ statusCode }`);
 
@@ -82,6 +82,11 @@ class ServiceApi extends Service {
             get : (path, queryParams = {}, options = {}) => {
 
                 return this.#call('GET', path, queryParams, options);
+            },
+
+            post : (path, body, queryParams = {}, options = {}) => {
+
+                return this.#call('POST', path, queryParams, { body, ...options });
             }
         };
     }

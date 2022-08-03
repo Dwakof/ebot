@@ -1,17 +1,13 @@
 'use strict';
 
-const { Constants } = require('discord.js');
-const { Listener }  = require('../../');
+const { Events }   = require('discord.js');
+const { Listener } = require('../../');
 
 module.exports = class MessageDeleteBulkListener extends Listener {
 
     constructor() {
 
-        super(Constants.Events.MESSAGE_BULK_DELETE, {
-            category : 'core',
-            emitter  : 'client',
-            event    : Constants.Events.MESSAGE_BULK_DELETE
-        });
+        super(Events.MessageBulkDelete, { category : 'core', emitter : 'client' });
     }
 
     exec(messages) {

@@ -1,11 +1,11 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed, MessageAttachment, Constants : { Colors } } = require('discord.js');
+const { EmbedBuilder, AttachmentBuilder, Colors } = require('discord.js');
 
-const { inlineCode } = require('@discordjs/builders');
+const { inlineCode } = require('discord.js');
 
-const { View } = require('../../../core');
+const { View, Util } = require('../../../core');
 
 module.exports = class CurrencyView extends View {
 
@@ -15,7 +15,7 @@ module.exports = class CurrencyView extends View {
      * @param {Number}   amount
      * @param {Array}    stats
      *
-     * @return {Promise<{embeds: MessageEmbed[], files: MessageAttachment[]}>}
+     * @return {Promise<{embeds: EmbedBuilder[], files: AttachmentBuilder[]}>}
      */
     async history(from, to, amount, stats) {
 
@@ -32,8 +32,8 @@ module.exports = class CurrencyView extends View {
                 datasets : [
                     {
                         label           : 'rate',
-                        backgroundColor : embed.hexColor,
-                        borderColor     : embed.hexColor,
+                        backgroundColor : Util.embedHexColor(embed),
+                        borderColor     : Util.embedHexColor(embed),
                         stepped         : true,
                         pointRadius     : 0,
                         parsing         : false,
@@ -62,7 +62,7 @@ module.exports = class CurrencyView extends View {
     /**
      * @param {Array<Currency>} currencies
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     list(currencies) {
 
@@ -78,6 +78,6 @@ module.exports = class CurrencyView extends View {
 
     currencyNotFound(text) {
 
-        return this.embed().setColor(Colors.RED).setDescription(`Currency "${ text }" not found.`);
+        return this.embed().setColor(Colors.Red).setDescription(`Currency "${ text }" not found.`);
     }
 };

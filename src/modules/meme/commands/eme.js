@@ -1,6 +1,6 @@
 'use strict';
 
-const { Permissions } = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 
 const { Command } = require('../../../core');
 
@@ -10,7 +10,7 @@ module.exports = class EyeMouthEyeCommand extends Command {
 
         super('eme', {
             aliases           : ['eyemoutheye', 'eme'],
-            clientPermissions : [Permissions.FLAGS.SEND_MESSAGES],
+            clientPermissions : [PermissionsBitField.Flags.SendMessages],
             args              : [],
             description       : {
                 content  : '👁👄👁',

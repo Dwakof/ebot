@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 const { ServiceApi } = require('../../../core');
 
@@ -40,7 +40,7 @@ module.exports = class UrbanDictionaryService extends ServiceApi {
     /**
      * @param {DefinitionObject} definition
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     toEmbed(definition) {
 
@@ -58,7 +58,7 @@ module.exports = class UrbanDictionaryService extends ServiceApi {
     }
 
     /**
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     embed() {
 

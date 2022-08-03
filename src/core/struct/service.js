@@ -5,7 +5,8 @@ const { KeyvLruManagedTtl } = require('keyv-lru');
 const Hoek                  = require('@hapi/hoek');
 const Cron                  = require('node-cron');
 
-const Util = require('../util');
+const Util           = require('../util');
+const { CoreEvents } = require('../constants');
 
 class Service {
 
@@ -69,7 +70,11 @@ class Service {
 
             const method = this[methodName];
 
-            this.client.logger.info(`[${ this.module }.${ this.id }] Created a cache segment "${ methodName }" with a default ttl of ${ Util.getTimeString(segment.defaultTtl) }`);
+            this.client.logger.info({
+                msg     : `${ this.module }.${ this.id } created a cache segment "${ methodName }" with a default ttl of ${ Util.getTimeString(segment.defaultTtl) }`,
+                event   : CoreEvents.CACHE_SEGMENT_CREATED,
+                emitter : 'core'
+            });
 
             this[methodName] = async (...args) => {
 
@@ -134,7 +139,11 @@ class Service {
                 method = this[job];
             }
 
-            this.client.logger.info(`[${ this.module }.${ this.id }] Created a schedule "${ schedule }" for cron job ${ cron }`);
+            this.client.logger.info({
+                msg     : `${ this.module }.${ this.id } created a schedule "${ schedule }" for cron job ${ cron }`,
+                event   : CoreEvents.SCHEDULE_CREATED,
+                emitter : 'core'
+            });
 
             Cron.schedule(schedule, async () => {
 
@@ -143,16 +152,26 @@ class Service {
 
                 try {
 
-                    this.client.logger.info(`[${ this.module }.${ this.id }] Starting job "${ cron }" with id ${ id }`);
+                    this.client.logger.info({
+                        msg : `${ this.module }.${ this.id } Starting job "${ cron }" with id ${ id }`,
+                        event   : CoreEvents.SCHEDULE_STARTED,
+                        emitter : 'core'
+                    });
 
                     await method.call(this, this.client);
 
-                    this.client.logger.info(`[${ this.module }.${ this.id }] Job "${ cron }" with id ${ id } finished in ${ Util.getTimeString(DateTime.now().diff(start)) }`);
+                    this.client.logger.info({
+                        msg : `${ this.module }.${ this.id } Job "${ cron }" with id ${ id } finished in ${ Util.getTimeString(DateTime.now().diff(start)) }`,
+                        event   : CoreEvents.SCHEDULE_ENDED,
+                        emitter : 'core'
+                    });
                 }
                 catch (err) {
 
                     this.client.logger.error({
                         msg : `[${ this.module }.${ this.id }] Job "${ cron }" with id ${ id } failed in ${ Util.getTimeString(DateTime.now().diff(start)) }`,
+                        event   : CoreEvents.SCHEDULE_FAILED,
+                        emitter : 'core',
                         err
                     });
                 }

@@ -1,17 +1,13 @@
 'use strict';
 
-const { Constants } = require('discord.js');
-const { Listener }  = require('../../');
+const { Events }   = require('discord.js');
+const { Listener } = require('../../');
 
 module.exports = class GuildUnavailableListener extends Listener {
 
     constructor() {
 
-        super(Constants.Events.GUILD_UNAVAILABLE, {
-            category : 'core',
-            emitter  : 'client',
-            event    : Constants.Events.GUILD_UNAVAILABLE
-        });
+        super(Events.GuildUnavailable, { category : 'core', emitter : 'client' });
     }
 
     exec(guild) {

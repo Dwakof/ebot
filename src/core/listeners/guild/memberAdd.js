@@ -1,17 +1,13 @@
 'use strict';
 
-const { Constants } = require('discord.js');
-const { Listener }  = require('../../');
+const { Events }   = require('discord.js');
+const { Listener } = require('../../');
 
 module.exports = class MemberAddListener extends Listener {
 
     constructor() {
 
-        super(Constants.Events.GUILD_MEMBER_ADD, {
-            category : 'core',
-            emitter  : 'client',
-            event    : Constants.Events.GUILD_MEMBER_ADD
-        });
+        super(Events.GuildMemberAdd, { category : 'core', emitter : 'client' });
     }
 
     exec(member) {

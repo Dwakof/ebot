@@ -1,6 +1,6 @@
 'use strict';
 
-const { Constants } = require('discord.js');
+const { ButtonStyle } = require('discord.js');
 
 const { ApplicationCommand, Util } = require('../../../core');
 
@@ -64,8 +64,8 @@ module.exports = class Weather extends ApplicationCommand {
 
         await interaction.deferReply();
 
-        const { LocationService, WeatherService, HistoryService }           = this.services();
-        const { CurrentWeatherView, WeatherForecastView, WeatherAlertView } = this.views();
+        const { LocationService, WeatherService, HistoryService }                       = this.services();
+        const { CurrentWeatherView, WeatherForecastView, WeatherAlertView, CommonView } = this.views();
 
         let location;
 
@@ -108,8 +108,8 @@ module.exports = class Weather extends ApplicationCommand {
                     label : 'Alerts',
                     embed : WeatherAlertView.render(alerts, location),
                     style : {
-                        selected   : Constants.MessageButtonStyles.DANGER,
-                        unselected : Constants.MessageButtonStyles.DANGER
+                        selected   : ButtonStyle.Danger,
+                        unselected : ButtonStyle.Danger
                     }
                 });
             }
@@ -120,7 +120,10 @@ module.exports = class Weather extends ApplicationCommand {
 
             this.client.logger.error({ err : error });
 
-            await interaction.editReply({ content : `⚠ Unable to get weather information for location "${ location }"`, ephemeral : true });
+            await interaction.editReply({
+                content   : `⚠ Unable to get weather information for location "${ CommonView.location(location) }"`,
+                ephemeral : true
+            });
         }
         finally {
 

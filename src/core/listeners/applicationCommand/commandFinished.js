@@ -6,17 +6,13 @@ module.exports = class CommandFinishedListener extends Listener {
 
     constructor() {
 
-        super(ApplicationCommandHandler.Events.COMMAND_FINISHED, {
-            category : 'core',
-            emitter  : 'handler',
-            event    : ApplicationCommandHandler.Events.COMMAND_FINISHED
-        });
+        super(ApplicationCommandHandler.Events.COMMAND_FINISHED, { category : 'core', emitter : 'handler' });
     }
 
     exec(interaction, command) {
 
         this.client.logger.info({
-            msg         : `ApplicationCommand "${ command.categoryID }${ command.id }" was triggered by user "${ interaction?.user?.username }" in guild "${ interaction?.member?.guild?.name }"`,
+            msg         : `ApplicationCommand "${ command.categoryID }.${ command.id }" was triggered by user "${ interaction?.user?.username }" in guild "${ interaction?.member?.guild?.name }" in channel "${ interaction?.channel?.name }"`,
             event       : this.event,
             emitter     : this.emitter,
             command     : {

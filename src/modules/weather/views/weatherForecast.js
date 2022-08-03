@@ -2,7 +2,7 @@
 
 const { View, Util } = require('../../../core');
 
-const { time : Time, TimestampStyles, inlineCode } = require('@discordjs/builders');
+const { time : Time, TimestampStyles, inlineCode } = require('discord.js');
 
 module.exports = class WeatherForecastView extends View {
 
@@ -11,7 +11,7 @@ module.exports = class WeatherForecastView extends View {
      * @param {Location}                  location
      * @param {Number}                    [maxDays=5]
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     daily(daily, location, maxDays = 5) {
 
@@ -46,7 +46,13 @@ module.exports = class WeatherForecastView extends View {
             rows.push(`${ CommonView.conditionToEmoji(w, true) } ${ inlineCode(w.description) }`);
         }
 
-        return embed.addField(`${ Time(dt, TimestampStyles.LongDate) } ${ CommonView.moon(moon_phase ?? -1) }`, rows.join('\n'), true);
+        return embed.addFields([
+            {
+                name   : `${ Time(dt, TimestampStyles.LongDate) } ${ CommonView.moon(moon_phase ?? -1) }`,
+                value  : rows.join('\n'),
+                inline : true
+            }
+        ]);
     }
 
     temperature(embed, day, title = 'Temperature') {
@@ -55,10 +61,16 @@ module.exports = class WeatherForecastView extends View {
 
         const { temp, feels_like } = day;
 
-        return embed.addField(title, [
-            `:thermometer: ${ inlineCode(`${ CommonView.temperature(temp.min) }, ${ CommonView.temperature(temp.max) }`) }`,
-            `:dash: ${ inlineCode(`${ CommonView.temperature(feels_like.morn) }, ${ CommonView.temperature(feels_like.eve) }`) }`
-        ].join('\n'), true);
+        return embed.addFields([
+            {
+                name   : title,
+                value  : [
+                    `:thermometer: ${ inlineCode(`${ CommonView.temperature(temp.min) }, ${ CommonView.temperature(temp.max) }`) }`,
+                    `:dash: ${ inlineCode(`${ CommonView.temperature(feels_like.morn) }, ${ CommonView.temperature(feels_like.eve) }`) }`
+                ].join('\n'),
+                inline : true
+            }
+        ]);
     }
 
     air(embed, day, title = 'Air') {
@@ -89,6 +101,6 @@ module.exports = class WeatherForecastView extends View {
 
         rows.push(Util.BLANK_CHAR);
 
-        return embed.addField(title, rows.join('\n'), true);
+        return embed.addFields([{ name : title, value : rows.join('\n'), inline : true }]);
     }
 };

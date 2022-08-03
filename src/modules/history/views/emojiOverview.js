@@ -1,8 +1,8 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed, Guild, User, GuildMember, TextChannel } = require('discord.js');
-const { userMention, inlineCode }                             = require('@discordjs/builders');
+const { EmbedBuilder, Guild, User, GuildMember, TextChannel } = require('discord.js');
+const { userMention, inlineCode }                             = require('discord.js');
 
 const { View, Util } = require('../../../core');
 
@@ -17,7 +17,7 @@ module.exports = class EmojiOverviewView extends View {
      * @param {Guild}  guild
      * @param {Object} stats
      *
-     * @return {Promise<MessageEmbed>}
+     * @return {Promise<EmbedBuilder>}
      */
     async guild(guild, stats) {
 
@@ -37,7 +37,7 @@ module.exports = class EmojiOverviewView extends View {
      * @param {TextChannel} channel
      * @param {Object}      stats
      *
-     * @return {Promise<MessageEmbed>}
+     * @return {Promise<EmbedBuilder>}
      */
     async channel(channel, stats) {
 
@@ -57,7 +57,7 @@ module.exports = class EmojiOverviewView extends View {
      * @param {GuildMember|User} user
      * @param {Object}           stats
      *
-     * @return {Promise<MessageEmbed>}
+     * @return {Promise<EmbedBuilder>}
      */
     async user(user, stats) {
 
@@ -114,16 +114,20 @@ module.exports = class EmojiOverviewView extends View {
 
         if (!rankOfUserForEmoji) {
 
-            embed.addField('Total Emoji used', '0', true)
-                .addField(Util.BLANK_CHAR, Util.BLANK_CHAR, true)
-                .addField('Rank', 'unranked', true);
+            embed.addFields([
+                { name : 'Total Emoji used', value : '0', inline : true },
+                { name : Util.BLANK_CHAR, value : Util.BLANK_CHAR, inline : true },
+                { name : 'Rank', value : 'unranked', inline : true }
+            ]);
 
             return embed;
         }
 
-        embed.addField('Total Emoji used', rankOfUserForEmoji.count, true)
-            .addField(Util.BLANK_CHAR, Util.BLANK_CHAR, true)
-            .addField('Rank', Util.RANK_LIST[parseInt(rankOfUserForEmoji.rank) - 1] || Util.ordinal(parseInt(rankOfUserForEmoji.rank)), true);
+        embed.addFields([
+            { name : 'Total Emoji used', value : rankOfUserForEmoji.count, inline : true },
+            { name : Util.BLANK_CHAR, value : Util.BLANK_CHAR, inline : true },
+            { name : 'Rank', value : Util.RANK_LIST[parseInt(rankOfUserForEmoji.rank) - 1] || Util.ordinal(parseInt(rankOfUserForEmoji.rank)), inline : true }
+        ]);
 
         return embed;
     }
@@ -142,7 +146,7 @@ module.exports = class EmojiOverviewView extends View {
                 datasets : [
                     {
                         label           : 'messages',
-                        backgroundColor : embed.hexColor,
+                        backgroundColor : Util.embedHexColor(embed),
                         borderRadius    : 30,
                         borderWidth     : 0,
                         parsing         : false,
@@ -166,7 +170,7 @@ module.exports = class EmojiOverviewView extends View {
 
         embed.setImage(url);
 
-        embed.addField('Percentage of emoji per message', Util.BLANK_CHAR, false);
+        embed.addFields([{ name : 'Percentage of emoji per message', value : Util.BLANK_CHAR, inline : false }]);
 
         return embed;
     }

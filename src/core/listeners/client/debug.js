@@ -1,17 +1,13 @@
 'use strict';
 
-const { Constants } = require('discord.js');
-const { Listener }  = require('../../');
+const { Events }   = require('discord.js');
+const { Listener } = require('../../');
 
 module.exports = class ClientDebugListener extends Listener {
 
     constructor() {
 
-        super(Constants.Events.DEBUG, {
-            category : 'core',
-            emitter  : 'client',
-            event    : Constants.Events.DEBUG
-        });
+        super(Events.Debug, { category : 'core', emitter : 'client' });
     }
 
     exec(msg) {

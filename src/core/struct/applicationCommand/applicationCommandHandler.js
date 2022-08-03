@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { Interaction, AutocompleteInteraction, BaseCommandInteraction, CommandInteraction } = require('discord.js');
+const { BaseInteraction, AutocompleteInteraction, BaseCommandInteraction, CommandInteraction, InteractionType } = require('discord.js');
 
 const { Routes }        = require('discord-api-types/v10');
 const { AkairoHandler } = require('discord-akairo');
@@ -83,12 +83,9 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
             const commands = this.getCommandsArray(false);
 
             this.client.logger.info({
-                msg     : `${ commands.length } application commands were registered per Guild`,
+                msg     : `${ commands.length } application commands were registered per Guild (${ commands.join(', ') })`,
                 event   : CoreEvents.GUILD_APPLICATION_COMMANDS_REGISTERED,
-                emitter : 'core',
-                global  : false,
-                module  : 'ApplicationCommandHandler',
-                commands
+                emitter : 'core'
             });
         }
         catch (err) {
@@ -108,12 +105,9 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
             const commands = this.getCommandsArray(true);
 
             this.client.logger.info({
-                msg     : `${ commands.length } application commands were registered globally`,
+                msg     : `${ commands.length } application commands were registered globally (${ commands.join(', ') })`,
                 event   : CoreEvents.GLOBAL_APPLICATION_COMMANDS_REGISTERED,
-                module  : 'ApplicationCommandHandler',
-                emitter : 'core',
-                global  : true,
-                commands
+                emitter : 'core'
             });
         }
         catch (err) {
@@ -170,7 +164,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
     }
 
     /**
-     * @param {Interaction|AutocompleteInteraction|BaseCommandInteraction|CommandInteraction} interaction
+     * @param {BaseInteraction|AutocompleteInteraction|BaseCommandInteraction|CommandInteraction} interaction
      *
      * @return {Promise<void>}
      */
@@ -199,7 +193,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
         const { applicationCommand, args } = this.commands.get(id);
 
-        if (interaction.isAutocomplete()) {
+        if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
 
             await applicationCommand.runAutocomplete(id, interaction);
 

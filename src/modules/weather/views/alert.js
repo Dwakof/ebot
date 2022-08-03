@@ -2,14 +2,14 @@
 
 const { View, Util } = require('../../../core');
 
-const { time : Time, TimestampStyles } = require('@discordjs/builders');
+const { time : Time, TimestampStyles } = require('discord.js');
 
 module.exports = class WeatherAlertView extends View {
 
     /**
      * @param {Array<WeatherAlert>} alerts
      *
-     * @return {Array<MessageEmbed>}
+     * @return {Array<EmbedBuilder>}
      */
     render(alerts) {
 
@@ -20,21 +20,22 @@ module.exports = class WeatherAlertView extends View {
      *
      * @param {WeatherAlert} alert
      *
-     * @return {MessageEmbed}
+     * @return {EmbedBuilder}
      */
     alert(alert) {
 
         const embed = this.embed()
             .setTitle(`${ alert.event }`)
-            .setColor('#ED4245')
-            .setDescription(`${ alert.description }`);
-
-        embed.addField(`Start : ${ Time(alert.start, TimestampStyles.RelativeTime) }`, Util.BLANK_CHAR, true);
-        embed.addField(`End : ${ Time(alert.end, TimestampStyles.RelativeTime) }`, Util.BLANK_CHAR, true);
+            .setColor('#ed4245')
+            .setDescription(`${ alert.description }`)
+            .addFields([
+                { name : `Start : ${ Time(alert.start, TimestampStyles.RelativeTime) }`, value : Util.BLANK_CHAR, inline : true },
+                { name : `End : ${ Time(alert.end, TimestampStyles.RelativeTime) }`, value : Util.BLANK_CHAR, inline : true }
+            ]);
 
         if (alert.sender_name) {
 
-            embed.setFooter(`from ${ alert.sender_name }`);
+            embed.setFooter({ text : `from ${ alert.sender_name }` });
         }
 
         return embed;

@@ -29,12 +29,11 @@ const store = new Confidence.Store({
     discord : {
         $filter     : { $env : 'NODE_ENV' },
         $base       : {
-            partials : { $env : 'DISCORD_PARTIALS', $coerce : 'array' },
-            ownerID  : { $env : 'DISCORD_OWNER_IDS', $coerce : 'array' },
             clientId : { $env : 'DISCORD_CLIENT_ID' },
             token    : { $env : 'DISCORD_TOKEN' },
+            ownerID  : { $env : 'DISCORD_OWNER_IDS', $coerce : 'array' },
             prefix   : { $env : 'DISCORD_COMMAND_PREFIX', $default : '!' },
-            intends  : {}
+            partials : { $env : 'DISCORD_PARTIALS', $coerce : 'array' }
         },
         development : {
             presence : {
@@ -70,7 +69,15 @@ const store = new Confidence.Store({
         },
         development : {
             level     : { $env : 'LOG_LEVEL', $default : 'debug' },
-            transport : { target : 'pino-pretty' }
+            transport : {
+                target  : 'pino-pretty',
+                options : {
+                    colorize      : { $env : 'LOG_COLOR', $coerce : 'boolean', $default : true },
+                    ignore        : 'event,emitter,command,interaction',
+                    messageFormat : '[{emitter}.{event}] : {msg}',
+                    translateTime : true
+                }
+            }
         },
         production  : {}
     },
@@ -93,11 +100,12 @@ const store = new Confidence.Store({
     plugins : {
         tooling      : {
             upload    : {
-                region      : { $env : 'UPLOAD_REGION' },
-                bucket      : { $env : 'UPLOAD_BUCKET' },
-                endpoint    : { $env : 'UPLOAD_ENDPOINT' },
-                proto       : { $env : 'UPLOAD_PROTO', $default : 'https' },
-                credentials : {
+                region       : { $env : 'UPLOAD_REGION' },
+                bucket       : { $env : 'UPLOAD_BUCKET' },
+                endpoint     : { $env : 'UPLOAD_ENDPOINT' },
+                proto        : { $env : 'UPLOAD_PROTO', $default : 'https' },
+                storageClass : { $env : 'UPLOAD_STORAGE_CLASS', $default : 'ONEZONE_IA' },
+                credentials  : {
                     accessKeyId     : { $env : 'UPLOAD_ACCESS_KEY' },
                     secretAccessKey : { $env : 'UPLOAD_SECRET_KEY' }
                 }

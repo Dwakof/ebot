@@ -6,11 +6,7 @@ module.exports = class ProcessUnhandledRejectionListener extends Listener {
 
     constructor() {
 
-        super('unhandledRejection', {
-            category : 'core',
-            emitter  : 'process',
-            event    : 'unhandledRejection'
-        });
+        super('unhandledRejection', { category : 'core', emitter : 'process' });
     }
 
     exec(err) {

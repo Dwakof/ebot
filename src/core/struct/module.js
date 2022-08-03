@@ -111,6 +111,8 @@ class Module {
             }
             catch (error) {
 
+                this.#client.logger.error({ err : error });
+
                 throw new Error(`Could not register ${ type } ${ name } from module ${ this.#name } because of : ${ error.toString() }`, { cause : error });
             }
         }

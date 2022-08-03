@@ -1,6 +1,6 @@
 'use strict';
 
-const { Constants } = require('discord.js');
+const { Colors } = require('discord.js');
 
 const { ApplicationCommand } = require('../../../core');
 
@@ -33,7 +33,7 @@ class AvatarCommand extends ApplicationCommand {
         const user = member ?? interaction.user;
 
         const embed = this.client.util.embed()
-            .setColor(user.displayHexColor || Constants.Colors.NAVY)
+            .setColor(user.displayHexColor || Colors.Navy)
             .setTitle(`Avatar for ${ user.username }`)
             .setImage(user.avatarURL({ dynamic : true, size : 4096 }));
 

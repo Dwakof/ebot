@@ -1,9 +1,9 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { MessageEmbed, TextChannel, Guild, User, GuildMember } = require('discord.js');
+const { EmbedBuilder, TextChannel, Guild, User, GuildMember } = require('discord.js');
 
-const { channelMention, userMention, time : Time, inlineCode } = require('@discordjs/builders');
+const { channelMention, userMention, time : Time, inlineCode } = require('discord.js');
 
 const { View, Util } = require('../../../core');
 
@@ -13,7 +13,7 @@ module.exports = class MessageOverviewView extends View {
      * @param {Guild}  guild
      * @param {Object} stats
      *
-     * @return {Promise<MessageEmbed>}
+     * @return {Promise<EmbedBuilder>}
      */
     async guild(guild, stats) {
 
@@ -35,7 +35,7 @@ module.exports = class MessageOverviewView extends View {
      * @param {TextChannel} channel
      * @param {Object}      stats
      *
-     * @return {Promise<MessageEmbed>}
+     * @return {Promise<EmbedBuilder>}
      */
     async channel(channel, stats) {
 
@@ -56,7 +56,7 @@ module.exports = class MessageOverviewView extends View {
      * @param {GuildMember|User} user
      * @param {Object}           stats
      *
-     * @return {Promise<MessageEmbed>}
+     * @return {Promise<EmbedBuilder>}
      */
     async user(user, stats) {
 
@@ -78,9 +78,11 @@ module.exports = class MessageOverviewView extends View {
 
         const total = Util.sum(countMessageOverTime, ({ value }) => value);
 
-        embed.addField('Total messages', inlineCode(total), true)
-            .addField(Util.BLANK_CHAR, Util.BLANK_CHAR, true)
-            .addField(Util.BLANK_CHAR, Util.BLANK_CHAR, true);
+        embed.addFields([
+            { name : 'Total messages', value : inlineCode(total), inline : true },
+            { name : Util.BLANK_CHAR, value : Util.BLANK_CHAR, inline : true },
+            { name : Util.BLANK_CHAR, value : Util.BLANK_CHAR, inline : true }
+        ]);
 
         return embed;
     }
@@ -89,9 +91,11 @@ module.exports = class MessageOverviewView extends View {
 
         const { rankOfUserForMessage : { count, rank } } = stats;
 
-        embed.addField('Total messages', count, true)
-            .addField('Rank', Util.RANK_LIST[parseInt(rank) - 1] || Util.ordinal(parseInt(rank)), true)
-            .addField(Util.BLANK_CHAR, Util.BLANK_CHAR, true);
+        embed.addFields([
+            { name : 'Total messages', value : count, inline : true },
+            { name : 'Rank', value : Util.RANK_LIST[parseInt(rank) - 1] || Util.ordinal(parseInt(rank)), inline : true },
+            { name : Util.BLANK_CHAR, value : Util.BLANK_CHAR, inline : true }
+        ]);
 
         return embed;
     }
@@ -100,9 +104,11 @@ module.exports = class MessageOverviewView extends View {
 
         const { firstAndLastMessages : { first, last } } = stats;
 
-        embed.addField('First message', Time(first.createdAt, 'R'), true)
-            .addField('Last message', Time(last.createdAt, 'R'), true)
-            .addField(Util.BLANK_CHAR, Util.BLANK_CHAR, true);
+        embed.addFields([
+            { name : 'First message', value : Time(first.createdAt, 'R'), inline : true },
+            { name : 'Last message', value : Time(last.createdAt, 'R'), inline : true },
+            { name : Util.BLANK_CHAR, value : Util.BLANK_CHAR, inline : true }
+        ]);
 
         return embed;
     }
@@ -163,7 +169,7 @@ module.exports = class MessageOverviewView extends View {
                 datasets : [
                     {
                         label           : 'messages',
-                        backgroundColor : embed.hexColor,
+                        backgroundColor : Util.embedHexColor(embed),
                         borderRadius    : 30,
                         borderWidth     : 0,
                         parsing         : false,
@@ -180,7 +186,7 @@ module.exports = class MessageOverviewView extends View {
 
         embed.setImage(url);
 
-        embed.addField('Message over time', Util.BLANK_CHAR, false);
+        embed.addFields([{ name : 'Message over time', value : Util.BLANK_CHAR, inline : false }]);
 
         return embed;
     }
