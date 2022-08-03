@@ -1,3 +1,15 @@
+# [0.23.0](https://github.com/Dwakof/ebot/compare/v0.22.0...v0.23.0) (2022-08-03)
+
+
+### Bug Fixes
+
+* some broken require for v14 ([0374fd1](https://github.com/Dwakof/ebot/commit/0374fd19d2d200a290b417b0ca3384772ef315ef))
+
+
+### Features
+
+* update to discord.js v14 ([6162082](https://github.com/Dwakof/ebot/commit/616208201871e69658b0918f8ef1d64ec43681cd))
+
 # [0.22.0](https://github.com/Dwakof/ebot/compare/v0.21.0...v0.22.0) (2022-06-21)
 
 
