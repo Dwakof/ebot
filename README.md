@@ -3,7 +3,7 @@
   <img alt="Version" src="https://img.shields.io/github/package-json/v/dwakof/ebot" />
   <img alt="Discord.js" src="https://img.shields.io/github/package-json/dependency-version/dwakof/ebot/discord.js" />
   <img src="https://img.shields.io/badge/node-%3E%3D16.6.0-blue.svg" />
-  <img src="https://img.shields.io/david/dwakof/ebot" />
+  <img alt="Libraries.io dependency status" src="https://img.shields.io/librariesio/github/dwakof/ebot">
   <a href="https://github.com/Dwakof/ebot#readme" target="_blank">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-no-red.svg" />
   </a>
@@ -15,11 +15,21 @@
   </a>
 </p>
 
-Ebot is a Discord bot for highly useful and highly useless purposes. We built it for quality, control, and to avoid closed-source bots in our server. We do not host it for the public but feel free to host it for yourself. Work on it continues and ideas or issue reports are welcome.
+<p>
+  <img align="left" width="128" height="128" src="https://user-images.githubusercontent.com/18331529/182911966-01836464-3a9a-4998-8fa8-48b4ab511fd4.png" alt="Dwakof in suit">
+  <p align="left">
+      Ebot is a Discord bot for highly useful and highly useless purposes. We built it for quality, control, and to avoid closed-source bots in our server. We do not host it for the public but feel free to host it for yourself. Work on it continues and ideas or issue reports are welcome.
+  </p>
+</p>
+
+<br>
+<br>
+
+---
 
 ## Features
 
-<details>
+<details align="left">
   <summary>Mimic</summary>
 
   Ebot can sync your server's message history and build a mimic model with it, which it can then use to mimic anyone on your guild or even the entire guild as a combined persona. Over time, as more messages are posted, it'll keep updating itself, so you only need to sync once.
