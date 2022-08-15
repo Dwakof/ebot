@@ -22,7 +22,7 @@
     "@discordjs/rest": "1.0.1",
     "@hapi/hoek": "10.0.1",
     "@hapipal/confidence": "6.0.2",
-    "@sentry/node": "7.8.1",
+    "@sentry/node": "7.10.0",
     "@sentry/tracing": "7.8.1",
     "@skyra/discord-components-core": "3.4.0",
     "ajv-formats": "2.1.1",
