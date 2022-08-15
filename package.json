@@ -35,7 +35,7 @@
     "discord-akairo": "github:discord-akairo/discord-akairo",
     "discord-api-types": "0.37.0",
     "discord-markdown": "2.5.1",
-    "discord.js": "14.1.2",
+    "discord.js": "14.2.0",
     "dotenv": "16.0.1",
     "emoji-regex": "10.1.0",
     "keyv": "4.3.3",
