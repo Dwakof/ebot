@@ -1,3 +1,10 @@
+## [0.24.2](https://github.com/Dwakof/ebot/compare/v0.24.1...v0.24.2) (2022-08-19)
+
+
+### Bug Fixes
+
+* export version on the client for info command ([7fe0477](https://github.com/Dwakof/ebot/commit/7fe0477e79de2723ba182e3d24232b0f5d5ac252))
+
 ## [0.24.1](https://github.com/Dwakof/ebot/compare/v0.24.0...v0.24.1) (2022-08-19)
 
 
