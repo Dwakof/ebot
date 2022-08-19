@@ -1,3 +1,11 @@
+## [0.24.3](https://github.com/Dwakof/ebot/compare/v0.24.2...v0.24.3) (2022-08-19)
+
+
+### Bug Fixes
+
+* gtp-3 character edition from list broken ([a1da16d](https://github.com/Dwakof/ebot/commit/a1da16d18a1d3a29bc07003804e05452317afae2))
+* typo ([db531ce](https://github.com/Dwakof/ebot/commit/db531ce6a1558135466b2de803d3f3e17bf2cadc))
+
 ## [0.24.2](https://github.com/Dwakof/ebot/compare/v0.24.1...v0.24.2) (2022-08-19)
 
 
