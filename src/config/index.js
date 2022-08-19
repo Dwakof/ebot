@@ -1,8 +1,9 @@
 'use strict';
 
-const Path       = require('path');
-const Confidence = require('@hapipal/confidence');
-const Dotenv     = require('dotenv');
+const Path             = require('path');
+const Confidence       = require('@hapipal/confidence');
+const Dotenv           = require('dotenv');
+const { ActivityType } =  require('discord-api-types/v10');
 
 const Pkg = require('../../package.json');
 
@@ -33,7 +34,7 @@ const store = new Confidence.Store({
                     afk        : false,
                     activities : [
                         {
-                            type : 'PLAYING',
+                            type : ActivityType.Playing,
                             name : `with my owner | ${ process.env.DISCORD_COMMAND_PREFIX || '!' }help`
                         }
                     ]
@@ -45,7 +46,7 @@ const store = new Confidence.Store({
                     afk        : false,
                     activities : [
                         {
-                            type : 'PLAYING',
+                            type : ActivityType.Playing,
                             name : `Ebot | ${ process.env.DISCORD_COMMAND_PREFIX || '!' }help`
                         }
                     ]
