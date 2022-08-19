@@ -262,13 +262,13 @@ module.exports = class Stats extends ApplicationCommand {
 
         user = await user.fetch(true);
 
-        return new Util.DashboardPaginatedEmbeds(interaction, [
-            { id : 'message', label : 'Messages', embed : this._message({ guild, user }) },
-            { id : 'reaction', label : 'Reactions', embed : this._reaction({ guild, user }) },
-            { id : 'weekly', label : 'Weekly', embed : this._weekly({ guild, user }) },
-            { id : 'daily', label : 'Daily', embed : this._daily({ guild, user }) },
-            { id : 'emoji', label : 'Emoji', embed : this._emoji({ guild, user }) }
-        ]).send();
+        return new Util.DashboardEmbeds(interaction, [
+            { label : 'Messages', embed : this._message({ guild, user }) },
+            { label : 'Reactions', embed : this._reaction({ guild, user }) },
+            { label : 'Weekly', embed : this._weekly({ guild, user }) },
+            { label : 'Daily', embed : this._daily({ guild, user }) },
+            { label : 'Emoji', embed : this._emoji({ guild, user }) }
+        ]);
     }
 
     overviewChannel(interaction, { channel }) {
@@ -280,25 +280,25 @@ module.exports = class Stats extends ApplicationCommand {
             channel = interaction.channel;
         }
 
-        return new Util.DashboardPaginatedEmbeds(interaction, [
-            { id : 'message', label : 'Messages', embed : this._message({ guild, channel }) },
-            { id : 'reaction', label : 'Reactions', embed : this._reaction({ guild, channel }) },
-            { id : 'weekly', label : 'Weekly', embed : this._weekly({ guild, channel }) },
-            { id : 'daily', label : 'Daily', embed : this._daily({ guild, channel }) },
-            { id : 'emoji', label : 'Emoji', embed : this._emoji({ guild, channel }) }
-        ]).send();
+        return new Util.DashboardEmbeds(interaction, [
+            { label : 'Messages', embed : this._message({ guild, channel }) },
+            { label : 'Reactions', embed : this._reaction({ guild, channel }) },
+            { label : 'Weekly', embed : this._weekly({ guild, channel }) },
+            { label : 'Daily', embed : this._daily({ guild, channel }) },
+            { label : 'Emoji', embed : this._emoji({ guild, channel }) }
+        ]);
     }
 
     overviewGuild(interaction) {
 
         const guild = interaction.guild;
 
-        return new Util.DashboardPaginatedEmbeds(interaction, [
-            { id : 'message', label : 'Messages', embed : this._message({ guild }) },
-            { id : 'reaction', label : 'Reactions', embed : this._reaction({ guild }) },
-            { id : 'weekly', label : 'Weekly', embed : this._weekly({ guild }) },
-            { id : 'daily', label : 'Daily', embed : this._daily({ guild }) },
-            { id : 'emoji', label : 'Emoji', embed : this._emoji({ guild }) }
-        ]).send();
+        return new Util.DashboardEmbeds(interaction, [
+            { label : 'Messages', embed : this._message({ guild }) },
+            { label : 'Reactions', embed : this._reaction({ guild }) },
+            { label : 'Weekly', embed : this._weekly({ guild }) },
+            { label : 'Daily', embed : this._daily({ guild }) },
+            { label : 'Emoji', embed : this._emoji({ guild }) }
+        ]);
     }
 };

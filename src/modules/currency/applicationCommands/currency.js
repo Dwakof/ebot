@@ -144,7 +144,7 @@ module.exports = class Currency extends ApplicationCommand {
 
         const currencies = CurrencyService.list();
 
-        return new Util.PaginatedEmbeds(interaction, Util.chunk(currencies, 12).map(CurrencyView.list.bind(CurrencyView))).send();
+        return new Util.PaginatedEmbeds(interaction, Util.chunk(currencies, 12).map(CurrencyView.list.bind(CurrencyView)));
     }
 
     /**

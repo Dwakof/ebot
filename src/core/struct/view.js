@@ -27,7 +27,7 @@ class View {
     /**
      * Method to override that is called when the client is started.
      */
-    init() {}
+    init(settings) {}
 
     /**
      * @param [data]
@@ -67,6 +67,14 @@ class View {
     views(module = this.module) {
 
         return this.client.views(module);
+    }
+
+    /**
+     * @return {Module~Store}
+     */
+    get store() {
+
+        return this.client.store(this.module);
     }
 
     multiColumnSingleFullWidthField(embed, values, title = 'Title', options = {}) {

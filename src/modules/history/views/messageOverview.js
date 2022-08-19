@@ -157,7 +157,7 @@ module.exports = class MessageOverviewView extends View {
 
     async chartOverTime(embed, stats) {
 
-        const { ChartService } = this.services('tooling');
+        const { ChartService } = this.services('core');
 
         const { countMessageOverTime } = stats;
 

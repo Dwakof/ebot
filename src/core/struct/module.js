@@ -11,10 +11,96 @@ const { CoreEvents } = require('../constants');
 const Service = require('./service');
 const View    = require('./view');
 
+/**
+ * @class
+ * @memberof Module
+ */
+class Store {
+
+    #name;
+    #service;
+
+    constructor(name, storeService) {
+
+        this.#name    = name;
+        this.#service = storeService;
+    }
+
+    /**
+     * @template [T=Object]
+     *
+     * @param {String} namespace
+     * @param {String} guildId
+     * @param {String} id
+     *
+     * @return {Promise<StoreService~Entry<T>>}
+     */
+    get(namespace, guildId, id) {
+
+        return this.#service.get(this.#name, namespace, guildId, id);
+    }
+
+    /**
+     * @template [T=Object]
+     *
+     * @param {String} namespace
+     * @param {String} guildId
+     * @param {String} id
+     * @param {Object} value
+     *
+     * @return {Promise<StoreService~Entry<T>>}
+     */
+    set(namespace, guildId, id, value) {
+
+        return this.#service.set(this.#name, namespace, guildId, id, value);
+    }
+
+    /**
+     * @template [T=Object]
+     *
+     * @param {String}   namespace
+     * @param {String}   [guildId]
+     * @param {String[]} [ids]
+     *
+     * @return {Promise<Array<StoreService~Entry<T>>>}
+     */
+    list(namespace, guildId, ids) {
+
+        return this.#service.list(this.#name, namespace, guildId, ids);
+    }
+
+    /**
+     * @template [T=Object]
+     *
+     * @param {String}   namespace
+     * @param {String}   guildId
+     *
+     * @return {Promise<Array<String>>}
+     */
+    listIds(namespace, guildId) {
+
+        return this.#service.listIds(this.#name, namespace, guildId);
+    }
+
+    /**
+     * @template [T=Object]
+     *
+     * @param {String} namespace
+     * @param {String} [guildId]
+     * @param {String} [id]
+     * @returns {Promise<Number>}
+     */
+    delete(namespace, guildId, id) {
+
+        return this.#service.delete(this.#name, namespace, guildId, id);
+    }
+}
+
 class Module {
 
     #name;
     #path;
+    #settings;
 
     /**
      * The Ebot client.
@@ -30,6 +116,11 @@ class Module {
     #views               = new Map();
     #applicationCommands = new Map();
 
+    /**
+     * @type {Module~Store}
+     */
+    #store;
+
     constructor(name, path) {
 
         this.#name = name;
@@ -38,18 +129,25 @@ class Module {
 
     /**
      * @param {EbotClient} client
+     * @param {Object}     settings
      *
      * @return {Promise<void>}
      */
-    async load(client) {
+    async load(client, settings) {
 
-        this.#client = client;
+        this.#client   = client;
+        this.#settings = settings;
 
         const components = await Fs.readdir(this.#path);
 
         if (components.includes('providers')) {
 
             await this.registerProviders();
+        }
+
+        if (this.#name !== 'core') {
+
+            this.registerStore();
         }
 
         if (components.includes('services')) {
@@ -81,6 +179,13 @@ class Module {
 
             await this.registerApplicationCommands();
         }
+    }
+
+    registerStore() {
+
+        const { StoreService } = this.#client.services('core');
+
+        this.#store = new Store(this.#name, StoreService);
     }
 
     async registerAkairoModule(collection, handler, subPath, type) {
@@ -154,7 +259,7 @@ class Module {
 
                 if (typeof file === 'function') {
 
-                    ({ id, provider } = await file(this.#client));
+                    ({ id, provider } = await file(this.#client, this.#settings));
                 }
                 else {
 
@@ -256,7 +361,7 @@ class Module {
 
         for (const [id, { provider }] of this.#providers.entries()) {
 
-            await provider.init();
+            await provider.init(this.#settings);
 
             this.#client.logger.debug({
                 event    : CoreEvents.PROVIDER_INITIALIZED,
@@ -268,7 +373,7 @@ class Module {
 
         for (const [id, { service }] of this.#services.entries()) {
 
-            await service.init();
+            await service.init(this.#settings);
 
             this.#client.logger.debug({
                 event   : CoreEvents.SERVICE_INITIALIZED,
@@ -280,7 +385,7 @@ class Module {
 
         for (const [id, { view }] of this.#views.entries()) {
 
-            await view.init();
+            await view.init(this.#settings);
 
             this.#client.logger.debug({
                 event   : CoreEvents.VIEW_INITIALIZED,
@@ -318,7 +423,13 @@ class Module {
             }, {});
     }
 
-    applicationCommands() {}
+    /**
+     * @return {Module~Store}
+     */
+    get store() {
+
+        return this.#store;
+    }
 }
 
 module.exports = Module;

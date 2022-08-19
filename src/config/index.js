@@ -1,8 +1,9 @@
 'use strict';
 
-const Path       = require('path');
-const Confidence = require('@hapipal/confidence');
-const Dotenv     = require('dotenv');
+const Path             = require('path');
+const Confidence       = require('@hapipal/confidence');
+const Dotenv           = require('dotenv');
+const { ActivityType } =  require('discord-api-types/v10');
 
 const Pkg = require('../../package.json');
 
@@ -17,88 +18,93 @@ const knexDefault = new Confidence.Store({
 
 const store = new Confidence.Store({
     version : Pkg.version,
-    ebot    : {
-        cacheWarmup         : {
-            guilds : { $env : 'EBOT_CACHE_WARMUP_GUILDS', $coerce : 'array', $default : [] },
-            users  : { $env : 'EBOT_CACHE_WARMUP_USERS', $coerce : 'array', $default : [] }
-        },
-        applicationCommands : {
-            register : { $env : 'EBOT_APPLICATION_COMMAND_REGISTER', $coerce : 'boolean', $default : true }
-        }
-    },
-    discord : {
-        $filter     : { $env : 'NODE_ENV' },
-        $base       : {
-            clientId : { $env : 'DISCORD_CLIENT_ID' },
-            token    : { $env : 'DISCORD_TOKEN' },
-            ownerID  : { $env : 'DISCORD_OWNER_IDS', $coerce : 'array' },
-            prefix   : { $env : 'DISCORD_COMMAND_PREFIX', $default : '!' },
-            partials : { $env : 'DISCORD_PARTIALS', $coerce : 'array' }
-        },
-        development : {
-            presence : {
-                status     : 'online',
-                afk        : false,
-                activities : [
-                    {
-                        type : 'PLAYING',
-                        name : `with my owner | ${ process.env.DISCORD_COMMAND_PREFIX || '!' }help`
-                    }
-                ]
-            }
-        },
-        production  : {
-            presence : {
-                status     : 'online',
-                afk        : false,
-                activities : [
-                    {
-                        type : 'PLAYING',
-                        name : `Ebot | ${ process.env.DISCORD_COMMAND_PREFIX || '!' }help`
-                    }
-                ]
-            }
-        }
-    },
-    logger  : {
-        $filter     : { $env : 'NODE_ENV' },
-        $base       : {
-            name   : 'ebot',
-            level  : { $env : 'LOG_LEVEL', $default : 'info' },
-            redact : ['err.requestData.files[*].file', 'err.requestData.files[*].attachment']
-        },
-        development : {
-            level     : { $env : 'LOG_LEVEL', $default : 'debug' },
-            transport : {
-                target  : 'pino-pretty',
-                options : {
-                    colorize      : { $env : 'LOG_COLOR', $coerce : 'boolean', $default : true },
-                    ignore        : 'event,emitter,command,interaction',
-                    messageFormat : '[{emitter}.{event}] : {msg}',
-                    translateTime : true
+    core    : {
+        discord     : {
+            $filter     : { $env : 'NODE_ENV' },
+            $base       : {
+                clientId : { $env : 'DISCORD_CLIENT_ID' },
+                token    : { $env : 'DISCORD_TOKEN' },
+                ownerID  : { $env : 'DISCORD_OWNER_IDS', $coerce : 'array' },
+                prefix   : { $env : 'DISCORD_COMMAND_PREFIX', $default : '!' },
+                partials : { $env : 'DISCORD_PARTIALS', $coerce : 'array' }
+            },
+            development : {
+                presence : {
+                    status     : 'online',
+                    afk        : false,
+                    activities : [
+                        {
+                            type : ActivityType.Playing,
+                            name : `with my owner | ${ process.env.DISCORD_COMMAND_PREFIX || '!' }help`
+                        }
+                    ]
+                }
+            },
+            production  : {
+                presence : {
+                    status     : 'online',
+                    afk        : false,
+                    activities : [
+                        {
+                            type : ActivityType.Playing,
+                            name : `Ebot | ${ process.env.DISCORD_COMMAND_PREFIX || '!' }help`
+                        }
+                    ]
                 }
             }
         },
-        production  : {}
-    },
-    sentry  : {
-        $filter     : { $env : 'NODE_ENV' },
-        $base       : {
-            enabled          : false,
-            dsn              : { $env : 'SENTRY_ENDPOINT' },
-            release          : `ebot@${ Pkg.version }`,
-            environment      : { $env : 'NODE_ENV' },
-            tracesSampleRate : { $env : 'SENTRY_TRACE_SAMPLE_RATE', $coerce : 'number', $default : 1.0 }
+        logger      : {
+            $filter     : { $env : 'NODE_ENV' },
+            $base       : {
+                name   : 'ebot',
+                level  : { $env : 'LOG_LEVEL', $default : 'info' },
+                redact : ['err.requestData.files[*].file', 'err.requestData.files[*].attachment']
+            },
+            development : {
+                level     : { $env : 'LOG_LEVEL', $default : 'debug' },
+                transport : {
+                    target  : 'pino-pretty',
+                    options : {
+                        colorize      : { $env : 'LOG_COLOR', $coerce : 'boolean', $default : true },
+                        ignore        : 'event,emitter,command,interaction',
+                        messageFormat : '[{emitter}.{event}] : {msg}',
+                        translateTime : true
+                    }
+                }
+            },
+            production  : {}
         },
-        development : {
-            enabled : { $env : 'EBOT_SENTRY_ENABLED', $coerce : 'boolean', $default : false }
+        sentry      : {
+            $filter     : { $env : 'NODE_ENV' },
+            $base       : {
+                enabled          : false,
+                dsn              : { $env : 'SENTRY_ENDPOINT' },
+                release          : `ebot@${ Pkg.version }`,
+                environment      : { $env : 'NODE_ENV' },
+                tracesSampleRate : { $env : 'SENTRY_TRACE_SAMPLE_RATE', $coerce : 'number', $default : 1.0 }
+            },
+            development : {
+                enabled : { $env : 'EBOT_SENTRY_ENABLED', $coerce : 'boolean', $default : false }
+            },
+            production  : {
+                enabled : { $env : 'EBOT_SENTRY_ENABLED', $coerce : 'boolean', $default : true }
+            }
         },
-        production  : {
-            enabled : { $env : 'EBOT_SENTRY_ENABLED', $coerce : 'boolean', $default : true }
-        }
-    },
-    plugins : {
-        tooling      : {
+        cacheWarmup : {
+            guilds : { $env : 'EBOT_CACHE_WARMUP_GUILDS', $coerce : 'array', $default : [] },
+            users  : { $env : 'EBOT_CACHE_WARMUP_USERS', $coerce : 'array', $default : [] }
+        },
+        module      : {
+            knex      : {
+                client     : 'pg',
+                connection : {
+                    host     : { $env : 'CORE_POSTGRES_HOST', $default : knexDefault.host },
+                    user     : { $env : 'CORE_POSTGRES_USER', $default : knexDefault.user },
+                    password : { $env : 'CORE_POSTGRES_PASS', $default : knexDefault.password },
+                    database : { $env : 'CORE_POSTGRES_DB', $default : 'core' },
+                    port     : { $env : 'CORE_POSTGRES_PORT', $coerce : 'number', $default : knexDefault.port }
+                }
+            },
             upload    : {
                 region       : { $env : 'UPLOAD_REGION' },
                 bucket       : { $env : 'UPLOAD_BUCKET' },
@@ -112,6 +118,14 @@ const store = new Confidence.Store({
             },
             puppeteer : {
                 path : { $env : 'CHROMIUM_PATH', $default : undefined }
+            }
+        }
+    },
+    modules : {
+        ai           : {
+            openai : {
+                organization : { $env : 'OPENAI_ORGANIZATION' },
+                apiKey       : { $env : 'OPENAI_API_KEY' }
             }
         },
         karma        : {
@@ -176,7 +190,7 @@ const store = new Confidence.Store({
                 }
             }
         },
-        tool         : {
+        tools        : {
             googleImages   : {
                 apiKey   : { $env : 'GOOGLE_CSE_API_KEY' },
                 engineId : { $env : 'GOOGLE_CSE_ENGINE_ID' }

@@ -97,14 +97,13 @@ module.exports = class Weather extends ApplicationCommand {
             ]);
 
             const embeds = [
-                { id : 'current', label : 'Current', embed : CurrentWeatherView.render(current, airQuality, location) },
-                { id : 'forecast', label : 'Forecast', embed : WeatherForecastView.daily(daily, location) }
+                { label : 'Current', embed : CurrentWeatherView.render(current, airQuality, location) },
+                { label : 'Forecast', embed : WeatherForecastView.daily(daily, location) }
             ];
 
             if (alerts?.length > 0) {
 
                 embeds.push({
-                    id    : 'alert',
                     label : 'Alerts',
                     embed : WeatherAlertView.render(alerts, location),
                     style : {
@@ -114,7 +113,7 @@ module.exports = class Weather extends ApplicationCommand {
                 });
             }
 
-            await new Util.DashboardPaginatedEmbeds(interaction, embeds).send();
+            await new Util.DashboardEmbeds(interaction, embeds);
         }
         catch (error) {
 

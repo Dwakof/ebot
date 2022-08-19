@@ -6,12 +6,12 @@ module.exports = class LocationService extends ServiceApi {
 
     static ENDPOINT = 'https://eu1.locationiq.com';
 
-    init() {
+    init(settings) {
 
         super.init();
 
         this.defaultQueryParams = {
-            key               : this.client.settings.plugins.weather.LocationIQApiKey,
+            key               : settings.LocationIQApiKey,
             format            : 'json',
             addressdetails    : 1,
             normalizecity     : 1,

@@ -19,7 +19,7 @@ module.exports = class CurrencyView extends View {
      */
     async history(from, to, amount, stats) {
 
-        const { ChartService }    = this.services('tooling');
+        const { ChartService }    = this.services('core');
         const { CurrencyService } = this.services();
 
         const embed = this.embed().setTitle(`Conversion rates for ${ CurrencyService.format(amount, from) } ${ from.currency } to ${ to.currency }`);

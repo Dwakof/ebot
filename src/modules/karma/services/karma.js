@@ -251,7 +251,7 @@ module.exports = class KarmaService extends Service {
      */
     renderGraph(stats) {
 
-        const { ChartService } = this.services('tooling');
+        const { ChartService } = this.services('core');
 
         const GREEN = '#12d512';
         const RED   = '#cb1111';

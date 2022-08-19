@@ -40,7 +40,7 @@ class Service {
     /**
      * Method to override that is called when the client is started.
      */
-    init() {
+    init(settings) {
 
     }
 
@@ -57,6 +57,14 @@ class Service {
     providers(module = this.module) {
 
         return this.client.providers(module);
+    }
+
+    /**
+     * @return {Module~Store}
+     */
+    get store() {
+
+        return this.client.store(this.module);
     }
 
     /**
@@ -153,7 +161,7 @@ class Service {
                 try {
 
                     this.client.logger.info({
-                        msg : `${ this.module }.${ this.id } Starting job "${ cron }" with id ${ id }`,
+                        msg     : `${ this.module }.${ this.id } Starting job "${ cron }" with id ${ id }`,
                         event   : CoreEvents.SCHEDULE_STARTED,
                         emitter : 'core'
                     });
@@ -161,7 +169,7 @@ class Service {
                     await method.call(this, this.client);
 
                     this.client.logger.info({
-                        msg : `${ this.module }.${ this.id } Job "${ cron }" with id ${ id } finished in ${ Util.getTimeString(DateTime.now().diff(start)) }`,
+                        msg     : `${ this.module }.${ this.id } Job "${ cron }" with id ${ id } finished in ${ Util.getTimeString(DateTime.now().diff(start)) }`,
                         event   : CoreEvents.SCHEDULE_ENDED,
                         emitter : 'core'
                     });
@@ -169,7 +177,7 @@ class Service {
                 catch (err) {
 
                     this.client.logger.error({
-                        msg : `[${ this.module }.${ this.id }] Job "${ cron }" with id ${ id } failed in ${ Util.getTimeString(DateTime.now().diff(start)) }`,
+                        msg     : `[${ this.module }.${ this.id }] Job "${ cron }" with id ${ id } failed in ${ Util.getTimeString(DateTime.now().diff(start)) }`,
                         event   : CoreEvents.SCHEDULE_FAILED,
                         emitter : 'core',
                         err

@@ -44,8 +44,8 @@ module.exports = class EbotClient extends AkairoClient {
 
     constructor(settings) {
 
-        super({ ownerID : settings.discord.ownerID }, {
-            ...settings.discord,
+        super({ ownerID : settings.core.discord.ownerID }, {
+            ...settings.core.discord,
             intents : [
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildMembers,
@@ -57,14 +57,14 @@ module.exports = class EbotClient extends AkairoClient {
         this.#settings = settings;
 
         this.util = new ClientUtil(this);
-        this.API  = new REST({ version : '10' }).setToken(this.#settings.discord.token);
+        this.API  = new REST({ version : '10' }).setToken(this.#settings.core.discord.token);
 
-        this.#logger = Pino(this.#settings.logger);
+        this.#logger = Pino(this.#settings.core.logger);
 
-        if (this.#settings.sentry.enabled) {
+        if (this.#settings.core.sentry.enabled) {
 
             Sentry.init({
-                ...this.#settings.sentry,
+                ...this.#settings.core.sentry,
                 integrations : [
                     new Sentry.Integrations.Http({ tracing : true }),
                     new Tracing.Integrations.Postgres()
@@ -106,9 +106,9 @@ module.exports = class EbotClient extends AkairoClient {
             commandUtilLifetime : 60000,
             allowMention        : true,
             handleEdits         : true,
-            ignorePermissions   : this.#settings.discord.ownerId,
-            ignoreCooldown      : this.#settings.discord.ownerId,
-            prefix              : this.#settings.discord.prefix
+            ignorePermissions   : this.#settings.core.discord.ownerId,
+            ignoreCooldown      : this.#settings.core.discord.ownerId,
+            prefix              : this.#settings.core.discord.prefix
 
         }, settings));
 
@@ -155,23 +155,35 @@ module.exports = class EbotClient extends AkairoClient {
             await this.initialize();
         }
 
+        await this.registerModule('core', Path.join(__dirname, 'module'), this.#settings.core.module);
+
         for (const name of await Fs.readdir(modulesPath)) {
 
-            if (this.#modules.has(name)) {
-
-                throw new Error('A module with this name already exists');
-            }
-
-            const path = Path.join(modulesPath, name);
-
-            const module = new Module(name, path);
-
-            await module.load(this);
-
-            this.#modules.set(name, { path, module });
-
-            this.logger.debug({ msg : `Module ${ name } loaded from ${ path }`, emitter : 'core', event : CoreEvents.MODULE_LOADED });
+            await this.registerModule(name, Path.join(modulesPath, name), this.#settings.modules[name]);
         }
+    }
+
+    /**
+     * @private
+     * @param name
+     * @param path
+     * @param settings
+     * @returns {Promise<void>}
+     */
+    async registerModule(name, path, settings) {
+
+        if (this.#modules.has(name)) {
+
+            throw new Error('A module with this name already exists');
+        }
+
+        const module = new Module(name, path);
+
+        await module.load(this, settings);
+
+        this.#modules.set(name, { path, module });
+
+        this.logger.info({ msg : `Module ${ name } loaded from ${ path }`, emitter : 'core', event : CoreEvents.MODULE_LOADED });
     }
 
     async initialize() {
@@ -259,7 +271,7 @@ module.exports = class EbotClient extends AkairoClient {
             });
         }
 
-        await this.login(this.#settings.discord.token);
+        await this.login(this.#settings.core.discord.token);
 
         await this.warmupCache();
 
@@ -286,17 +298,12 @@ module.exports = class EbotClient extends AkairoClient {
 
     get sentry() {
 
-        if (this.#settings.sentry.enabled) {
+        if (this.#settings.core.sentry.enabled) {
 
             return this.#sentry;
         }
 
         return false;
-    }
-
-    get settings() {
-
-        return this.#settings;
     }
 
     providers(moduleName) {
@@ -324,6 +331,20 @@ module.exports = class EbotClient extends AkairoClient {
         if (this.#modules.has(moduleName)) {
 
             return this.#modules.get(moduleName).module.views();
+        }
+
+        throw new Error(`module ${ moduleName } not found`);
+    }
+
+    /**
+     * @param moduleName
+     * @return {Module~Store}
+     */
+    store(moduleName) {
+
+        if (this.#modules.has(moduleName)) {
+
+            return this.#modules.get(moduleName).module.store;
         }
 
         throw new Error(`module ${ moduleName } not found`);
@@ -357,14 +378,14 @@ module.exports = class EbotClient extends AkairoClient {
             emitter : 'core'
         });
 
-        for (const id of this.#settings.ebot.cacheWarmup.guilds) {
+        for (const id of this.#settings.core.cacheWarmup.guilds) {
 
             const guild = await this.guilds.fetch(id);
 
             await guild.members.fetch();
         }
 
-        for (const id of this.#settings.ebot.cacheWarmup.users) {
+        for (const id of this.#settings.core.cacheWarmup.users) {
 
             await this.users.fetch(id);
         }
@@ -406,8 +427,6 @@ module.exports = class EbotClient extends AkairoClient {
      */
     handleError(module, error, message, extraData = {}) {
 
-        console.log({ module, error, message, extraData });
-
         this.logger.error({
             event        : CoreEvents.MODULE_ERROR,
             emitter      : module.id,
@@ -428,5 +447,10 @@ module.exports = class EbotClient extends AkairoClient {
 
             this.sentry.captureException(error);
         }
+    }
+
+    get clientId() {
+
+        return this.#settings.core.discord.clientId;
     }
 };

@@ -6,11 +6,11 @@ module.exports = class WeatherService extends ServiceApi {
 
     static ENDPOINT = 'https://api.openweathermap.org/';
 
-    init() {
+    init(settings) {
 
         super.init();
 
-        this.defaultQueryParams = { appid : this.client.settings.plugins.weather.openWeatherApiKey, units : 'standard', lang : 'en' };
+        this.defaultQueryParams = { appid : settings.openWeatherApiKey, units : 'standard', lang : 'en' };
     }
 
     /**

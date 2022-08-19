@@ -7,7 +7,7 @@ const { ObjectionProvider, Util } = require('../../../../core');
 module.exports = async (client, settings) => {
 
     return {
-        id       : 'history',
+        id       : 'store',
         provider : new ObjectionProvider({
             ...settings.knex,
             migrations : {
