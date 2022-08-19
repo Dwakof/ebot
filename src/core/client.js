@@ -453,4 +453,9 @@ module.exports = class EbotClient extends AkairoClient {
 
         return this.#settings.core.discord.clientId;
     }
+
+    get version() {
+
+        return this.#settings.version;
+    }
 };

@@ -28,7 +28,7 @@ class InfoCommand extends ApplicationCommand {
         const embed = this.client.util.embed()
             .setAuthor({ name : 'Statistics of Ebot', icon_url : this.client.user.avatarURL({ dynamic : true }) })
             .addFields([
-                { name : 'Version', value : this.client.settings.version, inline : true },
+                { name : 'Version', value : this.client.version, inline : true },
                 { name : 'Memory', value : `${ (process.memoryUsage().rss / 1024 / 1024).toFixed(2) } MB`, inline : true },
                 { name : 'Uptime', value : Duration.fromObject({ milliseconds : this.client.uptime }).toHuman(), inline : true },
                 { name : 'Commands', value : totalCommands.toString(), inline : true },
