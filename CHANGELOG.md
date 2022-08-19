@@ -1,3 +1,15 @@
+# [0.24.0](https://github.com/Dwakof/ebot/compare/v0.23.0...v0.24.0) (2022-08-19)
+
+
+### Bug Fixes
+
+* Presence was not working anymore ([33f5853](https://github.com/Dwakof/ebot/commit/33f585338ca4ca37d7d98ae1399509c4cef5d776))
+
+
+### Features
+
+* 0.24.0 ([ad4931d](https://github.com/Dwakof/ebot/commit/ad4931d1040042e5884bf07fc06e7038d868eee7))
+
 # [0.23.0](https://github.com/Dwakof/ebot/compare/v0.22.0...v0.23.0) (2022-08-03)
 
 
