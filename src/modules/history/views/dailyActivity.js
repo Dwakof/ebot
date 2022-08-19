@@ -78,7 +78,7 @@ module.exports = class DailyActivityView extends View {
 
     async chart(embed, stats) {
 
-        const { ChartService } = this.services('tooling');
+        const { ChartService } = this.services('core');
 
         const Color = this.client.util.color;
 

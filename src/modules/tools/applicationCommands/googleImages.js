@@ -43,7 +43,7 @@ class GoogleImagesCommand extends ApplicationCommand {
 
             return new Util.PaginatedEmbeds(interaction, results.map((result) => GoogleImagesService.toEmbed(result)), {
                 footer : (_, index, total) => `Result ${ index + 1 } / ${ total }`
-            }).send();
+            });
         }
         catch (error) {
 

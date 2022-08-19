@@ -48,8 +48,8 @@ class IsThereAnyDealCommand extends ApplicationCommand {
             };
 
             return new Util.PaginatedEmbeds(interaction, searchResults.map(search), {
-                footerBuilder : (_, index, total) => `Result ${ index + 1 } / ${ total }`
-            }).send();
+                footer : (_, index, total) => `Result ${ index + 1 } / ${ total }`
+            });
         }
         catch (error) {
 

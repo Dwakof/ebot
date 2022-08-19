@@ -225,7 +225,7 @@ module.exports = class BuildService extends Service {
         const guild = this.client.guilds.cache.get(guildId);
 
         embed.setTitle(`Building of guild's mimic models`)
-            .setAuthor(guild.name, guild.iconURL({ dynamic : false, size : 32 }))
+            .setAuthor({ name : guild.name, iconURL : guild.iconURL({ dynamic : false, size : 32 }) })
             .setThumbnail(guild.iconURL({ dynamic : false, size : 128 }))
             .setTimestamp()
             .setColor(Colors.Blue);
@@ -300,11 +300,6 @@ module.exports = class BuildService extends Service {
         const send = () => {
 
             const payload = { embeds : [this.progressBuild(guildId, task)] };
-
-            if (message) {
-
-                return message.edit(payload);
-            }
 
             return this.client.util.send(interaction, payload);
         };

@@ -43,7 +43,7 @@ class UrbanDictionaryCommand extends ApplicationCommand {
                 });
             }
 
-            return new Util.PaginatedEmbeds(interaction, results.map((def) => UrbanDictionaryService.toEmbed(def))).send();
+            return new Util.PaginatedEmbeds(interaction, results.map((def) => UrbanDictionaryService.toEmbed(def)));
         }
         catch (error) {
 

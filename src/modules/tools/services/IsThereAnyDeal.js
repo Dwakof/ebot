@@ -70,11 +70,11 @@ module.exports = class IsThereAnyDealService extends ServiceApi {
 
     static ENDPOINT = 'https://api.isthereanydeal.com';
 
-    init() {
+    init(settings) {
 
         super.init();
 
-        this.defaultQueryParams = { key : this.client.settings.plugins.tool.isThereAnyDeal.apiKey };
+        this.defaultQueryParams = { key : settings.isThereAnyDeal.apiKey };
     }
 
     /**

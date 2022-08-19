@@ -112,7 +112,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
 
         if (command.root !== RootCommand && command.type === ApplicationCommand.SubTypes.Subcommand) {
 
-            id = `${ parent.name }.${ command.name }`;
+            id = `${ this.name }.${ command.name }`;
         }
 
         if (command.root !== RootCommand && parent.type === ApplicationCommand.SubTypes.SubcommandGroup) {
@@ -161,13 +161,25 @@ module.exports = class ApplicationCommand extends AkairoModule {
 
         this.#command.options = [];
 
-        for (const [name, { description, subcommands }] of Object.entries(this.constructor.subgroups)) {
+        for (const [name, { description, subcommands, method, options }] of Object.entries(this.constructor.subgroups)) {
 
-            const subgroup = { name, description, type : ApplicationCommand.SubTypes.SubcommandGroup };
+            const entity = { name, description };
 
-            this.#subcommands(subgroup, subcommands);
+            if (subcommands) {
 
-            this.#command.options.push(subgroup);
+                entity.type = ApplicationCommand.SubTypes.SubcommandGroup;
+
+                this.#subcommands(entity, subcommands);
+            }
+
+            if (method) {
+
+                entity.type = ApplicationCommand.SubTypes.Subcommand;
+
+                this.#setMethod(subgroups, entity, { method, options });
+            }
+
+            this.#command.options.push(entity);
         }
     }
 
@@ -271,7 +283,7 @@ module.exports = class ApplicationCommand extends AkairoModule {
      */
 
     /**
-     * @typedef {Object<String, ApplicationSubcommand>} ApplicationSubcommands
+     * @typedef {Object<String, ApplicationSubcommand|ApplicationCommand>} ApplicationSubcommands
      */
 
     /**
@@ -403,9 +415,9 @@ module.exports = class ApplicationCommand extends AkairoModule {
 
         command.options = [];
 
-        for (const [name, { description, type, required = false, choices, autocomplete }] of Object.entries(applicationOptions)) {
+        for (const [name, { description, type, required = false, choices, autocomplete, min_value, max_value }] of Object.entries(applicationOptions)) {
 
-            const option = { name, description, required, type };
+            const option = { name, description, required, type, min_value, max_value };
 
             if (autocomplete && choices) {
 
@@ -480,5 +492,13 @@ module.exports = class ApplicationCommand extends AkairoModule {
     providers(module = this.categoryID) {
 
         return this.client.providers(module);
+    }
+
+    /**
+     * @deprecated
+     */
+    get store() {
+
+        return this.client.store(this.categoryID);
     }
 };

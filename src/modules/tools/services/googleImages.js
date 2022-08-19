@@ -32,13 +32,13 @@ module.exports = class GoogleImagesService extends ServiceApi {
 
     static ENDPOINT = 'https://www.googleapis.com';
 
-    init() {
+    init(settings) {
 
         super.init();
 
         this.defaultQueryParams = {
-            key        : this.client.settings.plugins.tool.googleImages.apiKey,
-            cx         : this.client.settings.plugins.tool.googleImages.engineId,
+            key        : settings.googleImages.apiKey,
+            cx         : settings.googleImages.engineId,
             searchType : 'image'
         };
     }

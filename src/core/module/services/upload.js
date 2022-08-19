@@ -7,14 +7,18 @@ const { Service, Util } = require('../../../core');
 
 module.exports = class UploadService extends Service {
 
-    init() {
+    #settings;
 
-        this.bucketUrl = `https://${ this.client.settings.plugins.tooling.upload.bucket }.${ this.client.settings.plugins.tooling.upload.endpoint }`;
+    init(settings) {
+
+        this.#settings = settings.upload;
+
+        this.bucketUrl = `https://${ this.#settings.bucket }.${ this.#settings.endpoint }`;
 
         this.s3 = new S3Client({
-            credentials : this.client.settings.plugins.tooling.upload.credentials,
-            endpoint    : `${ this.client.settings.plugins.tooling.upload.proto }://${ this.client.settings.plugins.tooling.upload.endpoint }`,
-            region      : this.client.settings.plugins.tooling.upload.region
+            credentials : this.#settings.credentials,
+            endpoint    : `${ this.#settings.proto }://${ this.#settings.endpoint }`,
+            region      : this.#settings.region
         });
     }
 
@@ -24,8 +28,8 @@ module.exports = class UploadService extends Service {
 
         const command = new PutObjectCommand({
             ACL          : 'public-read',
-            StorageClass : this.client.settings.plugins.tooling.upload.storageClass,
-            Bucket       : this.client.settings.plugins.tooling.upload.bucket,
+            StorageClass : this.#settings.storageClass,
+            Bucket       : this.#settings.bucket,
             ContentType  : options.contentType,
             Body         : file,
             Key          : key

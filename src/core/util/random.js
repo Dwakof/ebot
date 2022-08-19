@@ -1,6 +1,20 @@
 'use strict';
 
+const Crypto = require('crypto');
+
 module.exports = {
+
+    /**
+     * Return a random UUID.
+     * @see https://nodejs.org/docs/latest-v14.x/api/crypto.html#crypto_crypto_randomuuid_options
+     *
+     * @param {Object} [options]
+     * @return {string}
+     */
+    uuid(options) {
+
+        return Crypto.randomUUID(options);
+    },
 
     /**
      * Returns a random integer between the specified values. The value is no lower than min

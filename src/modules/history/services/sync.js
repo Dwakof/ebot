@@ -1,7 +1,7 @@
 'use strict';
 
-const { SnowflakeUtil, Colors, PermissionsBitField } = require('discord.js');
-const { channelMention }                             = require('discord.js');
+const { SnowflakeUtil, Colors, PermissionsBitField, ChannelType } = require('discord.js');
+const { channelMention }                                          = require('discord.js');
 
 const { DateTime } = require('luxon');
 
@@ -11,7 +11,7 @@ const { Service, Util } = require('../../../core');
 
 module.exports = class SyncService extends Service {
 
-    static FIRST_MESSAGE_ID = SnowflakeUtil.generate(SnowflakeUtil.EPOCH);
+    static FIRST_MESSAGE_ID = SnowflakeUtil.epoch;
     static CHANNEL_STATE    = 'channel_import';
     static GUILD_STATE      = 'guild_import';
     static REQUIRED_PERMS   = [PermissionsBitField.Flags.ReadMessageHistory, PermissionsBitField.Flags.ViewChannel];
@@ -24,7 +24,7 @@ module.exports = class SyncService extends Service {
 
         while (after) {
 
-            messages = await channel.messages.fetch({ after, limit });
+            messages = await channel.messages.fetch({ after, limit, cache : false });
 
             const timeout = this.client.util.wait(900);
 
@@ -278,7 +278,7 @@ module.exports = class SyncService extends Service {
         const guild = this.client.guilds.cache.get(guildId);
 
         embed.setTitle(`Syncing guild`)
-            .setAuthor(guild.name, guild.iconURL({ dynamic : false, size : 32 }))
+            .setAuthor({ name : guild.name, iconURL : guild.iconURL({ dynamic : false, size : 32 }) })
             .setThumbnail(guild.iconURL({ dynamic : false, size : 128 }))
             .setTimestamp()
             .setColor(Colors.Blue);
@@ -451,7 +451,7 @@ module.exports = class SyncService extends Service {
             return false;
         }
 
-        if (!channel.isText()) {
+        if (channel.type !== ChannelType.GuildText) {
 
             return false;
         }
@@ -461,6 +461,6 @@ module.exports = class SyncService extends Service {
             return false;
         }
 
-        return channel.guild.me.permissionsIn(channel).has(SyncService.REQUIRED_PERMS);
+        return channel.guild.members.me.permissionsIn(channel).has(SyncService.REQUIRED_PERMS);
     }
 };

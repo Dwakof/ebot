@@ -82,7 +82,7 @@ module.exports = class WeeklyActivityView extends View {
 
         const { weeklyActivity } = stats;
 
-        const { ChartService } = this.services('tooling');
+        const { ChartService } = this.services('core');
 
         const days  = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
         const hours = Array.from(Array(24).keys()).map((hour) => `${ hour }h`.padStart(3, '0'));

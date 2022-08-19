@@ -134,7 +134,7 @@ module.exports = class EmojiOverviewView extends View {
 
     async averageOverTime(embed, stats) {
 
-        const { ChartService } = this.services('tooling');
+        const { ChartService } = this.services('core');
 
         const { averageEmojiPerMessageOverTime } = stats;
 

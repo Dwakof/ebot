@@ -4,12 +4,12 @@ const Path = require('path');
 
 const { ObjectionProvider, Util } = require('../../../../core');
 
-module.exports = async (client) => {
+module.exports = async (client, settings) => {
 
     return {
         id       : 'history',
         provider : new ObjectionProvider({
-            ...client.settings.plugins.weather.knex,
+            ...settings.knex,
             migrations : {
                 directory : Path.join(__dirname, '/migrations')
             }

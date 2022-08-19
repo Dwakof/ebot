@@ -71,7 +71,7 @@ module.exports = class ScreenshotService extends Service {
      */
     async screenshotMessageIdAndUpload(messageId, channelId) {
 
-        const { UploadService } = this.services('tooling');
+        const { UploadService } = this.services('core');
 
         const buffer = await this.screenshotMessageId(messageId, channelId);
 
@@ -85,7 +85,7 @@ module.exports = class ScreenshotService extends Service {
      */
     async screenshotMessage(message) {
 
-        const { BrowserService } = this.services('tooling');
+        const { BrowserService } = this.services('core');
 
         const page = await BrowserService.newPage();
 
@@ -263,7 +263,7 @@ module.exports = class ScreenshotService extends Service {
      */
     async screenshotMessageAndUpload(message) {
 
-        const { UploadService } = this.services('tooling');
+        const { UploadService } = this.services('core');
 
         const buffer = await this.screenshotMessage(message);
 

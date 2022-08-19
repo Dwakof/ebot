@@ -6,7 +6,8 @@ const { BaseInteraction, AutocompleteInteraction, BaseCommandInteraction, Comman
 const { Routes }        = require('discord-api-types/v10');
 const { AkairoHandler } = require('discord-akairo');
 
-const { CoreEvents } = require('../../constants');
+const { CoreEvents }              = require('../../constants');
+const { InteractiveReply, Modal } = require('../../util');
 
 const ApplicationCommand = require('./applicationCommand');
 
@@ -53,11 +54,6 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
     async registerCommands() {
 
-        if (!this.client.settings.ebot.applicationCommands.register) {
-
-            return false;
-        }
-
         const guildCommands  = [];
         const globalCommands = [];
 
@@ -77,7 +73,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
             for (const [guildId] of this.client.guilds.cache) {
 
-                await this.client.API.put(Routes.applicationGuildCommands(this.client.settings.discord.clientId, guildId), { body : guildCommands });
+                await this.client.API.put(Routes.applicationGuildCommands(this.client.clientId, guildId), { body : guildCommands });
             }
 
             const commands = this.getCommandsArray(false);
@@ -100,7 +96,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
         try {
 
-            await this.client.API.put(Routes.applicationCommands(this.client.settings.discord.clientId), { body : globalCommands });
+            await this.client.API.put(Routes.applicationCommands(this.client.clientId), { body : globalCommands });
 
             const commands = this.getCommandsArray(true);
 
@@ -240,7 +236,12 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
             this.emit(ApplicationCommandHandler.Events.COMMAND_STARTED, interaction, applicationCommand);
 
-            await applicationCommand.runCommand(id, interaction);
+            const reply = await applicationCommand.runCommand(id, interaction);
+
+            if (reply instanceof InteractiveReply || reply instanceof Modal) {
+
+                await reply.send();
+            }
 
             this.emit(ApplicationCommandHandler.Events.COMMAND_FINISHED, interaction, applicationCommand);
 
