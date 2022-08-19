@@ -12,7 +12,7 @@ module.exports = class BrowserService extends Service {
     async init(settings) {
 
         this.#browser = await Puppeteer.launch({
-            args           : ['--disable-gpu', '--disable-dev-shm-usage'],
+            args           : ['--disable-gpu', '--disable-dev-shm-usage', '--no-sandbox'],
             executablePath : settings.puppeteer.path,
             headless       : true
         });
