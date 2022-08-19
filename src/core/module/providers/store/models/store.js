@@ -64,4 +64,4 @@ module.exports = class Store extends Model {
 
         this.updatedAt = new Date().toISOString();
     }
-}
+};

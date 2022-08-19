@@ -321,6 +321,7 @@ class InteractiveReply extends ComponentBased {
         };
     }
 
+    // eslint-disable-next-line require-await
     async build() {
 
         throw new Error('to implement');
