@@ -146,7 +146,7 @@ module.exports = class CharacterView extends View {
                     style    : ButtonStyle.Secondary,
                     onAction : (_, editInteraction, index) => {
 
-                        return this.editCharacterModal(editInteraction, characters[index].value).send();
+                        return this.editCharacterModal(editInteraction, characters[index]).send();
                     }
                 },
                 {
