@@ -1,3 +1,10 @@
+## [0.24.1](https://github.com/Dwakof/ebot/compare/v0.24.0...v0.24.1) (2022-08-19)
+
+
+### Bug Fixes
+
+* I was wrong, you still need to disable chrome sandbox in Docker or grand SYS_ADMIN to the container :bruh: ([c423c4e](https://github.com/Dwakof/ebot/commit/c423c4e894f9d57aba3a5c5c30261e10b5fe3f07))
+
 # [0.24.0](https://github.com/Dwakof/ebot/compare/v0.23.0...v0.24.0) (2022-08-19)
 
 
