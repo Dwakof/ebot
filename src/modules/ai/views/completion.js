@@ -140,7 +140,7 @@ module.exports = class CompletionView extends View {
         characters = characters.map(({ value }) => value);
 
         return new Util.Modal(interaction, {
-            title      : `You story prompt`,
+            title      : `Your story prompt`,
             components : [
                 {
                     id          : 'prompt',
