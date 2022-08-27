@@ -1,3 +1,10 @@
+## [0.25.1](https://github.com/Dwakof/ebot/compare/v0.25.0...v0.25.1) (2022-08-27)
+
+
+### Bug Fixes
+
+* update dependencies ([cf970cd](https://github.com/Dwakof/ebot/commit/cf970cd19b3309c55d7ad729c098377d0270d50c))
+
 # [0.25.0](https://github.com/Dwakof/ebot/compare/v0.24.3...v0.25.0) (2022-08-27)
 
 
