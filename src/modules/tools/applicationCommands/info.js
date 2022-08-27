@@ -8,10 +8,7 @@ class InfoCommand extends ApplicationCommand {
 
     constructor() {
 
-        super('info', {
-            description : 'Get informations on the bot',
-            global      : true
-        });
+        super('info', { description : 'Get informations on the bot' });
     }
 
     static get command() {

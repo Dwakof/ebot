@@ -214,6 +214,24 @@ module.exports = class EbotClient extends AkairoClient {
             await this.initialize();
         }
 
+        this.API.on('response', ({ method, route }, { statusCode }) => {
+
+            this.logger.debug({
+                msg     : `${ method } ${ route } (${ statusCode })`,
+                event   : 'response',
+                emitter : 'client.api'
+            });
+        });
+
+        this.rest.on('response', ({ method, route }, { statusCode }) => {
+
+            this.logger.debug({
+                msg     : `${ method } ${ route } (${ statusCode })`,
+                event   : 'response',
+                emitter : 'client.rest'
+            });
+        });
+
         for (const [, { module }] of this.#modules.entries()) {
 
             await module.init();
@@ -278,15 +296,6 @@ module.exports = class EbotClient extends AkairoClient {
         await this.#applicationCommandHandler.registerCommands();
 
         this.#started = true;
-
-        this.rest.on('response', ({ method, route }, { statusCode }) => {
-
-            this.logger.trace({
-                msg     : `${ method } ${ route } (${ statusCode }`,
-                event   : 'apiResponse',
-                emitter : 'client'
-            });
-        });
 
         return this;
     }
@@ -413,7 +422,7 @@ module.exports = class EbotClient extends AkairoClient {
         });
 
         this.logger.info({
-            msg     : `You can add the bot to your service with this link : ${ url }`,
+            msg     : `You can add the bot to your server with this link : ${ url }`,
             event   : CoreEvents.INVITE_LINK,
             emitter : 'core'
         });

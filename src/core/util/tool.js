@@ -35,23 +35,6 @@ module.exports = {
         return Object.assign({}, walker(obj));
     },
 
-    chunk(array, chunkSize = 10) {
-
-        return array.reduce((acc, each, index, src) => {
-
-            if (!(index % chunkSize)) {
-                return [...acc, src.slice(index, index + chunkSize)];
-            }
-
-            return acc;
-        }, []);
-    },
-
-    unique(arrayLike) {
-
-        return Array.from(new Set(arrayLike));
-    },
-
     wait : Util.promisify(setTimeout),
 
     debounce(func, timeout = 300) {

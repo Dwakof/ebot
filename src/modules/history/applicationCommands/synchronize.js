@@ -1,6 +1,6 @@
 'use strict';
 
-const { PermissionsBitField, ChannelType } = require('discord.js');
+const { ChannelType, PermissionFlagsBits } = require('discord.js');
 
 const { ApplicationCommand } = require('../../../core');
 
@@ -8,7 +8,10 @@ module.exports = class Synchronize extends ApplicationCommand {
 
     constructor() {
 
-        super('synchronize', { description : 'Synchronize the message with the database' });
+        super('synchronize', {
+            description : 'Synchronize the message with the database',
+            permissions : PermissionFlagsBits.Administrator
+        });
     }
 
     static get command() {
@@ -29,11 +32,6 @@ module.exports = class Synchronize extends ApplicationCommand {
 
         const { State }       = this.providers();
         const { SyncService } = this.services();
-
-        if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-
-            return interaction.reply({ content : `Only administrator can use this command`, ephemeral : true });
-        }
 
         await interaction.deferReply();
 

@@ -5,10 +5,7 @@ const { ApplicationCommand } = require('../../../core');
 class BlyatCommand extends ApplicationCommand {
     constructor() {
 
-        super('blyat', {
-            description : 'Vhen you vant to send a message as a rrussian, blyat',
-            global      : true
-        });
+        super('blyat', { description : 'Vhen you vant to send a message as a rrussian, blyat' });
     }
 
     static get command() {

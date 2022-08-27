@@ -5,7 +5,7 @@ const Hoek = require('@hapi/hoek');
 const { ApplicationCommandOptionType, ApplicationCommandType } = require('discord-api-types/v10');
 
 // eslint-disable-next-line no-unused-vars
-const { AutocompleteInteraction, CommandInteraction } = require('discord.js');
+const { AutocompleteInteraction, CommandInteraction, PermissionFlagsBits } = require('discord.js');
 
 const { AkairoModule } = require('discord-akairo');
 
@@ -42,14 +42,25 @@ module.exports = class ApplicationCommand extends AkairoModule {
      */
     #methods = new Map();
 
-    constructor(id, { description, category, global, type }) {
+    /**
+     * @param {String}  id
+     * @param {String}  description
+     * @param {String}  category
+     * @param {Boolean} [global=true]
+     * @param {String}  [type='ChatInput']
+     * @param {Boolean} [dm=false]
+     * @param {BigInt}  [permissions=[SendMessages]]
+     */
+    constructor(id, { description, category, global, type, dm, permissions } = {}) {
 
         super(id, { category });
 
-        this.name        = id;
-        this.description = description;
-        this.global      = global ?? false;
-        this.type        = type ?? ApplicationCommand.Types.SlashCommand;
+        this.name          = id;
+        this.description   = description ?? '';
+        this.global        = global ?? true;
+        this.directMessage = dm ?? false;
+        this.permissions   = permissions?.toString() ?? PermissionFlagsBits.SendMessages.toString();
+        this.type          = type ?? ApplicationCommand.Types.SlashCommand;
 
         Hoek.assert(this.name, 'The application command class must have a name.');
 
@@ -59,10 +70,13 @@ module.exports = class ApplicationCommand extends AkairoModule {
         }
 
         this.#command = {
-            name        : this.name,
-            description : this.description,
-            type        : this.type,
-            root        : RootCommand
+            root                       : RootCommand,
+            name                       : this.name,
+            type                       : this.type,
+            description                : this.description,
+            dm_permission              : this.directMessage,
+            default_member_permissions : this.permissions,
+            default_permission         : true
         };
 
         if (this.type !== ApplicationCommand.Types.SlashCommand) {
@@ -99,6 +113,8 @@ module.exports = class ApplicationCommand extends AkairoModule {
                 this.#subgroups(this.constructor.subgroups);
             }
         }
+
+        this.#command = JSON.parse(JSON.stringify(this.#command)); // Dirty hack to remove everything that is undefined on the object for applicationCommandHandler deepEqual with API values
     }
 
     #setMethod(parent, command, { method : methodName, options = {} }) {
@@ -411,13 +427,25 @@ module.exports = class ApplicationCommand extends AkairoModule {
      * @param {Object}             command
      * @param {ApplicationOptions} applicationOptions
      */
-    static #setOptions(command, applicationOptions) {
+    static #setOptions(command, applicationOptions = {}) {
+
+        const entries = Object.entries(applicationOptions);
+
+        if (entries.length === 0) {
+
+            return;
+        }
 
         command.options = [];
 
-        for (const [name, { description, type, required = false, choices, autocomplete, min_value, max_value }] of Object.entries(applicationOptions)) {
+        for (const [name, { description, type, required, choices, autocomplete, min_value, max_value }] of entries) {
 
             const option = { name, description, required, type, min_value, max_value };
+
+            if (!required) {
+
+                option.required = undefined;
+            }
 
             if (autocomplete && choices) {
 

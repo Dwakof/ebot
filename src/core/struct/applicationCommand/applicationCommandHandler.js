@@ -1,13 +1,15 @@
 'use strict';
 
+const DeepEqual = require('fast-deep-equal');
+
 // eslint-disable-next-line no-unused-vars
 const { BaseInteraction, AutocompleteInteraction, BaseCommandInteraction, CommandInteraction, InteractionType } = require('discord.js');
 
 const { Routes }        = require('discord-api-types/v10');
 const { AkairoHandler } = require('discord-akairo');
 
-const { CoreEvents }              = require('../../constants');
-const { InteractiveReply, Modal } = require('../../util');
+const Util           = require('../../util');
+const { CoreEvents } = require('../../constants');
 
 const ApplicationCommand = require('./applicationCommand');
 
@@ -61,7 +63,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
             if (global) {
 
-                globalCommands.push(command);
+                globalCommands.push({ ...command });
 
                 continue;
             }
@@ -69,39 +71,37 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
             guildCommands.push({ ...command });
         }
 
-        try {
+        await this.registerGlobalCommands(globalCommands);
+        await this.registerGuildCommands(guildCommands, globalCommands);
 
-            for (const [guildId] of this.client.guilds.cache) {
+        return true;
+    }
 
-                await this.client.API.put(Routes.applicationGuildCommands(this.client.clientId, guildId), { body : guildCommands });
-            }
-
-            const commands = this.getCommandsArray(false);
-
-            this.client.logger.info({
-                msg     : `${ commands.length } application commands were registered per Guild (${ commands.join(', ') })`,
-                event   : CoreEvents.GUILD_APPLICATION_COMMANDS_REGISTERED,
-                emitter : 'core'
-            });
-        }
-        catch (err) {
-
-            if (err.status >= 400) {
-
-                this.client.logger.error({ err, errors : err.rawError.errors, commands : guildCommands, global : false });
-            }
-
-            throw err;
-        }
+    async registerGlobalCommands(commands) {
 
         try {
 
-            await this.client.API.put(Routes.applicationCommands(this.client.clientId), { body : globalCommands });
+            const currents = await this.client.API.get(Routes.applicationCommands(this.client.clientId));
 
-            const commands = this.getCommandsArray(true);
+            const { add, remove, update, same, noChange } = this.diffCommands(commands, currents);
+
+            if (noChange) {
+
+                this.client.logger.info({
+                    msg     : `${ commands.length } application commands were registered globally without update required`,
+                    event   : CoreEvents.GLOBAL_APPLICATION_COMMANDS_REGISTERED,
+                    emitter : 'core'
+                });
+
+                return;
+            }
+
+            const body = [...add, ...update, ...same];
+
+            await this.client.API.put(Routes.applicationCommands(this.client.clientId), { body });
 
             this.client.logger.info({
-                msg     : `${ commands.length } application commands were registered globally (${ commands.join(', ') })`,
+                msg     : `${ body.length } application commands were registered globally (added=${ add.length }, updated=${ update.length }, removed=${ remove.length })`,
                 event   : CoreEvents.GLOBAL_APPLICATION_COMMANDS_REGISTERED,
                 emitter : 'core'
             });
@@ -110,13 +110,89 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
             if (err.status >= 400) {
 
-                this.client.logger.error({ err, errors : err.rawError.errors, commands : globalCommands, global : true });
+                this.client.logger.error({ err, errors : err.rawError.errors, commands, global : true });
             }
 
             throw err;
         }
+    }
 
-        return true;
+    async registerGuildCommands(commands, globalCommands) {
+
+        try {
+
+            for (const [guildId, { name }] of this.client.guilds.cache) {
+
+                const currents = await this.client.API.get(Routes.applicationCommands(this.client.clientId));
+
+                const { add, remove, update, same, noChange } = this.diffCommands(commands, Util.leftExclusiveJoin(currents, globalCommands, (c) => c.name));
+
+                if (noChange) {
+
+                    this.client.logger.info({
+                        msg     : `${ commands.length } application commands were registered for guild "${ name }" (${ guildId }) without update required`,
+                        event   : CoreEvents.GUILD_APPLICATION_COMMANDS_REGISTERED,
+                        emitter : 'core'
+                    });
+
+                    continue;
+                }
+
+                const body = [...add, ...update, ...same];
+
+                await this.client.API.put(Routes.applicationGuildCommands(this.client.clientId, guildId), { body });
+
+                this.client.logger.info({
+                    msg     : `${ body.length } application commands were registered for guild "${ name }" (${ guildId }) (added=${ add.length }, updated=${ update.length }, removed=${ remove.length })`,
+                    event   : CoreEvents.GUILD_APPLICATION_COMMANDS_REGISTERED,
+                    emitter : 'core'
+                });
+            }
+        }
+        catch (err) {
+
+            if (err.status >= 400) {
+
+                this.client.logger.error({ err, errors : err.rawError.errors, commands, global : true });
+            }
+
+            throw err;
+        }
+    }
+
+    diffCommands(commands, currents) {
+
+        const predicate = ({ name }) => name;
+
+        const commandMap = Util.toMap(commands, predicate);
+        const currentMap = Util.toMap(currents, predicate);
+
+        const commandNames = Array.from(commandMap.keys());
+        const currentNames = Array.from(currentMap.keys());
+
+        const add    = Util.leftExclusiveJoin(commandNames, currentNames).map((name) => commandMap.get(name));
+        const remove = Util.rightExclusiveJoin(commandNames, currentNames).map((name) => currentMap.get(name));
+
+        const { same, update } = Util.innerExclusiveJoin(commandNames, currentNames).reduce((result, name) => {
+
+            // eslint-disable-next-line no-unused-vars
+            const { id, application_id, version, ...current } = currentMap.get(name);
+            const command                                     = commandMap.get(name);
+
+            if (DeepEqual(command, current)) {
+
+                result.same.push(current);
+            }
+            else {
+
+                result.update.push({ id, application_id, ...command });
+            }
+
+            return result;
+
+        }, { same : [], update : [] });
+
+        return { add, remove, update, same, noChange : !(add.length || remove.length || update.length) };
     }
 
     /**
@@ -238,7 +314,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
             const reply = await applicationCommand.runCommand(id, interaction);
 
-            if (reply instanceof InteractiveReply || reply instanceof Modal) {
+            if (reply instanceof Util.InteractiveReply || reply instanceof Util.Modal) {
 
                 await reply.send();
             }

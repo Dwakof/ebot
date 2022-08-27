@@ -1,35 +1,58 @@
 'use strict';
 
 /* eslint-disable no-unused-vars */
-const { Message, BaseInteraction, AnyComponentBuilder, Guild, User, InteractionCollector, EmbedBuilder } = require('discord.js');
-const { ButtonStyle, TextInputStyle, BuildersSelectMenuOption, SelectMenuComponentOptionData }           = require('discord.js');
-const { APISelectMenuOption, ActionRowBuilder, ButtonBuilder, SelectMenuBuilder }                        = require('discord.js');
-const { TextInputBuilder, ComponentType, ModalBuilder, APIMessageComponentEmoji }                        = require('discord.js');
+const { Message, BaseInteraction, ComponentBuilder, Guild, User, InteractionCollector, EmbedBuilder } = require('discord.js');
+const { ButtonStyle, TextInputStyle, BuildersSelectMenuOption, SelectMenuComponentOptionData }        = require('discord.js');
+const { APISelectMenuOption, ActionRowBuilder, ButtonBuilder, SelectMenuBuilder }                     = require('discord.js');
+const { TextInputBuilder, ComponentType, ModalBuilder, APIMessageComponentEmoji }                     = require('discord.js');
 /* eslint-enable no-unused-vars */
 
 const Random = require('./random');
 
 /**
- * @typedef {Object} ComponentOptions
+ * @typedef {Object} BaseComponentOptions
  *
  * @property {String}               id
+ * @property {String}               [discordId]
  * @property {String}               type
  * @property {Function}             [onAction]
  * @property {Function}             [onReply]
  * @property {Function}             [hide]
+ */
+
+/**
+ * @typedef {BaseComponentOptions} ButtonComponentOptions
+ *
+ * @property {Boolean|Function}                          [disabled]
+ * @property {String|Function}                           [label]
+ * @property {ButtonStyle|Function}                      [style]
+ * @property {String|Function}                           [url]
+ * @property {String|APIMessageComponentEmoji|Function}  [emoji]
+ */
+
+/**
+ * @typedef {BaseComponentOptions} SelectComponentOptions
  *
  * @property {Boolean|Function}                                                                                  [disabled]
- * @property {String|Function}                                                                                   [label]
  * @property {String|Function}                                                                                   [placeholder]
- * @property {ButtonStyle|TextInputStyle|Function}                                                               [style]
  * @property {Number|Function}                                                                                   [max_values]
  * @property {Number|Function}                                                                                   [min_values]
- * @property {Number|Function}                                                                                   [max_length]
- * @property {Number|Function}                                                                                   [min_length]
- * @property {String|Function}                                                                                   [value]
- * @property {String|Function}                                                                                   [url]
- * @property {String|APIMessageComponentEmoji|Function}                                                          [emoji]
  * @property {RestOrArray<BuildersSelectMenuOption|SelectMenuComponentOptionData|APISelectMenuOption>|Function}  [options]
+ */
+
+/**
+ * @typedef {BaseComponentOptions} TextComponentOptions
+ *
+ * @property {String|Function}          [label]
+ * @property {String|Function}          [placeholder]
+ * @property {TextInputStyle|Function}  [style]
+ * @property {Number|Function}          [max_length]
+ * @property {Number|Function}          [min_length]
+ * @property {String|Function}          [value]
+ */
+
+/**
+ * @typedef {ButtonComponentOptions|SelectComponentOptions|TextComponentOptions} ComponentOptions
  */
 
 /**
@@ -40,6 +63,10 @@ const Random = require('./random');
  * @property {Boolean}                 [hideComponentsOnEnd=true]
  * @property {Boolean}                 [ephemeral=false]
  * @property {Function}                [onReply]
+ */
+
+/**
+ * @typedef {ButtonBuilder|SelectMenuBuilder|TextInputBuilder} ComponentBuilder
  */
 
 class ComponentBased {
@@ -60,9 +87,15 @@ class ComponentBased {
     };
 
     /**
-     * @type {Map<String, AnyComponentBuilder>}
+     * @type {Map<String, ComponentBuilder>}
      */
     #components = new Map();
+
+    /**
+     *
+     * @type {Map<String, String>}
+     */
+    #bindingIds = new Map();
 
     #config;
 
@@ -98,7 +131,7 @@ class ComponentBased {
 
         for (const component of this.#config) {
 
-            const { id, type, onAction, onReply, hide } = component;
+            const { id, discordId, type, onAction, onReply, hide } = component;
 
             this.#hooks.onReply.set(id, []);
 
@@ -143,6 +176,11 @@ class ComponentBased {
 
                 this.#hooks.hide.set(id, hide.bind(this));
             }
+
+            const customId = discordId || Random.uuid();
+
+            this.#components.get(id).setCustomId(customId);
+            this.#bindingIds.set(customId, id);
         }
     }
 
@@ -171,7 +209,7 @@ class ComponentBased {
         this.registerHook(id, emoji, 'setEmoji');
         this.registerHook(id, url, 'setURL');
 
-        return new ButtonBuilder({ customId : id, style });
+        return new ButtonBuilder();
     }
 
     setupSelect(component) {
@@ -184,7 +222,7 @@ class ComponentBased {
         this.registerHook(id, disabled, 'setDisabled');
         this.registerHook(id, options, 'setOptions');
 
-        return new SelectMenuBuilder({ customId : id });
+        return new SelectMenuBuilder();
     }
 
     setupText(component) {
@@ -199,11 +237,11 @@ class ComponentBased {
         this.registerHook(id, required, 'setRequired');
         this.registerHook(id, value, 'setValue');
 
-        return new TextInputBuilder({ customId : id });
+        return new TextInputBuilder();
     }
 
     /**
-     * @returns {ActionRowBuilder<AnyComponentBuilder>[]}
+     * @returns {ActionRowBuilder<ComponentBuilder>[]}
      */
     buildActionRows() {
 
@@ -232,7 +270,7 @@ class ComponentBased {
 
     /**
      *
-     * @param {ActionRowBuilder<AnyComponentBuilder>} actionRowBuilder
+     * @param {ActionRowBuilder<ComponentBuilder>} actionRowBuilder
      *
      * @return {Number}
      */
@@ -252,9 +290,11 @@ class ComponentBased {
         }
     }
 
-    onAction(interaction, id, ...data) {
+    onAction(interaction, customId, ...data) {
 
-        if (this.#hooks.onAction.has(id)) {
+        const id = this.#bindingIds.get(customId);
+
+        if (id && this.#hooks.onAction.has(id)) {
 
             return this.#hooks.onAction.get(id)(this.#components.get(id), interaction, ...data);
         }
@@ -265,7 +305,7 @@ class ComponentBased {
      */
     get componentIds() {
 
-        return Array.from(this.#components.keys());
+        return Array.from(this.#bindingIds.keys());
     }
 
     disableEveryComponents() {

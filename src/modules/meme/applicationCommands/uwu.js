@@ -5,10 +5,7 @@ const { ApplicationCommand } = require('../../../core');
 class UwUCommand extends ApplicationCommand {
     constructor() {
 
-        super('uwu', {
-            description : 'Whwen y-you wawnt to swend a cwoot missage to sempwai, OwO',
-            global      : true
-        });
+        super('uwu', { description : 'Whwen y-you wawnt to swend a cwoot missage to sempwai, OwO' });
     }
 
     static get command() {

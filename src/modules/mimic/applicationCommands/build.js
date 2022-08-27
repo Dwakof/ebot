@@ -1,12 +1,17 @@
 'use strict';
 
+const { PermissionFlagsBits } = require('discord.js');
+
 const { ApplicationCommand } = require('../../../core');
 
 module.exports = class Rebuild extends ApplicationCommand {
 
     constructor() {
 
-        super('build-mimic', { description : `Build guild's models`, defaultPermission : false });
+        super('build-mimic', {
+            description : `Build guild's models`,
+            permissions : PermissionFlagsBits.Administrator
+        });
     }
 
     static get command() {

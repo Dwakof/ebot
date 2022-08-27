@@ -14,7 +14,7 @@ class CoinFlipCommand extends ApplicationCommand {
 
     static get command() {
 
-        return { method : 'flip', options : {} };
+        return { method : 'flip' };
     }
 
     flip(interaction) {
