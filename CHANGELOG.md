@@ -1,3 +1,10 @@
+# [0.25.0](https://github.com/Dwakof/ebot/compare/v0.24.3...v0.25.0) (2022-08-27)
+
+
+### Features
+
+* **core:** Rework command registration system ([530309c](https://github.com/Dwakof/ebot/commit/530309c9fe2f7338246ab38de43385607c5aebad)), closes [#223](https://github.com/Dwakof/ebot/issues/223)
+
 ## [0.24.3](https://github.com/Dwakof/ebot/compare/v0.24.2...v0.24.3) (2022-08-19)
 
 
