@@ -1,7 +1,7 @@
 version: 2
 updates:
 # Enable version updates for NPM
-- package-ecosystem: "docker"
+- package-ecosystem: "npm"
   directory: "/"
   schedule:
     interval: "weekly"
@@ -12,9 +12,7 @@ updates:
 
 # Enable version updates for Docker
 - package-ecosystem: "docker"
-  # Look for a `Dockerfile` in the `root` directory
   directory: "/"
-  # Check for updates once a week
   schedule:
     interval: "weekly"
   reviewers:
