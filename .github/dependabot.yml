@@ -1,56 +1,33 @@
 version: 2
 updates:
-- package-ecosystem: npm
+# Enable version updates for NPM
+- package-ecosystem: "docker"
   directory: "/"
   schedule:
-    interval: weekly
-  open-pull-requests-limit: 10
+    interval: "weekly"
   reviewers:
   - yoannma
   assignees:
   - yoannma
-  ignore:
-  - dependency-name: eslint
-    versions:
-    - 7.18.0
-    - 7.19.0
-    - 7.20.0
-    - 7.21.0
-    - 7.22.0
-    - 7.23.0
-    - 7.24.0
-  - dependency-name: "@sentry/node"
-    versions:
-    - 6.0.1
-    - 6.0.3
-    - 6.1.0
-    - 6.2.0
-    - 6.2.1
-    - 6.2.2
-    - 6.2.3
-    - 6.2.5
-  - dependency-name: pino
-    versions:
-    - 6.11.0
-    - 6.11.1
-    - 6.11.2
-  - dependency-name: knex
-    versions:
-    - 0.21.16
-    - 0.21.17
-    - 0.21.18
-    - 0.95.1
-    - 0.95.2
-  - dependency-name: objection
-    versions:
-    - 2.2.10
-    - 2.2.14
-  - dependency-name: "@hapi/hoek"
-    versions:
-    - 9.1.1
-  - dependency-name: got
-    versions:
-    - 11.8.1
-  - dependency-name: discord.js
-    versions:
-    - 12.5.1
+
+# Enable version updates for Docker
+- package-ecosystem: "docker"
+  # Look for a `Dockerfile` in the `root` directory
+  directory: "/"
+  # Check for updates once a week
+  schedule:
+    interval: "weekly"
+  reviewers:
+  - yoannma
+  assignees:
+  - yoannma
+
+# Enable version updates for Github Actions
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: "weekly"
+  reviewers:
+  - yoannma
+  assignees:
+  - yoannma
