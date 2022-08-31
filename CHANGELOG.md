@@ -1,3 +1,10 @@
+## [0.25.4](https://github.com/Dwakof/ebot/compare/v0.25.3...v0.25.4) (2022-08-31)
+
+
+### Bug Fixes
+
+* guild commands were not correctly handled ([48dba64](https://github.com/Dwakof/ebot/commit/48dba6473da012200ab3b196bd4565da62b29d4a))
+
 ## [0.25.3](https://github.com/Dwakof/ebot/compare/v0.25.2...v0.25.3) (2022-08-31)
 
 
