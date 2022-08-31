@@ -72,7 +72,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
         }
 
         await this.registerGlobalCommands(globalCommands);
-        await this.registerGuildCommands(guildCommands, globalCommands);
+        await this.registerGuildCommands(guildCommands, guildCommands);
 
         return true;
     }
@@ -117,7 +117,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
         }
     }
 
-    async registerGuildCommands(commands, globalCommands) {
+    async registerGuildCommands(commands, guildCommands) {
 
         try {
 
@@ -125,7 +125,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
                 const currents = await this.client.API.get(Routes.applicationGuildCommands(this.client.clientId, guildId));
 
-                const { add, remove, update, same, noChange } = this.diffCommands(commands, Util.leftExclusiveJoin(currents, globalCommands, (c) => c.name));
+                const { add, remove, update, same, noChange } = this.diffCommands(commands, Util.leftExclusiveJoin(currents, guildCommands, (c) => c.name));
 
                 if (noChange) {
 
