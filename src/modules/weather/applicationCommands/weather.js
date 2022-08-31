@@ -113,7 +113,7 @@ module.exports = class Weather extends ApplicationCommand {
                 });
             }
 
-            await new Util.DashboardEmbeds(interaction, embeds);
+            return new Util.DashboardEmbeds(interaction, embeds);
         }
         catch (error) {
 
