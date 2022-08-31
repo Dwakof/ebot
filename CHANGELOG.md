@@ -1,3 +1,10 @@
+## [0.25.2](https://github.com/Dwakof/ebot/compare/v0.25.1...v0.25.2) (2022-08-31)
+
+
+### Bug Fixes
+
+* application Guild commands not correctly patched ([3737191](https://github.com/Dwakof/ebot/commit/3737191ab6aa24a9b11d6dc4be146ca4ade13fd5))
+
 ## [0.25.1](https://github.com/Dwakof/ebot/compare/v0.25.0...v0.25.1) (2022-08-27)
 
 
