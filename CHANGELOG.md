@@ -1,3 +1,10 @@
+## [0.25.3](https://github.com/Dwakof/ebot/compare/v0.25.2...v0.25.3) (2022-08-31)
+
+
+### Bug Fixes
+
+* weather not responding with the dashboard reply ([ff5d6dc](https://github.com/Dwakof/ebot/commit/ff5d6dcf39b413b56e651606dcd295b53a331264))
+
 ## [0.25.2](https://github.com/Dwakof/ebot/compare/v0.25.1...v0.25.2) (2022-08-31)
 
 
