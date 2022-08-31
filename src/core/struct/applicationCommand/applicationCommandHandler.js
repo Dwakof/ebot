@@ -123,7 +123,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
             for (const [guildId, { name }] of this.client.guilds.cache) {
 
-                const currents = await this.client.API.get(Routes.applicationCommands(this.client.clientId));
+                const currents = await this.client.API.get(Routes.applicationGuildCommands(this.client.clientId, guildId));
 
                 const { add, remove, update, same, noChange } = this.diffCommands(commands, Util.leftExclusiveJoin(currents, globalCommands, (c) => c.name));
 
