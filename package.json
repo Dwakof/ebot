@@ -27,7 +27,7 @@
     "@skyra/discord-components-core": "3.4.1",
     "ajv-formats": "2.1.1",
     "bezier-easing": "2.1.0",
-    "canvas": "2.9.3",
+    "canvas": "2.10.1",
     "chart.js": "3.9.1",
     "chartjs-adapter-luxon": "1.2.0",
     "chroma-js": "2.4.2",
