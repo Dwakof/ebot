@@ -1,3 +1,10 @@
+## [0.25.5](https://github.com/Dwakof/ebot/compare/v0.25.4...v0.25.5) (2022-09-20)
+
+
+### Bug Fixes
+
+* urgent fix broken emoji on weather commands ([1328573](https://github.com/Dwakof/ebot/commit/13285735f6f1a8be6999cb44c78744ebbce4bd64))
+
 ## [0.25.4](https://github.com/Dwakof/ebot/compare/v0.25.3...v0.25.4) (2022-08-31)
 
 
