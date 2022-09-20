@@ -127,7 +127,7 @@ module.exports = class CommonView extends View {
             781 : ':cloud_tornado:',
             // Clouds
             800 : ':crescent_moon:',
-            801 : ':crescent_moon',
+            801 : ':crescent_moon:',
             802 : ':cloud:',
             803 : ':cloud:',
             804 : ':cloud:'
