@@ -1,6 +1,6 @@
 {
   "name": "ebot",
-  "version": "0.25.4",
+  "version": "0.25.5",
   "description": "Ebot aka Ecto Botanical Otherworldly Traitorbot",
   "homepage": "https://github.com/Dwakof/ebot#readme",
   "bugs": {
@@ -50,7 +50,7 @@
     "p-queue-compat": "1.0.166",
     "pg": "8.8.0",
     "pg-query-stream": "4.2.4",
-    "pino": "8.4.2",
+    "pino": "8.6.0",
     "pug": "3.0.2",
     "puppeteer": "16.2.0",
     "undici": "5.10.0"
