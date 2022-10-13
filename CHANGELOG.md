@@ -1,3 +1,12 @@
+## [0.25.6](https://github.com/Dwakof/ebot/compare/v0.25.5...v0.25.6) (2022-10-13)
+
+
+### Bug Fixes
+
+* better error logging ([883724c](https://github.com/Dwakof/ebot/commit/883724c96b4fb2b7e6dc129ee709b404eb3b041c))
+* sync channel was broken ([f72a61a](https://github.com/Dwakof/ebot/commit/f72a61a5bfbb8d34f145ddfd2bfb18a8a61d8e71))
+* update dependencies and use `import()` for `p-queue` instead of p-queue-compat package ([b7cb3d0](https://github.com/Dwakof/ebot/commit/b7cb3d01a8036795c7709b4e64b7421c020938f3))
+
 ## [0.25.5](https://github.com/Dwakof/ebot/compare/v0.25.4...v0.25.5) (2022-09-20)
 
 
