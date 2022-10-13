@@ -5,16 +5,21 @@ const { channelMention }                                          = require('dis
 
 const { DateTime } = require('luxon');
 
-const { default : PQueue } = require('p-queue-compat');
-
 const { Service, Util } = require('../../../core');
 
 module.exports = class SyncService extends Service {
+
+    #PQueue;
 
     static FIRST_MESSAGE_ID = SnowflakeUtil.epoch;
     static CHANNEL_STATE    = 'channel_import';
     static GUILD_STATE      = 'guild_import';
     static REQUIRED_PERMS   = [PermissionsBitField.Flags.ReadMessageHistory, PermissionsBitField.Flags.ViewChannel];
+
+    async init() {
+
+        this.#PQueue = await import('p-queue');
+    }
 
     async * fetchAllMessages(channel, limit = 100) {
 
@@ -136,7 +141,7 @@ module.exports = class SyncService extends Service {
 
                 task.set({ total : channels.length });
 
-                const queue = new PQueue({ concurrency : 7 });
+                const queue = new this.#PQueue({ concurrency : 7 });
 
                 for (const channel of channels) {
 
