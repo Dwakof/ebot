@@ -344,7 +344,7 @@ module.exports = class SyncService extends Service {
         const channel = guild.channels.cache.get(channelId);
 
         embed.setTitle(`Syncing channel ${ channel.name }`)
-            .setAuthor(guild.name, guild.iconURL({ dynamic : false, size : 32 }))
+            .setAuthor({ name : guild.name, iconURL : guild.iconURL({ dynamic : false, size : 32 }) })
             .setThumbnail(channel.guild.iconURL({ dynamic : false, size : 128 }))
             .setTimestamp()
             .setColor(Colors.Blue);
