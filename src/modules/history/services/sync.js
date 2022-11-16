@@ -19,7 +19,9 @@ module.exports = class SyncService extends Service {
     async init() {
 
         // eslint-disable-next-line node/no-unsupported-features/es-syntax,node/no-missing-import
-        this.#PQueue = await import('p-queue');
+        const { default : PQueue } = await import('p-queue');
+
+        this.#PQueue = PQueue;
     }
 
     async * fetchAllMessages(channel, limit = 100) {
