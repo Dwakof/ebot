@@ -50,7 +50,8 @@ module.exports = class EbotClient extends AkairoClient {
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildMembers,
                 GatewayIntentBits.GuildMessages,
-                GatewayIntentBits.GuildMessageReactions
+                GatewayIntentBits.GuildMessageReactions,
+                GatewayIntentBits.MessageContent
             ]
         });
 
