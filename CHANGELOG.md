@@ -1,3 +1,10 @@
+## [0.25.8](https://github.com/Dwakof/ebot/compare/v0.25.7...v0.25.8) (2022-11-16)
+
+
+### Bug Fixes
+
+* synchronize system was broken thanks to ESM ([c8c829b](https://github.com/Dwakof/ebot/commit/c8c829b9aaddf378902f48b884dd302c558051cd))
+
 ## [0.25.7](https://github.com/Dwakof/ebot/compare/v0.25.6...v0.25.7) (2022-11-16)
 
 
