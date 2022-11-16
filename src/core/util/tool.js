@@ -156,5 +156,36 @@ module.exports = {
         }
 
         return string;
+    },
+
+    paragraphText(text, maxLength = 1000) {
+
+        return text.split('\n').reduce((acc, block) => {
+
+            if (acc[acc.length - 1].length + block.length > maxLength) {
+
+                acc.push('');
+            }
+
+            if (block.length > maxLength) {
+
+                for (const sentence of block.split('.')) {
+
+                    if (acc[acc.length - 1].length + sentence.length > maxLength) {
+
+                        acc.push('');
+                    }
+
+                    acc[acc.length - 1] = acc[acc.length - 1].concat('.', block);
+                }
+
+                return acc;
+            }
+
+            acc[acc.length - 1] = acc[acc.length - 1].concat('\n', block);
+
+            return acc;
+
+        }, ['']);
     }
 };

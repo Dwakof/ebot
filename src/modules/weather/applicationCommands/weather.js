@@ -117,7 +117,7 @@ module.exports = class Weather extends ApplicationCommand {
         }
         catch (error) {
 
-            this.client.logger.error({ err : error });
+            this.client.handleError(this, error);
 
             await interaction.editReply({
                 content   : `⚠ Unable to get weather information for location "${ CommonView.location(location) }"`,

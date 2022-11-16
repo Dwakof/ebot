@@ -13,21 +13,20 @@ module.exports = class WeatherAlertView extends View {
      */
     render(alerts) {
 
-        return alerts.map(this.alert.bind(this));
+        return alerts.map(this.alert.bind(this)).flat(1);
     }
 
     /**
      *
      * @param {WeatherAlert} alert
      *
-     * @return {EmbedBuilder}
+     * @return {Array<EmbedBuilder>}
      */
     alert(alert) {
 
-        const embed = this.embed()
+        const mainEmbed = this.embed()
             .setTitle(`${ alert.event }`)
             .setColor('#ed4245')
-            .setDescription(`${ alert.description }`)
             .addFields([
                 { name : `Start : ${ Time(alert.start, TimestampStyles.RelativeTime) }`, value : Util.BLANK_CHAR, inline : true },
                 { name : `End : ${ Time(alert.end, TimestampStyles.RelativeTime) }`, value : Util.BLANK_CHAR, inline : true }
@@ -35,9 +34,36 @@ module.exports = class WeatherAlertView extends View {
 
         if (alert.sender_name) {
 
-            embed.setFooter({ text : `from ${ alert.sender_name }` });
+            mainEmbed.setFooter({ text : `from ${ alert.sender_name }` });
         }
 
-        return embed;
+        if (alert.description.length <= 3500) {
+
+            mainEmbed.setDescription(`${ alert.description }`);
+
+            return [mainEmbed];
+        }
+
+        if (alert.description.length <= 5000) {
+
+            const blocks = Util.paragraphText(alert.description, 1000);
+
+            mainEmbed.addFields(blocks.map((block) => ({ name : Util.BLANK_CHAR, value : block.trim(), input : false })));
+
+            return [mainEmbed];
+        }
+
+        const blocks = Util.paragraphText(alert.description, 4000);
+
+        mainEmbed.setDescription(`${ blocks.shift() }`);
+
+        const extraEmbeds = [];
+
+        for (const block of blocks) {
+
+            extraEmbeds.push(this.embed().setColor('#ed4245').setDescription(`${ block }`));
+        }
+
+        return [mainEmbed, ...extraEmbeds];
     }
 };
