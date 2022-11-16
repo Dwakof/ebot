@@ -1,3 +1,11 @@
+## [0.25.7](https://github.com/Dwakof/ebot/compare/v0.25.6...v0.25.7) (2022-11-16)
+
+
+### Bug Fixes
+
+* add missing message intent ([be51704](https://github.com/Dwakof/ebot/commit/be517040e08a4df0466f1129848dd15d160cb4ba))
+* split very long alert into multiple embed because fuck florida ([182b1fd](https://github.com/Dwakof/ebot/commit/182b1fd6cb08fce4504df6daf97e57ee5fbfc079))
+
 ## [0.25.6](https://github.com/Dwakof/ebot/compare/v0.25.5...v0.25.6) (2022-10-13)
 
 
