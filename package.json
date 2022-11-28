@@ -23,7 +23,7 @@
     "@hapi/hoek": "10.0.1",
     "@hapipal/confidence": "6.0.2",
     "@sentry/node": "7.19.0",
-    "@sentry/tracing": "7.19.0",
+    "@sentry/tracing": "7.21.1",
     "@skyra/discord-components-core": "3.4.1",
     "ajv-formats": "2.1.1",
     "bezier-easing": "2.1.0",
