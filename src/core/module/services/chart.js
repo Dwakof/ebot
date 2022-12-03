@@ -6,8 +6,9 @@ const Hoek = require('@hapi/hoek');
 const Canvas = require('canvas');
 
 const { Chart }                           = require('chart.js');
-const ChartJSLuxon                        = require('chartjs-adapter-luxon');
-const { MatrixController, MatrixElement } = require('../../../../lib/chartjs-matrix');
+
+require('chartjs-adapter-luxon');
+require('chartjs-chart-matrix/dist/chartjs-chart-matrix.js');
 
 const { Service } = require('../../../core');
 
@@ -16,9 +17,6 @@ module.exports = class ChartService extends Service {
     init() {
 
         this.chartJS = Chart;
-
-        this.chartJS.register(ChartJSLuxon);
-        this.chartJS.register(MatrixController, MatrixElement);
     }
 
     /**
