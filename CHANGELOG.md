@@ -1,3 +1,16 @@
+## [0.25.9](https://github.com/Dwakof/ebot/compare/v0.25.8...v0.25.9) (2022-12-03)
+
+
+### Bug Fixes
+
+* Modal was not working as intended since 530309c9fe2f7338246ab38de43385607c5aebad ([adee7a3](https://github.com/Dwakof/ebot/commit/adee7a31720a858fff78ed99bd44d2e7bc558335))
+* remove custom implementation of chartjs matrix ([d479921](https://github.com/Dwakof/ebot/commit/d479921bc72db91174694bcc867c0514a0e0943f))
+* remove deprecated usage discordjs ([f0851f0](https://github.com/Dwakof/ebot/commit/f0851f07a09d7449c1333dd4bf52c3f60b09ed66))
+* remove multiple deprecated usage ([50346b0](https://github.com/Dwakof/ebot/commit/50346b082df3653f293da35dfeca65f9f667a858))
+* update dependencies ([a2c341e](https://github.com/Dwakof/ebot/commit/a2c341e1b337c3933426d06fa16ae81e346f0b34))
+* update OpenAI pricing and model version ([34ff53a](https://github.com/Dwakof/ebot/commit/34ff53a21af86906fa3047a4d474d0dc1b8ba14b))
+* update to Node 18 ([647e80f](https://github.com/Dwakof/ebot/commit/647e80f7817ad106804bacc810715d171adba0c4))
+
 ## [0.25.8](https://github.com/Dwakof/ebot/compare/v0.25.7...v0.25.8) (2022-11-16)
 
 
