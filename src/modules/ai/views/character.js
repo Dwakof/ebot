@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { Formatters, TextInputStyle, EmbedBuilder, BaseInteraction, ButtonStyle } = require('discord.js');
+const { TextInputStyle, EmbedBuilder, BaseInteraction, ButtonStyle } = require('discord.js');
 
 const { View, Util } = require('../../../core');
 
@@ -17,11 +17,11 @@ module.exports = class CharacterView extends View {
         return this.embed()
             .setTitle(`Character ${ character.name }`)
             .addFields([
-                { name : 'ID', value : Formatters.inlineCode(character.id), inline : true },
-                { name : 'Gender', value : character.gender ?? Formatters.inlineCode('Unknown'), inline : true },
-                { name : 'Age', value : character.age ?? Formatters.inlineCode('Unknown'), inline : true },
-                { name : 'Description', value : character.description ?? Formatters.inlineCode('Unknown'), inline : false },
-                { name : 'Story', value : character.story ? Formatters.blockQuote(character.story) : Formatters.inlineCode('Unknown'), inline : false }
+                { name : 'ID', value : Util.inlineCode(character.id), inline : true },
+                { name : 'Gender', value : character.gender ?? Util.inlineCode('Unknown'), inline : true },
+                { name : 'Age', value : character.age ?? Util.inlineCode('Unknown'), inline : true },
+                { name : 'Description', value : character.description ?? Util.inlineCode('Unknown'), inline : false },
+                { name : 'Story', value : character.story ? Util.blockQuote(character.story) : Util.inlineCode('Unknown'), inline : false }
             ]);
     }
 

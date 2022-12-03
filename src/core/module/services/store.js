@@ -96,7 +96,14 @@ module.exports = class StoreService extends Service {
             return entries.map(this.#toObject);
         }
 
-        const entries = await Store.models.Store.query().where({ module, namespace, guildId }).skipUndefined();
+        const query = Store.models.Store.query().where({ module, namespace });
+
+        if (guildId) {
+
+            query.where({ guildId });
+        }
+
+        const entries = await query;
 
         return entries.map(this.#toObject);
     }
@@ -140,7 +147,14 @@ module.exports = class StoreService extends Service {
         const { Store } = this.providers();
 
         // noinspection ES6RedundantAwait
-        return await Store.models.Store.query().delete().where({ module, namespace, guildId, id }).skipUndefined();
+        const query = Store.models.Store.query().delete().where({ module, namespace, id });
+
+        if (guildId) {
+
+            query.where({ guildId });
+        }
+
+        return await query;
     }
 
     static check(variable, name) {

@@ -44,5 +44,10 @@ module.exports = {
     isVoiceChannel(channel) {
 
         return channel.type === ChannelType.GuildVoice;
+    },
+
+    isNumber(value) {
+
+        return !Number.isNaN(Number.parseFloat(value)) && Number.isFinite(value);
     }
 };

@@ -3,7 +3,6 @@
 const { View, Util } = require('../../../core');
 
 const { time : Time, TimestampStyles, inlineCode } = require('discord.js');
-const { isNumber }                                 = require('chart.js/helpers');
 
 module.exports = class CurrentWeatherView extends View {
 
@@ -189,7 +188,7 @@ module.exports = class CurrentWeatherView extends View {
             rows.push(`${ Util.randomValue(emoji[airQuality.main.aqi - 1]) } ${ inlineCode(quality[airQuality.main.aqi - 1]) }`);
         }
 
-        if (isNumber(current?.uvi) && current?.uvi > 0) {
+        if (Util.isNumber(current?.uvi) && current?.uvi > 0) {
 
             title.push('UV Index');
             rows.push(`:sunny: ${ inlineCode(`${ current.uvi }`) }`);

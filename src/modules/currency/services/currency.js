@@ -4,8 +4,7 @@ const Lunr         = require('lunr');
 const { DateTime } = require('luxon');
 const CurrencyJS   = require('currency.js');
 
-const { ServiceApi } = require('../../../core');
-const { isNumber }   = require('chart.js/helpers');
+const { ServiceApi, Util } = require('../../../core');
 
 module.exports = class CurrencyService extends ServiceApi {
 
@@ -30,7 +29,7 @@ module.exports = class CurrencyService extends ServiceApi {
 
         for (const currency of Object.values(Currencies)) {
 
-            if (currency.code === 'USD' || isNumber(rates[currency.code])) {
+            if (currency.code === 'USD' || Util.isNumber(rates[currency.code])) {
 
                 this.#currencies.set(currency.code, currency);
             }

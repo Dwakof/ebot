@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { Formatters, TextInputStyle, EmbedBuilder, BaseInteraction, ButtonStyle } = require('discord.js');
+const { TextInputStyle, EmbedBuilder, BaseInteraction, ButtonStyle } = require('discord.js');
 
 const { View, Util } = require('../../../core');
 
@@ -23,8 +23,8 @@ module.exports = class CompletionView extends View {
                 iconURL : interaction?.member?.avatarURL?.({ dynamic : true }) || interaction?.user?.avatarURL?.({ dynamic : true })
             })
             .addFields([
-                { name : 'Prompt', value : Formatters.blockQuote(prompt), inline : false },
-                { name : 'Peoples', value : characters.map(({ name }) => name).join(', ') || Formatters.inlineCode('none'), inline : false }
+                { name : 'Prompt', value : Util.blockQuote(prompt), inline : false },
+                { name : 'Peoples', value : characters.map(({ name }) => name).join(', ') || Util.inlineCode('none'), inline : false }
             ]);
     }
 
@@ -63,8 +63,8 @@ module.exports = class CompletionView extends View {
 
         const blocks = this.parseReply(text);
 
-        embed.addFields([{ name : 'Result', value : Formatters.blockQuote(blocks.shift().trim()), inline : false }]);
-        embed.addFields(blocks.map((block) => ({ name : Util.BLANK_CHAR, value : Formatters.blockQuote(block.trim()), input : false })));
+        embed.addFields([{ name : 'Result', value : Util.blockQuote(blocks.shift().trim()), inline : false }]);
+        embed.addFields(blocks.map((block) => ({ name : Util.BLANK_CHAR, value : Util.blockQuote(block.trim()), input : false })));
 
         return embed;
     }
@@ -84,12 +84,12 @@ module.exports = class CompletionView extends View {
 
             for (const [, match] of result.matchAll(/((INT\. |EXT\. |INT\/EXT\. |EXT\/INT\. )[A-Z \-'()]+) [A-Z][a-z]/gm)) {
 
-                result = result.replace(match, `\n${ Formatters.inlineCode(match) }\n`);
+                result = result.replace(match, `\n${ Util.inlineCode(match) }\n`);
             }
 
             for (const [match, before, name, after] of result.matchAll(/[.?!] ([A-Z]{2}[A-Z. \-'()]+) [A-Z0-9][a-z.]/gm)) {
 
-                result = result.replace(match, `${ before }\n${ Formatters.bold(name) } : ${ after }`);
+                result = result.replace(match, `${ before }\n${ Util.bold(name) } : ${ after }`);
             }
         }
 
