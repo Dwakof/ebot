@@ -308,6 +308,15 @@ class ComponentBased {
         return Array.from(this.#bindingIds.keys());
     }
 
+    /**
+     * @param customId
+     * @return {String}
+     */
+    originalComponentId(customId) {
+
+        return this.#bindingIds.get(customId);
+    }
+
     disableEveryComponents() {
 
         for (const component of this.#components.values()) {
@@ -864,7 +873,7 @@ class Modal extends ComponentBased {
 
         return this.componentIds.reduce((parsed, id) => {
 
-            parsed[id] = interaction.fields.getTextInputValue(id) || undefined;
+            parsed[this.originalComponentId(id)] = interaction.fields.getTextInputValue(id) || undefined;
 
             return parsed;
 
