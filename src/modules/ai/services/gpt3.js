@@ -9,10 +9,10 @@ module.exports = class GPT3Service extends ServiceApi {
     static ENDPOINT = 'https://api.openai.com';
 
     static modelPrice = {
-        'text-davinci-002' : 0.06,
-        'text-curie-001'   : 0.006,
-        'text-babbage-001' : 0.0012,
-        'text-ada-001'     : 0.0008
+        'text-davinci-003' : 0.02,
+        'text-curie-001'   : 0.002,
+        'text-babbage-001' : 0.0005,
+        'text-ada-001'     : 0.0004
     };
 
     init(settings) {
@@ -53,7 +53,7 @@ module.exports = class GPT3Service extends ServiceApi {
         }
 
         const { choices : [{ text }], usage : { total_tokens } } = await this.api.post(`/v1/engines/${ model }/completions`, JSON.stringify({
-            max_tokens  : 512,
+            max_tokens  : 1024,
             temperature : options.temperature ?? 1,
             user        : options.user,
             prompt

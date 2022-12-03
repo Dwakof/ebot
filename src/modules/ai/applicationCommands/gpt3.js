@@ -66,7 +66,7 @@ module.exports = class GPT3Command extends ApplicationCommand {
                         required    : false,
                         default     : 'text-curie-001',
                         choices     : {
-                            'Davinci' : 'text-davinci-002',
+                            'Davinci' : 'text-davinci-003',
                             'Curie'   : 'text-curie-001',
                             'Babbage' : 'text-babbage-001',
                             'Ada'     : 'text-ada-001'
