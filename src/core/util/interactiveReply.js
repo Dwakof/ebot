@@ -3,8 +3,8 @@
 /* eslint-disable no-unused-vars */
 const { Message, BaseInteraction, ComponentBuilder, Guild, User, InteractionCollector, EmbedBuilder } = require('discord.js');
 const { ButtonStyle, TextInputStyle, BuildersSelectMenuOption, SelectMenuComponentOptionData }        = require('discord.js');
-const { APISelectMenuOption, ActionRowBuilder, ButtonBuilder, SelectMenuBuilder }                     = require('discord.js');
-const { TextInputBuilder, ComponentType, ModalBuilder, APIMessageComponentEmoji }                     = require('discord.js');
+const { APISelectMenuOption, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder }               = require('discord.js');
+const { TextInputBuilder, ComponentType, ModalBuilder, APIMessageComponentEmoji, RestOrArray }        = require('discord.js');
 /* eslint-enable no-unused-vars */
 
 const Random = require('./random');
@@ -66,7 +66,7 @@ const Random = require('./random');
  */
 
 /**
- * @typedef {ButtonBuilder|SelectMenuBuilder|TextInputBuilder} ComponentBuilder
+ * @typedef {ButtonBuilder|StringSelectMenuBuilder|TextInputBuilder} ComponentBuilder
  */
 
 class ComponentBased {
@@ -111,7 +111,7 @@ class ComponentBased {
 
         return {
             Button : ComponentType.Button,
-            Select : ComponentType.SelectMenu,
+            Select : ComponentType.StringSelect,
             Text   : ComponentType.TextInput
         };
     }
@@ -119,9 +119,9 @@ class ComponentBased {
     static get InputSize() {
 
         return {
-            [ComponentType.SelectMenu] : 5,
-            [ComponentType.TextInput]  : 5,
-            [ComponentType.Button]     : 1
+            [ComponentType.StringSelect] : 5,
+            [ComponentType.TextInput]    : 5,
+            [ComponentType.Button]       : 1
         };
     }
 
@@ -222,7 +222,7 @@ class ComponentBased {
         this.registerHook(id, disabled, 'setDisabled');
         this.registerHook(id, options, 'setOptions');
 
-        return new SelectMenuBuilder();
+        return new StringSelectMenuBuilder();
     }
 
     setupText(component) {
