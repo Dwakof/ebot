@@ -54,7 +54,7 @@
     "pino": "8.7.0",
     "pug": "3.0.2",
     "puppeteer": "19.3.0",
-    "undici": "5.13.0"
+    "undici": "5.14.0"
   },
   "devDependencies": {
     "@babel/core": "7.20.5",
