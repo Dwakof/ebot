@@ -54,9 +54,9 @@ module.exports = class CurrencyView extends View {
             }
         });
 
-        embed.setImage('attachment://chart.png');
+        embed.setImage('attachment://chart.webp');
 
-        return { embeds : [embed], files : [this.client.util.attachment(buffer, 'chart.png')] };
+        return { embeds : [embed], files : [this.client.util.attachment(buffer, 'chart.webp')] };
     }
 
     /**

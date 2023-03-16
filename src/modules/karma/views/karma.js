@@ -69,9 +69,9 @@ module.exports = class KarmaView extends View {
 
         if (stats) {
 
-            result.files.push(this.client.util.attachment(await this.renderGraph(stats), 'chart.png'));
+            result.files.push(this.client.util.attachment(await this.renderGraph(stats), 'chart.webp'));
 
-            embed.setImage('attachment://chart.png');
+            embed.setImage('attachment://chart.webp');
         }
 
         return result;

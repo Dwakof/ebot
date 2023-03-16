@@ -1,4 +1,4 @@
-FROM node:18.12 as base
+FROM node:18.12 AS base
 
 ENV APP_PATH=/app
 
@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 
 #########################################################
 
-FROM base as dependencies
+FROM base AS dependencies
 
 WORKDIR $APP_PATH
 
@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/usr/src/app/.npm \
 
 #########################################################
 
-FROM base as puppeteer
+FROM base AS puppeteer
 
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update \
@@ -39,7 +39,7 @@ ENV CHROMIUM_PATH="google-chrome-stable"
 
 #########################################################
 
-FROM puppeteer as release
+FROM puppeteer AS release
 
 USER node
 
@@ -47,6 +47,6 @@ WORKDIR $APP_PATH
 
 COPY --chown=node:node --from=dependencies $APP_PATH/package*.json ./
 COPY --chown=node:node --from=dependencies $APP_PATH/node_modules  ./node_modules
-COPY --chown=node:node . $APP_PATH
+COPY --chown=node:node src $APP_PATH
 
 CMD [ "dumb-init", "node", "src/index.js" ]

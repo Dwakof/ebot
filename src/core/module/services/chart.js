@@ -107,7 +107,7 @@ module.exports = class ChartService extends Service {
         colorLowZero  = colorLowZero ?? 'rgba(153, 9, 9, 1)';
         colorLow      = colorLow ?? 'rgba(214, 13, 13, 1)';
 
-        let gradient;
+        let gradient = null;
 
         return function (context) {
 

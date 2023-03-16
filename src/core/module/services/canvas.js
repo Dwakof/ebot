@@ -24,7 +24,7 @@ module.exports = class CanvasService extends Service {
      *
      * @return {Promise<Buffer>}
      */
-    toBuffer(canvas, format = 'webp', options) {
+    toBuffer(canvas, format = 'webp', options = null) {
 
         return canvas.encode(format, options);
     }
@@ -36,7 +36,7 @@ module.exports = class CanvasService extends Service {
      *
      * @return {Buffer}
      */
-    toBufferSync(canvas, format = 'webp', options) {
+    toBufferSync(canvas, format = 'webp', options = null) {
 
         return canvas.toBuffer(`image/${ format }`, options);
     }
@@ -48,7 +48,7 @@ module.exports = class CanvasService extends Service {
      *
      * @return {Promise<string>}
      */
-    toDataURL(canvas, format = 'webp', options) {
+    toDataURL(canvas, format = 'webp', options = null) {
 
         return canvas.toDataURLAsync(`image/${ format }`, options);
     }
@@ -60,7 +60,7 @@ module.exports = class CanvasService extends Service {
      *
      * @return {string}
      */
-    toDataURLSync(canvas, format = 'webp', options) {
+    toDataURLSync(canvas, format = 'webp', options = null) {
 
         return canvas.toDataURL(`image/${ format }`, options);
     }
