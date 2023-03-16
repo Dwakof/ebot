@@ -4,7 +4,7 @@ ENV APP_PATH=/app
 
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update \
-    && apt-get install -y build-essential dumb-init \
+    && apt-get install -y --no-install-recommends build-essential dumb-init \
     && rm -rf /var/lib/apt/lists/*
 
 #########################################################
@@ -27,11 +27,11 @@ FROM base AS puppeteer
 
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update \
-    && apt-get install -y wget gnupg \
+    && apt-get install -y --no-install-recommends wget gnupg \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && apt-get update \
-    && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 fonts-noto-color-emoji fonts-noto --no-install-recommends \
+    && apt-get install -y --no-install-recommends google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 fonts-noto-color-emoji fonts-noto \
     && rm -rf /var/lib/apt/lists/* \
     && usermod -aG audio,video node
 
