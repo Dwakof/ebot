@@ -91,7 +91,7 @@ module.exports = class ChartService extends Service {
      *
      * @returns {Promise<String>}
      */
-    async renderAndUpload(configuration, format, options) {
+    async renderAndUpload(configuration, format = 'webp', options = null) {
 
         const { UploadService } = this.services();
 
