@@ -1,7 +1,10 @@
 version: "3.7"
 services:
   ebot:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: release
     init: true
     env_file:
       - .env
