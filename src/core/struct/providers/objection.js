@@ -65,7 +65,7 @@ module.exports = class ObjectionProvider {
 
     ping() {
 
-        return this.#knex.queryBuilder().select(this.#knex.raw('1'));
+        return this.#knex.queryBuilder().select(this.#knex.raw('1')).timeout(1000);
     }
 
     /**
