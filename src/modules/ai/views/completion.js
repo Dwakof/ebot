@@ -19,8 +19,8 @@ module.exports = class CompletionView extends View {
 
         return this.embed()
             .setAuthor({
-                name    : `OpenAI x ${ interaction?.member?.nickname || interaction?.user?.username }`,
-                iconURL : interaction?.member?.avatarURL?.({ dynamic : true }) || interaction?.user?.avatarURL?.({ dynamic : true })
+                name    : `OpenAI x ${ this.username(interaction) }`,
+                iconURL : this.userAvatarURL(interaction)
             })
             .addFields([
                 { name : 'Prompt', value : Util.blockQuote(prompt), inline : false },

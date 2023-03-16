@@ -48,7 +48,7 @@ module.exports = class CurrencyView extends View {
                     x : { time : { stepSize : 2 }, grid : { display : false } },
                     y : {
                         ticks : { callback : (value) => CurrencyService.format(value, to), precision : 2 },
-                        grid  : { display : true, drawOnChartArea : true, drawBorder : false, color : 'rgb(235,235,235)', borderWidth : 1 }
+                        grid  : { display : true, drawOnChartArea : true, color : 'rgb(235,235,235)', border : { display : false, width : 1 } }
                     }
                 })
             }

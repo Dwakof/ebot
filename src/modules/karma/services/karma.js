@@ -51,26 +51,12 @@ module.exports = class KarmaService extends Service {
         }
     }
 
-    ordinalSuffix(i) {
-
-        const j = i % 10;
-        const k = i % 100;
-
-        if (j === 1 && k !== 11) {
-            return 'st';
-        }
-
-        if (j === 2 && k !== 12) {
-            return 'nd';
-        }
-
-        if (j === 3 && k !== 13) {
-            return 'rd';
-        }
-
-        return 'th';
-    }
-
+    /**
+     * @param {string} guildId
+     * @param {string} userId
+     *
+     * @return {KarmaUserInfo|null}
+     */
     getInfoUser(guildId, userId) {
 
         const { Karma } = this.providers();
@@ -98,6 +84,12 @@ module.exports = class KarmaService extends Service {
             .limit(1).first();
     }
 
+    /**
+     * @param {string} guildId
+     * @param {string} userId
+     *
+     * @return {Promise<KarmaUserStats[]>}
+     */
     async getStatsUser(guildId, userId) {
 
         const { Karma } = this.providers();
@@ -243,58 +235,23 @@ module.exports = class KarmaService extends Service {
 
         return Member.query().deleteById([guildId, userId, messageId, giverId, type, value]);
     }
-
-    /**
-     * @param {Array<Object>} stats
-     *
-     * @return {Promise<Buffer>}
-     */
-    renderGraph(stats) {
-
-        const { ChartService } = this.services('core');
-
-        const GREEN = '#12d512';
-        const RED   = '#cb1111';
-
-        return ChartService.renderToBuffer({
-            width   : 1200,
-            height  : 600,
-            type    : 'line',
-            data    : {
-                datasets : [
-                    {
-                        label                  : 'karma',
-                        fill                   : true,
-                        cubicInterpolationMode : 'monotone',
-                        data                   : stats.map(({ time, value }) => ({ x : time.getTime(), y : value })),
-                        parsing                : false,
-                        normalized             : true,
-                        borderColor            : ChartService.linearVerticalSplitAtZeroBackgroundColorGradient(
-                            this.client.util.color(GREEN).darken(0.2).css(),
-                            this.client.util.color(GREEN).darken(0.2).alpha(0.5).css(),
-                            this.client.util.color(RED).darken(0.2).alpha(0.5).css(),
-                            this.client.util.color(RED).darken(0.2).css()
-                        ),
-                        backgroundColor        : ChartService.linearVerticalSplitAtZeroBackgroundColorGradient(
-                            this.client.util.color(GREEN).darken(0.3).css(),
-                            this.client.util.color(GREEN).darken(0.4).alpha(0).css(),
-                            this.client.util.color(RED).darken(0.4).alpha(0).css(),
-                            this.client.util.color(RED).darken(0.3).css()
-                        )
-                    }
-                ]
-            },
-            options : {
-                elements : { point : { radius : 0 } },
-                plugins  : { legend : { display : false } },
-                scales   : ChartService.basicTimeSeriesScales({
-                    x : {
-                        ticks : {
-                            maxTicksLimit : 7
-                        }
-                    }
-                })
-            }
-        });
-    }
 };
+
+/**
+ * @typedef {Object} KarmaUserInfo
+ *
+ * @property {Snowflake} guildId
+ * @property {Snowflake} userId
+ * @property {number}    transaction
+ * @property {number}    karma
+ * @property {number}    rank
+ * @property {number}    total
+ * @property {string}    first
+ */
+
+/**
+ * @typedef {Object} KarmaUserStats
+ *
+ * @property {Date}   time
+ * @property {number} value
+ */
