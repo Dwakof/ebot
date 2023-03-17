@@ -1,3 +1,13 @@
+## [0.25.10](https://github.com/Dwakof/ebot/compare/v0.25.9...v0.25.10) (2023-03-17)
+
+
+### Bug Fixes
+
+* add short timeout to objection ping ([e1ef562](https://github.com/Dwakof/ebot/commit/e1ef5626e5bd35a864acfd1fc30bc26c155bbfdd))
+* chartjs/dependencies ([8a1d20c](https://github.com/Dwakof/ebot/commit/8a1d20c28d138c3b30bda5fe57b9c30d7496c1b3))
+* missing default format for chart upload ([73d5642](https://github.com/Dwakof/ebot/commit/73d564233d95e13d9d3a95383cefbbfa54be72f7))
+* puppeteer log forwarding issue ([94e6134](https://github.com/Dwakof/ebot/commit/94e61347994220dece972a7767ec92d546832cf6))
+
 ## [0.25.9](https://github.com/Dwakof/ebot/compare/v0.25.8...v0.25.9) (2022-12-03)
 
 
