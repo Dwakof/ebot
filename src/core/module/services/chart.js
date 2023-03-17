@@ -2,19 +2,29 @@
 
 const Hoek = require('@hapi/hoek');
 
-// const { Canvas } = require('skia-canvas');
-const Canvas = require('canvas');
-
-const { Chart }                           = require('chart.js');
-
-require('chartjs-adapter-luxon');
-require('chartjs-chart-matrix/dist/chartjs-chart-matrix.js');
-
 const { Service } = require('../../../core');
 
 module.exports = class ChartService extends Service {
 
-    init() {
+    async init() {
+
+        // eslint-disable-next-line node/no-unsupported-features/es-syntax
+        const { Chart, controllers, elements, plugins, scales } = await import('chart.js');
+
+        Chart.defaults.font.family = `'Noto Sans', 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif`;
+
+        Chart.register(...Object.values(controllers));
+        Chart.register(...Object.values(elements));
+        Chart.register(...Object.values(plugins));
+        Chart.register(...Object.values(scales));
+
+        // eslint-disable-next-line node/no-unsupported-features/es-syntax
+        const { MatrixController, MatrixElement } = await import('chartjs-chart-matrix');
+
+        Chart.register(MatrixController, MatrixElement);
+
+        // eslint-disable-next-line node/no-unsupported-features/es-syntax
+        await import('chartjs-adapter-luxon');
 
         this.chartJS = Chart;
     }
@@ -24,100 +34,70 @@ module.exports = class ChartService extends Service {
      * @param {Number} height
      * @param {Object} configuration
      *
-     * @return {Object}
+     * @return {{canvas: CanvasObject, chart}}
      */
     renderGraph({ width, height, ...configuration } = {}) {
 
-        // const canvas = new Canvas(width, height);
-        const canvas = Canvas.createCanvas(width, height);
+        const { CanvasService } = this.services();
+
+        const canvas = CanvasService.getCanvas(width, height);
 
         configuration.options            = configuration.options ?? {};
         configuration.options.scales     = configuration.options.scales ?? {};
         configuration.options.responsive = false;
         configuration.options.annimation = false;
 
-        // for (const scale of Object.values(configuration.options.scales)) {
-        //
-        //     // A weird patch, because sometimes borderDashOffset or tickBorderDashOffset is not defined, and it causes an error with Skia, so I am just forcing the default value
-        //
-        //     scale.grid                      = scale.grid ?? {};
-        //     scale.grid.borderDashOffset     = scale.grid.borderDashOffset ?? 0.0;
-        //     scale.grid.tickBorderDashOffset = scale.grid.tickBorderDashOffset ?? scale.grid.borderDashOffset;
-        // }
-
         const context = canvas.getContext('2d');
 
-        return { chart : new this.chartJS(context, configuration), canvas, context };
+        return { chart : new this.chartJS(context, configuration), canvas };
     }
 
     /**
-     * @param {Object}  configuration
-     * @param {String}  [mine]
-     * @param {Object}  [options={}]
-     * @param {Number}  options.page
-     * @param {String}  options.matte
-     * @param {Number}  options.density
-     * @param {Number}  options.quality
-     * @param {Boolean} options.outline
+     * @param {Object}       configuration
+     * @param {ImageFormat}  [format=webp]
+     * @param {ImageOptions} [options]
      *
      * @returns {Promise<Buffer>}
      */
-    renderToBuffer(configuration, mine, options = {}) {
+    renderToBuffer(configuration, format, options) {
+
+        const { CanvasService } = this.services();
 
         const { canvas } = this.renderGraph(configuration);
 
-        return new Promise((fulfil, reject) => {
-
-            canvas.toBuffer((error, buffer) => {
-
-                if (error) {
-
-                    return reject(error);
-                }
-
-                fulfil(buffer);
-            });
-        });
+        return CanvasService.toBuffer(canvas, format, options);
     }
 
     /**
      * @param {Object}  configuration
-     * @param {String}  [mine]
-     * @param {Object}  [options={}]
-     * @param {Number}  options.page
-     * @param {String}  options.matte
-     * @param {Number}  options.density
-     * @param {Number}  options.quality
-     * @param {Boolean} options.outline
-     *
-     * @returns {String}
-     */
-    renderToDataURL(configuration, mine, options = {}) {
-
-        const { canvas } = this.renderGraph(configuration);
-
-        return canvas.toDataURL(mine, options.quality);
-    }
-
-    /**
-     * @param {Object}  configuration
-     * @param {String}  [mine]
-     * @param {Object}  [options={}]
-     * @param {Number}  options.page
-     * @param {String}  options.matte
-     * @param {Number}  options.density
-     * @param {Number}  options.quality
-     * @param {Boolean} options.outline
+     * @param {ImageFormat}  [format=webp]
+     * @param {ImageOptions} [options]
      *
      * @returns {Promise<String>}
      */
-    async renderAndUpload(configuration, mine, options = {}) {
+    renderToDataURL(configuration, format, options) {
+
+        const { CanvasService } = this.services();
+
+        const { canvas } = this.renderGraph(configuration);
+
+        return CanvasService.toDataURL(canvas, format, options);
+    }
+
+    /**
+     * @param {Object}       configuration
+     * @param {ImageFormat}  [format]
+     * @param {ImageOptions} [options]
+     *
+     * @returns {Promise<String>}
+     */
+    async renderAndUpload(configuration, format = 'webp', options = null) {
 
         const { UploadService } = this.services();
 
-        const buffer = await this.renderToBuffer(configuration, mine, options);
+        const buffer = await this.renderToBuffer(configuration, format, options);
 
-        return UploadService.upload(buffer, { contentType : 'image/png' });
+        return UploadService.upload(buffer, { contentType : `image/${ format }` });
     }
 
     linearVerticalSplitAtZeroBackgroundColorGradient(colorHigh, colorHighZero, colorLowZero, colorLow) {
@@ -127,7 +107,14 @@ module.exports = class ChartService extends Service {
         colorLowZero  = colorLowZero ?? 'rgba(153, 9, 9, 1)';
         colorLow      = colorLow ?? 'rgba(214, 13, 13, 1)';
 
+        let gradient = null;
+
         return function (context) {
+
+            if (gradient) {
+
+                return gradient;
+            }
 
             const { scales, chartArea } = context.chart;
 
@@ -138,13 +125,13 @@ module.exports = class ChartService extends Service {
 
             const { top, bottom } = chartArea;
 
-            const zeroPos = Math.max(Math.min(Math.ceil(scales.y.getPixelForValue(0) - top) / (bottom - top), 1.0), 0);
+            const zeroPos = Math.max(Math.min(Math.ceil(scales.y.getPixelForValue(0) - top) / (bottom - top), 0.99999), 0.00001);
 
-            const gradient = context.chart.ctx.createLinearGradient(0, top, 0, bottom);
+            gradient = context.chart.ctx.createLinearGradient(0, top, 0, bottom);
 
             gradient.addColorStop(0, colorHigh);
             gradient.addColorStop(zeroPos, colorHighZero);
-            gradient.addColorStop(zeroPos, colorLowZero);
+            gradient.addColorStop(zeroPos + 0.000001, colorLowZero);
             gradient.addColorStop(1, colorLow);
 
             return gradient;

@@ -1,7 +1,7 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, BaseInteraction, ImageURLOptions, GuildMember, Message, User } = require('discord.js');
 
 const Util = require('../util');
 
@@ -25,6 +25,14 @@ class View {
     }
 
     /**
+     * @return {Module~Store}
+     */
+    get store() {
+
+        return this.client.store(this.module);
+    }
+
+    /**
      * Method to override that is called when the client is started.
      */
     init(settings) {}
@@ -36,7 +44,7 @@ class View {
      */
     embed(data) {
 
-        return this.client.util.embed(data).setColor('#404EED').setTimestamp();
+        return this.client.util.embed(data).setColor([64, 78, 237]).setTimestamp();
     }
 
     guildThumbnail(embed, guild) {
@@ -47,6 +55,47 @@ class View {
     userThumbnail(embed, user) {
 
         return embed.setThumbnail(user.displayAvatarURL({ dynamic : true, size : 32 }));
+    }
+
+    /**
+     * @param {Message|BaseInteraction|User|GuildMember} model
+     *
+     * @return String
+     */
+    username(model) {
+
+        if (model instanceof GuildMember) {
+
+            return model.displayName || model.nickname || model.user.username;
+        }
+
+        if (model instanceof User) {
+
+            return model.username;
+        }
+
+        if (model instanceof Message) {
+
+            return model.author.username;
+        }
+
+        if (model instanceof BaseInteraction) {
+
+            return model?.member?.displayName || model?.member?.nickname || model?.user?.username;
+        }
+
+        throw new Error('Unknown model type');
+    }
+
+    /**
+     * @param {Message|BaseInteraction|User|GuildMember} model
+     * @param {ImageURLOptions}                          [options]
+     *
+     * @return String
+     */
+    userAvatarURL(model, options = { forceStatic : false }) {
+
+        return model?.member?.avatarURL?.(options) || model?.user?.avatarURL?.(options) || model?.avatarURL?.(options);
     }
 
     rank(rank, total) {
@@ -67,14 +116,6 @@ class View {
     views(module = this.module) {
 
         return this.client.views(module);
-    }
-
-    /**
-     * @return {Module~Store}
-     */
-    get store() {
-
-        return this.client.store(this.module);
     }
 
     multiColumnSingleFullWidthField(embed, values, title = 'Title', options = {}) {

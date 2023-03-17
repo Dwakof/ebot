@@ -146,7 +146,7 @@ module.exports = class WeeklyActivityView extends View {
                         left    : 'left',
                         align   : 'center',
                         ticks   : ChartService.basicTicksConfig(),
-                        grid    : { display : false, drawBorder : false },
+                        grid    : { display : false, border : { display : false } },
                         title   : { display : false }
                     },
                     x : {
@@ -155,7 +155,7 @@ module.exports = class WeeklyActivityView extends View {
                         offset   : true,
                         position : 'bottom',
                         ticks    : ChartService.basicTicksConfig(),
-                        grid     : { display : false, drawBorder : false },
+                        grid     : { display : false, border : { display : false } },
                         title    : { display : false }
                     }
                 }
