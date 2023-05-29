@@ -1,3 +1,10 @@
+## [0.25.11](https://github.com/Dwakof/ebot/compare/v0.25.10...v0.25.11) (2023-05-29)
+
+
+### Bug Fixes
+
+* add 10 and 20 year range to currency history command ([5c6be4c](https://github.com/Dwakof/ebot/commit/5c6be4ca3656e8684c334fe7cbad897e755091f3))
+
 ## [0.25.10](https://github.com/Dwakof/ebot/compare/v0.25.9...v0.25.10) (2023-03-17)
 
 
