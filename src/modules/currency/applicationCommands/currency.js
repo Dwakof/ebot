@@ -60,12 +60,14 @@ module.exports = class Currency extends ApplicationCommand {
                         required    : false,
                         default     : '1Y',
                         choices     : {
-                            '1 month'  : '1M',
-                            '3 months' : '3M',
-                            '6 months' : '6M',
-                            '1 year'   : '1Y',
-                            '2 years'  : '2Y',
-                            '5 years'  : '5Y'
+                            '1 month'   : '1M',
+                            '3 months'  : '3M',
+                            '6 months'  : '6M',
+                            '1 year'    : '1Y',
+                            '2 years'   : '2Y',
+                            '5 years'   : '5Y',
+                            '10 years'  : '10Y',
+                            '20 years'  : '20Y'
                         }
                     },
                     amount : {
