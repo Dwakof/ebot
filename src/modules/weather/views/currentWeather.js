@@ -72,8 +72,8 @@ module.exports = class CurrentWeatherView extends View {
             {
                 name   : 'Sunrise/Sunset',
                 value  : [
-                    `:city_sunrise: ${ Time(sunrise, TimestampStyles.RelativeTime) }`,
-                    `:night_with_stars: ${ Time(sunset, TimestampStyles.RelativeTime) }`
+                    `🏙 ${ Time(sunrise, TimestampStyles.RelativeTime) }`,
+                    `🌆 ${ Time(sunset, TimestampStyles.RelativeTime) }`
                 ].join('\n'),
                 inline : true
             }
@@ -94,8 +94,8 @@ module.exports = class CurrentWeatherView extends View {
             {
                 name   : 'Temps/Feels like',
                 value  : [
-                    `:thermometer: ${ CommonView.temperature(current.temp) }`,
-                    `:dash: ${ CommonView.temperature(current.feels_like) }`
+                    `🌡 ${ CommonView.temperature(current.temp) }`,
+                    `💨 ${ CommonView.temperature(current.feels_like) }`
                 ].join('\n'),
                 inline : true
             }
@@ -115,7 +115,7 @@ module.exports = class CurrentWeatherView extends View {
 
         if (current.wind_speed === 0) {
 
-            return embed.addFields([{ name : 'Wind/Gust', value : `:wind_chime: ${ inlineCode('no wind') }`, inline : true }]);
+            return embed.addFields([{ name : 'Wind/Gust', value : `🎐 ${ inlineCode('no wind') }`, inline : true }]);
         }
 
         return embed.addFields([
@@ -124,11 +124,11 @@ module.exports = class CurrentWeatherView extends View {
                 inline : true,
                 value  : [
                     [
-                        `:wind_chime:`,
+                        `🎐`,
                         inlineCode(`${ CommonView.speed(current.wind_speed ?? 0) } ${ WeatherService.toDirection(current.wind_deg) }`)
                     ].join(' '),
                     [
-                        `:dash:`,
+                        `💨`,
                         inlineCode(`${ CommonView.speed(current.wind_gust ?? 0) }`)
                     ].join(' ')
                 ].join('\n')
@@ -149,8 +149,8 @@ module.exports = class CurrentWeatherView extends View {
                 name   : 'Humidity/Pressure',
                 inline : true,
                 value  : [
-                    [`:droplet:`, inlineCode(`${ current.humidity } %`)].join(' '),
-                    [`:dash:`, inlineCode(`${ current.pressure } hPa`)].join(' ')
+                    [`💧`, inlineCode(`${ current.humidity } %`)].join(' '),
+                    [`💨`, inlineCode(`${ current.pressure } hPa`)].join(' ')
                 ].join('\n')
             }
         ]);
@@ -176,11 +176,11 @@ module.exports = class CurrentWeatherView extends View {
         if (airQuality?.main?.aqi) {
 
             const emoji   = [
-                [':deciduous_tree:', ':evergreen_tree:', ':palm_tree:', ':tanabata_tree:'],
-                [':slight_smile:'],
-                [':slight_frown:'],
-                [':mask:'],
-                [':zombie:']
+                ['🌳', '🌲', '🌴', '🎋'],
+                ['🙂'],
+                ['🙁'],
+                ['😷'],
+                ['🧟']
             ];
             const quality = ['Good', 'Fair', 'Moderate', 'Poor', 'Very poor'];
 

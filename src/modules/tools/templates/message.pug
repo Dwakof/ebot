@@ -49,10 +49,15 @@ html(lang="en")
                 timestamp=message.timestamp
             ) !{message.content}
                 each embed in message.embeds
-                    if embed.type === "article"
-                        discord-embed(slot="embeds" author-name=embed.author.name embed-title=embed.title url=embed.url timestamp=embed.timestamp image=embed.image.url)
-                            if embed.description
-                                discord-embed-description(slot="description") !{embed.description}
+                    discord-embed(slot="embeds" color=embed.color provider=embed.provider.name author-name=embed.author.name author-image=embed.author.icon_url embed-title=embed.title url=embed.url image=embed.image.url thumbnail=embed.thumbnail.url)
+                        if embed.description
+                            discord-embed-description(slot="description") !{embed.description}
+                        if embed.footer
+                            discord-embed-footer(slot="footer" footer-image=embed.footer.icon_url timestamp=embed.timestamp)
+                        if embed.fields
+                        discord-embed-fields(slot="fields")
+                            each field in embed.fields
+                                discord-embed-field(field-title=field.name inline=field.inline inline-index=field.index) !{field.value}
                 discord-attachments(slot="attachments")
                     each attachment in message.attachments
                         if attachment.type === "media"

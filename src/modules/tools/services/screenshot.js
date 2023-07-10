@@ -5,9 +5,11 @@ const Path = require('path');
 
 const { markdownEngine : MarkdownEngine, rules, toHTML } = require('discord-markdown');
 
-const { Invite } = require('discord.js');
+const { Invite, ChannelType, FormattingPatterns } = require('discord.js');
 
-const { Service } = require('../../../core');
+const { DateTime } = require('luxon');
+
+const { Service, Util } = require('../../../core');
 
 const Pgk = require('../../../../package.json');
 
@@ -16,22 +18,44 @@ const UIVersion = Pgk.dependencies[UIPackage];
 
 module.exports = class ScreenshotService extends Service {
 
+    static #width = 800;
+
+    static TimestampRegex    = new RegExp(`^${ FormattingPatterns.Timestamp.source }`, FormattingPatterns.Timestamp.flags);
+    static EmojiUnicodeRegex = new RegExp(`^${ Util.REGEX_UNICODE_EMOJI.source }`, Util.REGEX_UNICODE_EMOJI.flags);
+
     #templates;
     #parser;
     #output;
 
-    static #width = 800;
-
     init() {
 
         this.#templates = {
-            message : Pug.compileFile(Path.join(__dirname, '../templates/message.pug')),
-            mention : Pug.compileFile(Path.join(__dirname, '../templates/mention.pug')),
-            emoji   : Pug.compileFile(Path.join(__dirname, '../templates/emoji.pug'))
+            message   : Pug.compileFile(Path.join(__dirname, '../templates/message.pug'), null),
+            mention   : Pug.compileFile(Path.join(__dirname, '../templates/mention.pug'), null),
+            emoji     : Pug.compileFile(Path.join(__dirname, '../templates/emoji.pug'), null),
+            timestamp : Pug.compileFile(Path.join(__dirname, '../templates/timestamp.pug'), null)
         };
 
         const config = {
             ...rules,
+            timestamp    : {
+                order : rules.strong.order,
+                match : (source) => ScreenshotService.TimestampRegex.exec(source),
+                parse : ({ groups }) => groups,
+                html  : ({ timestamp }) => {
+
+                    return this.#templates.timestamp({ time : DateTime.fromMillis(parseInt(timestamp, 10) * Util.SECOND).toRelativeCalendar() });
+                }
+            },
+            unicodeEmoji : {
+                order : rules.text.order,
+                match : (source) => ScreenshotService.EmojiUnicodeRegex.exec(source),
+                parse : ([unicode]) => ({ unicode }),
+                html  : ({ unicode }) => {
+
+                    return this.#templates.emoji({ url : this.client.util.emojiURL(unicode), name : 'unicode-emoji', embedEmoji : false });
+                }
+            },
             discordEmoji : {
                 ...rules.discordEmoji,
                 html : ({ id, animated, name }) => {
@@ -78,6 +102,11 @@ module.exports = class ScreenshotService extends Service {
         return UploadService.upload(buffer, { contentType : 'image/png' });
     }
 
+    discordStringToHTML(string, options = {}) {
+
+        return toHTML(string, options, this.#parser, this.#output);
+    }
+
     /**
      * @param {Message} message
      *
@@ -90,8 +119,6 @@ module.exports = class ScreenshotService extends Service {
         const page = await BrowserService.newPage();
 
         try {
-
-            // TODO maybe change viewport size based on attachment ?
 
             await page.setViewport({ width : ScreenshotService.#width, height : 600, deviceScaleFactor : 2 });
 
@@ -115,27 +142,7 @@ module.exports = class ScreenshotService extends Service {
                     color  : member.displayHexColor,
                     bot    : member.user.bot
                 },
-                embeds      : Array.from(message.embeds).map((embed) => {
-
-                    // TODO replace emoji with a component in every field
-
-                    // TODO Maybe check how Discord handle embed in his own client
-
-                    embed.author = embed.author || {};
-                    embed.image  = embed.image || {};
-
-                    if (embed.provider && !embed.author.name) {
-
-                        embed.author.name = embed.provider.name;
-                    }
-
-                    if (embed.thumbnail && !embed.image.url) {
-
-                        embed.image.url = embed.thumbnail.url;
-                    }
-
-                    return embed;
-                }),
+                embeds      : [],
                 attachments : Array.from(message.attachments.values()).map(({ width, height, ...attachment }) => {
 
                     if (width > (ScreenshotService.#width * 0.8)) {
@@ -158,7 +165,7 @@ module.exports = class ScreenshotService extends Service {
 
             if (message.content) {
 
-                const invites = [...message.content.matchAll(Invite.INVITES_PATTERN)];
+                const invites = [...message.content.matchAll(new RegExp(Invite.InvitesPattern.source, 'gi'))];
 
                 for (const [url] of invites) {
 
@@ -184,58 +191,92 @@ module.exports = class ScreenshotService extends Service {
             }
 
             const mentions = {
-                users    : {},
-                roles    : {},
-                channels : {}
+                users    : new Map(),
+                roles    : new Map(),
+                channels : new Map(),
+                messages : new Map()  // TODO discord added a message mention feature, maybe add it ? But would need discord-components support.
             };
 
             for (const [id] of message.mentions.users) {
 
                 const mentionedMember = await message.guild.members.fetch(id, { force : true }); // To be sure to get updated info of the member like `displayHexColor`
 
-                mentions.users[id] = this.#templates.mention({
+                mentions.users.set(String(id), this.#templates.mention({
                     color : mentionedMember.displayHexColor,
-                    type  : 'user',
-                    name  : mentionedMember.nickname ?? mentionedMember.user.username
-                });
+                    name  : mentionedMember.nickname ?? mentionedMember.user.username,
+                    type  : 'user'
+                }));
             }
 
-            mentions.roles = message.mentions.roles.reduce((acc, role, id) => {
+            for (const [id, role] of message.mentions.roles) {
 
-                return { ...acc, [`${ id }`] : this.#templates.mention({ color : role.hexColor, type : 'role', name : role.name }) };
+                mentions.roles.set(String(id), this.#templates.mention({ color : role.hexColor, type : 'role', name : role.name }));
+            }
 
-            }, {});
+            for (const [id, channel] of message.mentions.channels) {
 
-            mentions.channels = message.mentions.channels.reduce((acc, channel, id) => {
+                let type = 'channel';
 
-                if (channel.isVoice()) {
-
-                    return { ...acc, [`${ id }`] : this.#templates.mention({ type : 'voice', name : channel.name }) };
+                switch (channel.type) {
+                    case ChannelType.GuildVoice:
+                        type = 'voice';
+                        break;
+                    case ChannelType.GuildForum:
+                        type = 'forum';
+                        break;
+                    case ChannelType.PrivateThread:
+                    case ChannelType.PublicThread:
+                        type = 'thread';
+                        break;
                 }
 
-                return { ...acc, [`${ id }`] : this.#templates.mention({ type : 'channel', name : channel.name }) };
+                if (channel.locked) {
 
-            }, {});
+                    type = 'locked';
+                }
 
-            data.message.content = toHTML(data.message.content, {
+                mentions.channels.set(String(id), this.#templates.mention({ type, name : channel.name }));
+            }
+
+            // TODO need to parse embeds data for mentions too 🤦
+
+            const parserOptions = {
                 discordCallback : {
-                    user     : ({ id }) => mentions.users[id],
-                    channel  : ({ id }) => mentions.channels[id],
-                    role     : ({ id }) => mentions.roles[id],
+                    user     : ({ id }) => mentions.users.get(id),
+                    channel  : ({ id }) => mentions.channels.get(id),
+                    role     : ({ id }) => mentions.roles.get(id),
                     everyone : () => this.#templates.mention({ type : 'user', name : 'everyone' }),
                     here     : () => this.#templates.mention({ type : 'user', name : 'here' })
                 }
-            }, this.#parser, this.#output);
+            };
 
-            // TODO support Big (Jumboable) emoji (instead of 1.375em it's 3em)
+            data.message.content = this.discordStringToHTML(data.message.content, parserOptions);
 
-            for (const [string] of data.message.content.matchAll(this.client.util.REGEX_UNICODE_EMOJI)) {
+            for (const embed of message.embeds) {
 
-                data.message.content = data.message.content.replace(string, this.#templates.emoji({
-                    url        : this.client.util.emojiURL(string),
-                    name       : 'unicode-emoji', // Putting the actual emoji there could cause issues if there are multiple time the same emoji, an alternative would be the emoji name but I don't have it
-                    embedEmoji : false
-                }));
+                const raw = embed.toJSON();
+
+                raw.footer    = raw.footer ?? {};
+                raw.image     = raw.image ?? {};
+                raw.thumbnail = raw.thumbnail ?? {};
+                raw.video     = raw.video ?? {};
+                raw.provider  = raw.provider ?? {};
+                raw.author    = raw.author ?? {};
+                raw.fields    = raw.fields ?? [];
+
+                if (raw.color !== undefined) {
+
+                    // noinspection JSValidateTypes
+                    raw.color = embed.hexColor;
+                }
+
+                for (const [idx, field] of raw.fields.entries()) {
+
+                    field.value = this.discordStringToHTML(field.value, parserOptions);
+                    field.index = !raw.fields[idx - 1]?.inline || raw.fields[idx - 1]?.index === 3 ? 1 : raw.fields[idx - 1].index + 1;
+                }
+
+                data.message.embeds.push(raw);
             }
 
             await page.setContent(this.#templates.message(data), { waitUntil : 'load' });

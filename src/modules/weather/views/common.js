@@ -8,129 +8,129 @@ module.exports = class CommonView extends View {
     static EMOJI_MAPPING = {
         day   : {
             // Thunderstorm
-            200 : ':thunder_cloud_rain:',
-            201 : ':thunder_cloud_rain:',
-            202 : ':thunder_cloud_rain:',
-            210 : ':cloud_lightning:',
-            211 : ':cloud_lightning:',
-            212 : ':cloud_lightning:',
-            221 : ':thunder_cloud_rain:',
-            230 : ':thunder_cloud_rain:',
-            231 : ':thunder_cloud_rain:',
-            232 : ':thunder_cloud_rain:',
+            200 : '⛈', // thunderstorm with light rain
+            201 : '⛈', // thunderstorm with rain
+            202 : '⛈', // thunderstorm with heavy rain
+            210 : '🌩', // light thunderstorm
+            211 : '🌩', // thunderstorm
+            212 : '🌩', // heavy thunderstorm
+            221 : '⛈', // ragged thunderstorm
+            230 : '⛈', // thunderstorm with light drizzle
+            231 : '⛈', // thunderstorm with drizzle
+            232 : '⛈', // thunderstorm with heavy drizzle
             // Drizzle
-            300 : ':cloud_rain:',
-            301 : ':cloud_rain:',
-            302 : ':cloud_rain:',
-            310 : ':cloud_rain:',
-            311 : ':cloud_rain:',
-            312 : ':cloud_rain:',
-            313 : ':cloud_rain:',
-            314 : ':cloud_rain:',
-            321 : ':cloud_rain:',
+            300 : '🌧', // light intensity drizzle
+            301 : '🌧', // drizzle
+            302 : '🌧', // heavy intensity drizzle
+            310 : '🌧', // light intensity drizzle rain
+            311 : '🌧', // drizzle rain
+            312 : '🌧', // heavy intensity drizzle rain
+            313 : '🌧', // shower rain and drizzle
+            314 : '🌧', // heavy shower rain and drizzle
+            321 : '🌧', // shower drizzle
             // Rain
-            500 : ':white_sun_rain_cloud:',
-            501 : ':white_sun_rain_cloud:',
-            502 : ':white_sun_rain_cloud:',
-            503 : ':white_sun_rain_cloud:',
-            504 : ':white_sun_rain_cloud:',
-            511 : ':snowflake:',
-            520 : ':cloud_rain:',
-            521 : ':cloud_rain:',
-            522 : ':cloud_rain:',
-            531 : ':cloud_rain:',
+            500 : '🌦', // light rain
+            501 : '🌦', // moderate rain
+            502 : '🌦', // heavy intensity rain
+            503 : '🌦', // very heavy rain
+            504 : '🌦', // extreme rain
+            511 : '🌨', // freezing rain
+            520 : '🌧', // light intensity shower rain
+            521 : '🌧', // shower rain
+            522 : '🌧', // heavy intensity shower rain
+            531 : '🌧', // ragged shower rain
             // Snow
-            600 : ':snowflake:',
-            601 : ':snowflake:',
-            602 : ':snowflake:',
-            611 : ':snowflake:',
-            612 : ':snowflake:',
-            613 : ':snowflake:',
-            615 : ':snowflake:',
-            616 : ':snowflake:',
-            620 : ':snowflake:',
-            621 : ':snowflake:',
-            622 : ':snowflake:',
+            600 : '🌨', // light snow
+            601 : '🌨', // snow
+            602 : '🌨', // heavy snow
+            611 : '🌨', // sleet
+            612 : '🌨', // light shower sleet
+            613 : '🌨', // shower sleet
+            615 : '🌨', // light rain and snow
+            616 : '🌨', // rain and snow
+            620 : '🌨', // light shower snow
+            621 : '🌨', // shower snow
+            622 : '🌨', // heavy shower snow
             // Atmosphere
-            701 : ':fog:',
-            711 : ':fog:',
-            721 : ':fog:',
-            731 : ':fog:',
-            741 : ':fog:',
-            751 : ':fog:',
-            761 : ':fog:',
-            762 : ':volcano::fog:',
-            771 : ':fog:',
-            781 : ':cloud_tornado:',
+            701 : '🌫',   // mist
+            711 : '🌫',   // smoke
+            721 : '🌫',   // haze
+            731 : '🌫',   // sand, dust whirls
+            741 : '🌫',   // fog
+            751 : '🌫',   // sand
+            761 : '🌫',   // dust
+            762 : '🌋🌫', // volcanic ash
+            771 : '🌫',   // squalls
+            781 : '🌪',   // tornado
             // Clouds
-            800 : ':sunny:',
-            801 : ':white_sun_small_cloud:',
-            802 : ':partly_sunny:',
-            803 : ':white_sun_cloud:',
-            804 : ':cloud:'
+            800 : '☀', // clear sky
+            801 : '🌤', // few clouds
+            802 : '⛅', // scattered clouds
+            803 : '🌥', // broken clouds
+            804 : '☁' // overcast clouds
         },
         night : {
             // Thunderstorm
-            200 : ':thunder_cloud_rain:',
-            201 : ':thunder_cloud_rain:',
-            202 : ':thunder_cloud_rain:',
-            210 : ':cloud_lightning:',
-            211 : ':cloud_lightning:',
-            212 : ':cloud_lightning:',
-            221 : ':thunder_cloud_rain:',
-            230 : ':thunder_cloud_rain:',
-            231 : ':thunder_cloud_rain:',
-            232 : ':thunder_cloud_rain:',
+            200 : '⛈', // thunderstorm with light rain
+            201 : '⛈', // thunderstorm with rain
+            202 : '⛈', // thunderstorm with heavy rain
+            210 : '🌩', // light thunderstorm
+            211 : '🌩', // thunderstorm
+            212 : '🌩', // heavy thunderstorm
+            221 : '⛈', // ragged thunderstorm
+            230 : '⛈', // thunderstorm with light drizzle
+            231 : '⛈', // thunderstorm with drizzle
+            232 : '⛈', // thunderstorm with heavy drizzle
             // Drizzle
-            300 : ':cloud_rain:',
-            301 : ':cloud_rain:',
-            302 : ':cloud_rain:',
-            310 : ':cloud_rain:',
-            311 : ':cloud_rain:',
-            312 : ':cloud_rain:',
-            313 : ':cloud_rain:',
-            314 : ':cloud_rain:',
-            321 : ':cloud_rain:',
+            300 : '🌧', // light intensity drizzle
+            301 : '🌧', // drizzle
+            302 : '🌧', // heavy intensity drizzle
+            310 : '🌧', // light intensity drizzle rain
+            311 : '🌧', // drizzle rain
+            312 : '🌧', // heavy intensity drizzle rain
+            313 : '🌧', // shower rain and drizzle
+            314 : '🌧', // heavy shower rain and drizzle
+            321 : '🌧', // shower drizzle
             // Rain
-            500 : ':cloud_rain:',
-            501 : ':cloud_rain:',
-            502 : ':cloud_rain:',
-            503 : ':cloud_rain:',
-            504 : ':cloud_rain:',
-            511 : ':snowflake:',
-            520 : ':cloud_rain:',
-            521 : ':cloud_rain:',
-            522 : ':cloud_rain:',
-            531 : ':cloud_rain:',
+            500 : '🌦', // light rain
+            501 : '🌦', // moderate rain
+            502 : '🌦', // heavy intensity rain
+            503 : '🌦', // very heavy rain
+            504 : '🌦', // extreme rain
+            511 : '🌨', // freezing rain
+            520 : '🌧', // light intensity shower rain
+            521 : '🌧', // shower rain
+            522 : '🌧', // heavy intensity shower rain
+            531 : '🌧', // ragged shower rain
             // Snow
-            600 : ':snowflake:',
-            601 : ':snowflake:',
-            602 : ':snowflake:',
-            611 : ':snowflake:',
-            612 : ':snowflake:',
-            613 : ':snowflake:',
-            615 : ':snowflake:',
-            616 : ':snowflake:',
-            620 : ':snowflake:',
-            621 : ':snowflake:',
-            622 : ':snowflake:',
+            600 : '🌨', // light snow
+            601 : '🌨', // snow
+            602 : '🌨', // heavy snow
+            611 : '🌨', // sleet
+            612 : '🌨', // light shower sleet
+            613 : '🌨', // shower sleet
+            615 : '🌨', // light rain and snow
+            616 : '🌨', // rain and snow
+            620 : '🌨', // light shower snow
+            621 : '🌨', // shower snow
+            622 : '🌨', // heavy shower snow
             // Atmosphere
-            701 : ':fog:',
-            711 : ':fog:',
-            721 : ':fog:',
-            731 : ':fog:',
-            741 : ':fog:',
-            751 : ':fog:',
-            761 : ':fog:',
-            762 : ':volcano::fog:',
-            771 : ':fog:',
-            781 : ':cloud_tornado:',
+            701 : '🌫',   // mist
+            711 : '🌫',   // smoke
+            721 : '🌫',   // haze
+            731 : '🌫',   // sand, dust whirls
+            741 : '🌫',   // fog
+            751 : '🌫',   // sand
+            761 : '🌫',   // dust
+            762 : '🌋🌫', // volcanic ash
+            771 : '🌫',   // squalls
+            781 : '🌪',   // tornado
             // Clouds
-            800 : ':crescent_moon:',
-            801 : ':crescent_moon:',
-            802 : ':cloud:',
-            803 : ':cloud:',
-            804 : ':cloud:'
+            800 : '🌙', // clear sky
+            801 : '🌙', // few clouds
+            802 : '☁', // scattered clouds
+            803 : '☁', // broken clouds
+            804 : '☁' // overcast clouds
         }
     };
 
@@ -208,6 +208,6 @@ module.exports = class CommonView extends View {
      */
     moon(phase) {
 
-        return [':new_moon:', ':first_quarter_moon:', ':full_moon:', ':last_quarter_moon:', ':new_moon:'][phase * 4] || '';
+        return ['🌑', '🌓', '🌕', '🌗', '🌑'][phase * 4] || '';
     }
 };

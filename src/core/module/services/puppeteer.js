@@ -14,7 +14,7 @@ module.exports = class BrowserService extends Service {
         this.#browser = await Puppeteer.launch({
             args           : ['--disable-gpu', '--disable-dev-shm-usage', '--no-sandbox'],
             executablePath : settings.puppeteer.path,
-            headless       : true
+            headless       : 'new'
         });
     }
 
