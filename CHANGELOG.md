@@ -1,3 +1,19 @@
+# [0.26.0](https://github.com/Dwakof/ebot/compare/v0.25.11...v0.26.0) (2023-07-10)
+
+
+### Bug Fixes
+
+* guess who forgot some emoji ([585b975](https://github.com/Dwakof/ebot/commit/585b975272b0b55d75a3ab70bc04195b63724bbb))
+* migrate all named emoji to unicode character in code ([dccd3b3](https://github.com/Dwakof/ebot/commit/dccd3b39f0c20cbc6cd2bcb4ce8588aaa0f2cfa0))
+* update nodejs version ([812d761](https://github.com/Dwakof/ebot/commit/812d76195e55565fcbf2f236454f1a231216d14b))
+* update packages ([19ec532](https://github.com/Dwakof/ebot/commit/19ec53237116a1435a417f604af6d742de611cd5))
+* use new puppeteer headless mode ([a94e01b](https://github.com/Dwakof/ebot/commit/a94e01ba234a16ebfde614d441b95fc3282fa851))
+
+
+### Features
+
+* rework screenshot to handle embeds channel type, footer and timestamp ([a223d6e](https://github.com/Dwakof/ebot/commit/a223d6e4015d1344197c05ac42c3d535c4aafd28))
+
 ## [0.25.11](https://github.com/Dwakof/ebot/compare/v0.25.10...v0.25.11) (2023-05-29)
 
 
