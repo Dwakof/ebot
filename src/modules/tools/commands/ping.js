@@ -22,8 +22,8 @@ class PingCommand extends Command {
         embed.setTimestamp()
             .setColor(Colors.Green)
             .addFields([
-                { name : ':repeat_one: **RTT**', value : `${ timeDiff } ms`, inline : true },
-                { name : ':heart_decoration: **Heartbeat**', value : `${ Math.round(this.client.ws.ping) } ms`, inline : true }
+                { name : '🔂 **RTT**', value : `${ timeDiff } ms`, inline : true },
+                { name : '💟 **Heartbeat**', value : `${ Math.round(this.client.ws.ping) } ms`, inline : true }
             ]);
 
         if (timeDiff > 80 || this.client.ws.ping > 80) {

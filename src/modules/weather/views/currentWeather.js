@@ -176,11 +176,11 @@ module.exports = class CurrentWeatherView extends View {
         if (airQuality?.main?.aqi) {
 
             const emoji   = [
-                [':deciduous_tree:', ':evergreen_tree:', ':palm_tree:', ':tanabata_tree:'],
-                [':slight_smile:'],
-                [':slight_frown:'],
-                [':mask:'],
-                [':zombie:']
+                ['🌳', '🌲', '🌴', '🎋'],
+                ['🙂'],
+                ['🙁'],
+                ['😷'],
+                ['🧟']
             ];
             const quality = ['Good', 'Fair', 'Moderate', 'Poor', 'Very poor'];
 
