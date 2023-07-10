@@ -59,7 +59,7 @@
   "devDependencies": {
     "@babel/core": "7.21.3",
     "@babel/eslint-parser": "7.21.3",
-    "@babel/preset-env": "7.20.2",
+    "@babel/preset-env": "7.22.7",
     "@hapi/eslint-plugin": "6.0.0",
     "@semantic-release/changelog": "6.0.2",
     "@semantic-release/commit-analyzer": "9.0.2",
