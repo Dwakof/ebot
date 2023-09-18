@@ -23,7 +23,7 @@
     "@hapi/hoek": "11.0.2",
     "@hapipal/confidence": "6.0.2",
     "@napi-rs/canvas": "0.1.41",
-    "@sentry/node": "7.57.0",
+    "@sentry/node": "7.69.0",
     "@sentry/tracing": "7.57.0",
     "@skyra/discord-components-core": "3.6.0",
     "ajv-formats": "2.1.1",
