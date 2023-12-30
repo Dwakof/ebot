@@ -164,18 +164,6 @@ const store = new Confidence.Store({
                 }
             }
         },
-        reactionRole : {
-            knex : {
-                client     : 'pg',
-                connection : {
-                    host     : { $env : 'REACTION_ROLE_POSTGRES_HOST', $default : knexDefault.host },
-                    user     : { $env : 'REACTION_ROLE_POSTGRES_USER', $default : knexDefault.user },
-                    password : { $env : 'REACTION_ROLE_POSTGRES_PASS', $default : knexDefault.password },
-                    database : { $env : 'REACTION_ROLE_POSTGRES_DB', $default : 'reaction_role' },
-                    port     : { $env : 'REACTION_ROLE_POSTGRES_PORT', $coerce : 'number', $default : knexDefault.port }
-                }
-            }
-        },
         weather      : {
             openWeatherApiKey : { $env : 'OPEN_WEATHER_API_KEY' },
             LocationIQApiKey  : { $env : 'LOCATION_IQ_API_KEY' },
