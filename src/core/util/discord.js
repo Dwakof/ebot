@@ -68,9 +68,9 @@ module.exports = {
             return [cdn, 'v', v, size, `${ code }.${ ext }`].join('/');
         }
 
-        if (emoji.url) {
+        if (emoji.imageURL) {
 
-            return emoji.url;
+            return emoji.imageURL({ extension : 'webp', size : 128 });
         }
 
         if (isString(emoji.name)) {
