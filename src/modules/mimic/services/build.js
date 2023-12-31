@@ -225,8 +225,8 @@ module.exports = class BuildService extends Service {
         const guild = this.client.guilds.cache.get(guildId);
 
         embed.setTitle(`Building of guild's mimic models`)
-            .setAuthor({ name : guild.name, iconURL : guild.iconURL({ dynamic : false, size : 32 }) })
-            .setThumbnail(guild.iconURL({ dynamic : false, size : 128 }))
+            .setAuthor({ name : guild.name, iconURL : guild.iconURL({ forceStatic : true, extension : 'webp', size : 32 }) })
+            .setThumbnail(guild.iconURL({ forceStatic : true, extension : 'webp', size : 128 }))
             .setTimestamp()
             .setColor(Colors.Blue);
 
@@ -246,7 +246,7 @@ module.exports = class BuildService extends Service {
                 case 'ebot' :
 
                     embed.addFields([{ name : 'User', value : userMention(this.client.user.id), inline : true }])
-                        .setThumbnail(this.client.user.avatarURL({ dynamic : false, size : 128 }));
+                        .setThumbnail(this.client.user.avatarURL({ forceStatic : true, extension : 'webp', size : 128 }));
                     break;
                 case 'guild' :
 
@@ -257,7 +257,7 @@ module.exports = class BuildService extends Service {
                     const member = guild.members.cache.get(user);
 
                     embed.addFields([{ name : 'User', value : userMention(member.id), inline : true }])
-                        .setThumbnail(member.user.avatarURL({ dynamic : false, size : 128 }));
+                        .setThumbnail(member.user.avatarURL({ forceStatic : true, extension : 'webp', size : 128 }));
                     break;
             }
         }

@@ -286,8 +286,8 @@ module.exports = class SyncService extends Service {
         const guild = this.client.guilds.cache.get(guildId);
 
         embed.setTitle(`Syncing guild`)
-            .setAuthor({ name : guild.name, iconURL : guild.iconURL({ dynamic : false, size : 32 }) })
-            .setThumbnail(guild.iconURL({ dynamic : false, size : 128 }))
+            .setAuthor({ name : guild.name, iconURL : guild.iconURL({ forceStatic : true, extension : 'webp', size : 32 }) })
+            .setThumbnail(guild.iconURL({ forceStatic : true, extension : 'webp', size : 128 }))
             .setTimestamp()
             .setColor(Colors.Blue);
 
@@ -347,8 +347,8 @@ module.exports = class SyncService extends Service {
         const channel = guild.channels.cache.get(channelId);
 
         embed.setTitle(`Syncing channel ${ channel.name }`)
-            .setAuthor({ name : guild.name, iconURL : guild.iconURL({ dynamic : false, size : 32 }) })
-            .setThumbnail(channel.guild.iconURL({ dynamic : false, size : 128 }))
+            .setAuthor({ name : guild.name, iconURL : guild.iconURL({ forceStatic : true, extension : 'webp', size : 32 }) })
+            .setThumbnail(channel.guild.iconURL({ forceStatic : true, extension : 'webp', size : 128 }))
             .setTimestamp()
             .setColor(Colors.Blue);
 

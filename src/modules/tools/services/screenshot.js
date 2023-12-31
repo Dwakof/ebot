@@ -53,7 +53,11 @@ module.exports = class ScreenshotService extends Service {
                 parse : ([unicode]) => ({ unicode }),
                 html  : ({ unicode }) => {
 
-                    return this.#templates.emoji({ url : this.client.util.emojiURL(unicode), name : 'unicode-emoji', embedEmoji : false });
+                    return this.#templates.emoji({
+                        url        : this.client.util.emojiURL(unicode),
+                        name       : 'unicode-emoji',
+                        embedEmoji : false
+                    });
                 }
             },
             discordEmoji : {
@@ -126,7 +130,7 @@ module.exports = class ScreenshotService extends Service {
 
             await this.client.channels.cache.get(message.channelId).messages.fetch(message.id, { force : true });
 
-            const member = await message.guild.members.fetch(message.author.id, { force : true });
+            const member = await message.guild.members.fetch({ user : message.author.id, force : true });
 
             const data = {};
 
@@ -138,7 +142,7 @@ module.exports = class ScreenshotService extends Service {
                 edited      : !!message.editedTimestamp,
                 author      : {
                     name   : member.nickname ?? member.user.username,
-                    avatar : member.user.avatarURL({ dynamic : true, size : 64 }),
+                    avatar : member.user.avatarURL({ forceStatic : true, extension : 'webp', size : 64 }),
                     color  : member.displayHexColor,
                     bot    : member.user.bot
                 },
@@ -175,7 +179,7 @@ module.exports = class ScreenshotService extends Service {
 
                         data.message.attachments.push({
                             name      : invite.guild.name,
-                            icon      : invite.guild.iconURL({ dynamic : true, size : 128 }),
+                            icon      : invite.guild.iconURL({ forceStatic : false, extension : 'webp', size : 128 }),
                             online    : invite.presenceCount,
                             members   : invite.memberCount,
                             partnered : invite.guild.partnered,
@@ -199,7 +203,7 @@ module.exports = class ScreenshotService extends Service {
 
             for (const [id] of message.mentions.users) {
 
-                const mentionedMember = await message.guild.members.fetch(id, { force : true }); // To be sure to get updated info of the member like `displayHexColor`
+                const mentionedMember = await message.guild.members.fetch({ user : id, force : true }); // To be sure to get updated info of the member like `displayHexColor`
 
                 mentions.users.set(String(id), this.#templates.mention({
                     color : mentionedMember.displayHexColor,

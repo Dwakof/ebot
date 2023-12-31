@@ -30,7 +30,10 @@ module.exports = class EbotClient extends AkairoClient {
     #initialized = false;
     #started     = false;
 
+    /** @type {import('pino').Logger} */
     #logger;
+
+    /** @type {import('@sentry/node')} */
     #sentry;
 
     #coreListenerHandlers = new Map();

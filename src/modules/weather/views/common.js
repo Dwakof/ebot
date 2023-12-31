@@ -186,7 +186,7 @@ module.exports = class CommonView extends View {
      * @param {EmbedBuilder}            embed
      * @param {Array<WeatherCondition>} conditions
      * @param {Boolean}                 [day=true]
-     * @param {String}                  [title='Weather]
+     * @param {String}                  [title='Weather']
      *
      * @return {EmbedBuilder}
      */

@@ -109,7 +109,7 @@ module.exports = class CurrencyService extends ServiceApi {
         const rates = new Map();
 
         let _start_date = start_date;
-        let _end_date   = start_date.plus({ days : 365 });
+        let _end_date   = start_date.plus({ day : 365 });
 
         while (_end_date.toMillis() < end_date.toMillis()) {
 
@@ -120,8 +120,8 @@ module.exports = class CurrencyService extends ServiceApi {
                 rates.set(date, rate);
             }
 
-            _start_date = _start_date.plus({ days : 365 });
-            _end_date   = _end_date.plus({ days : 365 });
+            _start_date = _start_date.plus({ day : 365 });
+            _end_date   = _end_date.plus({ day : 365 });
 
             if (_end_date.toMillis() > end_date.toMillis()) {
 
