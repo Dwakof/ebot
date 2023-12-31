@@ -37,7 +37,7 @@ module.exports = {
 
         if (isString(emoji)) {
 
-            const { cdn = 'https://twemoji.maxcdn.com', v = 'latest', sep = '-', size = '72x72', ext = 'png' } = options;
+            const { cdn = 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/', sep = '-', size = '72x72', ext = 'png' } = options;
 
             const surrogates = emoji.indexOf(String.fromCharCode(0x200D)) < 0 ? emoji.replace(/\uFE0F/g, '') : emoji;
 
@@ -65,7 +65,7 @@ module.exports = {
 
             const code = r.join(sep);
 
-            return [cdn, 'v', v, size, `${ code }.${ ext }`].join('/');
+            return [cdn, size, `${ code }.${ ext }`].join('/');
         }
 
         if (emoji.imageURL) {
