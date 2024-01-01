@@ -56,6 +56,8 @@ module.exports = class EbotClient extends AkairoClient {
                 GatewayIntentBits.GuildMembers,
                 GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.GuildMessageReactions,
+                GatewayIntentBits.GuildEmojisAndStickers,
+                GatewayIntentBits.GuildVoiceStates,
                 GatewayIntentBits.MessageContent
             ]
         });
@@ -451,7 +453,10 @@ module.exports = class EbotClient extends AkairoClient {
                 PermissionsBitField.Flags.SendMessages,
                 PermissionsBitField.Flags.ReadMessageHistory,
                 PermissionsBitField.Flags.AddReactions,
-                PermissionsBitField.Flags.ViewChannel
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.ManageChannels,
+                PermissionsBitField.Flags.ManageRoles,
+                PermissionsBitField.Flags.MoveMembers
             ]
         });
 
