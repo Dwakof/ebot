@@ -13,11 +13,11 @@ module.exports = class ShardErrorListener extends Listener {
     exec(error, shardId) {
 
         this.client.logger.error({
-            msg     : 'Shard errored',
-            event   : this.event,
-            emitter : this.emitter,
-            err     : error,
-            shardId
+            msg      : `Shard ${ shardId } errored`,
+            event    : this.event,
+            emitter  : this.emitter,
+            metadata : { shardId },
+            err      : error
         });
 
         if (this.client.sentry) {

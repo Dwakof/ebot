@@ -18,6 +18,7 @@ const { CoreEvents } = require('./constants');
 
 const CommandHandler            = require('./struct/command/commandHandler');
 const ApplicationCommandHandler = require('./struct/applicationCommand/applicationCommandHandler');
+const InteractionHandler = require('./struct/interaction/interactionHandler');
 const ListenerHandler           = require('./struct/listener/listenerHandler');
 const Module                    = require('./struct/module');
 
@@ -40,6 +41,7 @@ module.exports = class EbotClient extends AkairoClient {
 
     #commandHandler;
     #applicationCommandHandler;
+    #interactionHandler;
     #inhibitorHandler;
     #listenerHandler;
 
@@ -138,6 +140,19 @@ module.exports = class EbotClient extends AkairoClient {
         });
     }
 
+    registerInteractionHandler(settings) {
+
+        this.#interactionHandler = new InteractionHandler(this, Hoek.merge({}, settings));
+
+        this.#coreListenerHandlers.get('interaction').setEmitters({ handler : this.#interactionHandler });
+
+        this.logger.trace({
+            msg     : 'Ebot Interaction Handler is registered',
+            event   : CoreEvents.INTERACTION_HANDLER_REGISTERED,
+            emitter : 'core'
+        });
+    }
+
     registerListenerHandler(settings) {
 
         this.#listenerHandler = new ListenerHandler(this, Hoek.merge({}, settings));
@@ -196,6 +211,7 @@ module.exports = class EbotClient extends AkairoClient {
 
         this.registerCommandHandler();
         this.registerApplicationCommandHandler();
+        this.registerInteractionHandler();
         this.registerListenerHandler();
         this.registerInhibitorHandler();
 
@@ -218,19 +234,19 @@ module.exports = class EbotClient extends AkairoClient {
             await this.initialize();
         }
 
-        this.API.on('response', ({ method, route }, { statusCode }) => {
+        this.API.on('response', ({ method, route }, { status, statusText }) => {
 
             this.logger.debug({
-                msg     : `${ method } ${ route } (${ statusCode })`,
+                msg     : `${ method } ${ route } (${ status } ${ statusText })`,
                 event   : 'response',
                 emitter : 'client.api'
             });
         });
 
-        this.rest.on('response', ({ method, route }, { statusCode }) => {
+        this.rest.on('response', ({ method, route }, { status, statusText }) => {
 
             this.logger.debug({
-                msg     : `${ method } ${ route } (${ statusCode })`,
+                msg     : `${ method } ${ route } (${ status } ${ statusText })`,
                 event   : 'response',
                 emitter : 'client.rest'
             });
@@ -289,6 +305,15 @@ module.exports = class EbotClient extends AkairoClient {
             this.logger.trace({
                 msg     : 'Ebot Application Command Handler is loaded',
                 event   : CoreEvents.APPLICATION_COMMAND_HANDLER_LOADED,
+                emitter : 'core'
+            });
+        }
+
+        if (this.#interactionHandler) {
+
+            this.logger.trace({
+                msg     : 'Ebot Interaction Handler is loaded',
+                event   : CoreEvents.INTERACTION_HANDLER_REGISTERED,
                 emitter : 'core'
             });
         }
@@ -371,6 +396,11 @@ module.exports = class EbotClient extends AkairoClient {
     get applicationCommandHandler() {
 
         return this.#applicationCommandHandler;
+    }
+
+    get interactionHandler() {
+
+        return this.#interactionHandler;
     }
 
     get listenerHandler() {

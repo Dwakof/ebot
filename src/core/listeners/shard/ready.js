@@ -13,10 +13,10 @@ module.exports = class ShardReadyListener extends Listener {
     exec(shardId) {
 
         this.client.logger.debug({
-            msg     : 'Shard is ready',
-            event   : this.event,
-            emitter : this.emitter,
-            shardId
+            msg      : `Shard ${ shardId } is ready`,
+            event    : this.event,
+            emitter  : this.emitter,
+            metadata : { shardId }
         });
     }
 };

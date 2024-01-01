@@ -66,7 +66,7 @@ const store = new Confidence.Store({
                     target  : 'pino-pretty',
                     options : {
                         colorize      : { $env : 'LOG_COLOR', $coerce : 'boolean', $default : true },
-                        ignore        : 'event,emitter,command,interaction',
+                        ignore        : 'event,emitter,command,interaction,metadata',
                         messageFormat : '[{emitter}.{event}] : {msg}',
                         translateTime : true
                     }

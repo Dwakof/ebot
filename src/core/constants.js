@@ -16,11 +16,13 @@ exports.CoreEvents = {
 
     COMMAND_HANDLER_REGISTERED             : 'commandHandlerRegistered',
     APPLICATION_COMMAND_HANDLER_REGISTERED : 'applicationCommandHandlerRegistered',
+    INTERACTION_HANDLER_REGISTERED         : 'interactionHandlerRegistered',
     INHIBITOR_HANDLER_REGISTERED           : 'inhibitorHandlerRegistered',
     LISTENER_HANDLER_REGISTERED            : 'listenerHandlerRegistered',
 
     COMMAND_HANDLER_LOADED             : 'commandHandlerLoaded',
     APPLICATION_COMMAND_HANDLER_LOADED : 'applicationCommandHandlerLoaded',
+    INTERACTION_HANDLER_LOADED         : 'interactionHandlerLoaded',
     INHIBITOR_HANDLER_LOADED           : 'inhibitorHandlerLoaded',
     LISTENER_HANDLER_LOADED            : 'listenerHandlerLoaded',
 
