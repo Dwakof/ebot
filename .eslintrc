@@ -1,16 +1,16 @@
 {
   "extends"      : [
-    "plugin:node/recommended",
+    "plugin:n/recommended",
     "plugin:@hapi/module"
   ],
   "env": {
     "node": true,
     "es6": true
   },
-  "parser": "@babel/eslint-parser",
-  "plugins"      : [
-    "security"
+  "plugins": [
+    "jsdoc"
   ],
+  "parser": "@babel/eslint-parser",
   "rules"        : {
     "key-spacing": "off"
   }
