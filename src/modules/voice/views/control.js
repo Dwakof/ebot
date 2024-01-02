@@ -1,6 +1,6 @@
 'use strict';
 
-const { ActionRowBuilder, ButtonBuilder, UserSelectMenuBuilder, MentionableSelectMenuBuilder, SelectMenuBuilder, ButtonStyle } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, UserSelectMenuBuilder, MentionableSelectMenuBuilder, StringSelectMenuBuilder, ButtonStyle } = require('discord.js');
 const { userMention, inlineCode, roleMention }                                                                                 = require('discord.js');
 
 const { View } = require('../../../core');
@@ -217,7 +217,7 @@ class ControlView extends View {
      */
     editRegion({ channel, owner, config }, regions) {
 
-        const select = new SelectMenuBuilder()
+        const select = new StringSelectMenuBuilder()
             .setCustomId(interactions.setRegion.customId)
             .setMinValues(1).setMaxValues(1)
             .setPlaceholder('Select a region');
@@ -254,7 +254,7 @@ class ControlView extends View {
             components : [
                 new ActionRowBuilder()
                     .addComponents([
-                        new SelectMenuBuilder()
+                        new StringSelectMenuBuilder()
                             .setCustomId(interactions.setUserLimit.customId)
                             .setMinValues(1).setMaxValues(1)
                             .setPlaceholder('Choose a user limit')
