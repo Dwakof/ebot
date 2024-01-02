@@ -42,20 +42,6 @@ class InteractionHandler extends AkairoHandler {
         };
     }
 
-    static #parsingArgs(interaction, args = []) {
-
-        const result = {};
-
-        for (const name of args) {
-
-            const { type, value } = interaction.options.get(name);
-
-            result[name] = { type : type.toLowerCase(), value };
-        }
-
-        return result;
-    }
-
     setup() {
 
         this.client.once('ready', () => {
