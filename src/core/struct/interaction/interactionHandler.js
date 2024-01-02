@@ -113,6 +113,7 @@ class InteractionHandler extends AkairoHandler {
 
                     scope.setContext('interaction', {
                         id        : interaction.id,
+                        messageId : interaction.message?.id,
                         channelId : interaction.channelId,
                         guild     : interaction.member.guild.name,
                         guildId   : interaction.guildId
