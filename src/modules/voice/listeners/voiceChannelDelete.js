@@ -16,18 +16,21 @@ module.exports = class ChannelDeleteListener extends Listener {
      */
     async exec(channel) {
 
-        const { HubService } = this.services();
+        const { HubService, TemporaryChannelService } = this.services();
 
         if (!channel.guildId) {
 
             return;
         }
 
-        const hub = await HubService.getHub(channel.guildId, channel.id);
+        if (await HubService.exist(channel.guildId, channel.id)) {
 
-        if (hub) {
+            await HubService.deleteById(channel.guildId, channel.id);
+        }
 
-            await HubService.deleteHub(hub);
+        if (await TemporaryChannelService.exist(channel.guildId, channel.id)) {
+
+            await TemporaryChannelService.deleteById(channel.guildId, channel.id);
         }
     }
 };

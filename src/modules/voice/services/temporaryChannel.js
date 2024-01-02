@@ -145,7 +145,7 @@ class TemporaryChannelService extends Service {
 
         await Promise.all([
             this.update({ channel, owner, config }),
-            this.store.set('control', hub.guildId, message.id, { channelId : channel.id })
+            this.store.set('control', channel.guild.id, message.id, { channelId : channel.id })
         ]);
 
         this.client.logger.info({
@@ -160,6 +160,13 @@ class TemporaryChannelService extends Service {
         });
 
         return { channel, owner, config };
+    }
+
+    async exist(guildId, channelId) {
+
+        const hub = await this.store.get('temporary', guildId, channelId);
+
+        return !!hub;
     }
 
     async _getTemporaryChannel(guildId, channelId) {
@@ -294,6 +301,21 @@ class TemporaryChannelService extends Service {
                 channelId : channel.id
             }
         });
+    }
+
+    async deleteById(guildId, channelId) {
+
+        const item = await this.store.get('temporary', guildId, channelId);
+
+        if (item) {
+
+            if (item?.value?.messageId) {
+
+                await this.store.delete('control', guildId, item.value.messageId);
+            }
+
+            await this.store.delete('temporary', guildId, channelId);
+        }
     }
 
     async cleanupOldChannels() {

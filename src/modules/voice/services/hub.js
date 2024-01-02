@@ -2,32 +2,40 @@
 
 // eslint-disable-next-line no-unused-vars
 const { Snowflake, GuildMember, VoiceChannel, PermissionsBitField, ChannelType } = require('discord.js');
+const Lunr                                                                       = require('lunr');
 
-const { Service } = require('../../../core');
+const { Service, Util } = require('../../../core');
 
 class HubService extends Service {
 
+    static get caching() {
+
+        return {
+            buildAutoComplete : {
+                generateKey : (guild) => guild.id,
+                ttl         : Util.SECOND * 30
+            }
+        };
+    }
+
     /**
      * @typedef {Object} Hub
-     * @property {import('discord.js').Snowflake}  id
-     * @property {import('discord.js').Snowflake}  guildId
      * @property {import('discord.js').GuildVoice} channel
      * @property {Object}                          config
-     * @property {string}                            config.name
      * @property {number}                            config.defaultSize
      * @property {'public'|'locked'|'private'}       config.defaultType
      */
 
     /**
      * @param {import('discord.js').Guild}     guild
+     * @param {string}                         name
      * @param {Hub['config']}                  config
      * @return {Hub}
      */
-    async createHub(guild, config) {
+    async createHub(guild, name, config) {
 
         const channel = await guild.channels.create({
             type                 : ChannelType.GuildVoice,
-            name                 : config.name,
             permissionOverwrites : [
                 { id : guild.roles.everyone.id, allow : PermissionsBitField.Flags.ViewChannel },
                 { id : guild.roles.everyone.id, allow : PermissionsBitField.Flags.Connect },
@@ -35,12 +43,20 @@ class HubService extends Service {
                 { id : guild.roles.everyone.id, deny : PermissionsBitField.Flags.UseSoundboard },
                 { id : guild.roles.everyone.id, deny : PermissionsBitField.Flags.SendMessages },
                 { id : guild.roles.everyone.id, deny : PermissionsBitField.Flags.SendMessagesInThreads }
-            ]
+            ],
+            name
         });
 
         await this.store.set('hub', guild.id, channel.id, config);
 
-        return { id : channel.id, config, guildId : guild.id, channel };
+        return { config, channel };
+    }
+
+    async exist(guildId, channelId) {
+
+        const hub = await this.store.get('hub', guildId, channelId);
+
+        return !!hub;
     }
 
     /**
@@ -59,7 +75,7 @@ class HubService extends Service {
 
         const channel = await this.client.channels.fetch(channelId);
 
-        return { id : channelId, config : hub.value, guildId, channel };
+        return { config : hub.value, channel };
     }
 
     /**
@@ -80,14 +96,65 @@ class HubService extends Service {
             return null;
         }
 
-        return { id : state.channelId, config : hub.value, guildId : state.guild.id, channel : state.channel };
+        return { config : hub.value, channel : state.channel };
+    }
+
+    /**
+     * @param {import('discord.js').Guild} guild
+     * @return {{index: Lunr.Index, channels: import('discord.js').BaseGuildVoiceChannel[]}}
+     */
+    async buildAutoComplete(guild) {
+
+        const hubIds = await this.store.listIds('hub', guild.id);
+
+        const channels = [];
+
+        for (const hubId of hubIds) {
+
+            const channel = guild.channels.cache.get(hubId);
+
+            if (channel) {
+
+                channels.push(channel);
+            }
+        }
+
+        const index = Lunr(function () {
+
+            this.ref('id');
+            this.field('name');
+            this.field('parent');
+
+            for (const channel of channels) {
+
+                this.add({ id : channel.id, name : channel.name, parent : channel.parent?.name });
+            }
+        });
+
+        return { index, channels };
+    }
+
+    /**
+     * @param {Hub} hub
+     * @return {Promise<Hub>}
+     */
+    async update({ config, channel }) {
+
+        const { value } = await this.store.set('hub', channel.guild.id, channel.id, config);
+
+        return { channel, config : value };
     }
 
     async deleteHub(hub) {
 
         await hub.channel.delete().catch(() => null);
 
-        await this.store.delete('hub', hub.guildId, hub.id);
+        await this.store.delete('hub', hub.channel.guild.id, hub.channel.id);
+    }
+
+    async deleteById(guildId, channelId) {
+
+        await this.store.delete('hub', guildId, channelId);
     }
 }
 

@@ -1,65 +1,78 @@
 'use strict';
 
-const { TextInputStyle, channelMention } = require('discord.js');
+const { StringSelectMenuBuilder, ActionRowBuilder, channelMention, ButtonBuilder, ButtonStyle } = require('discord.js');
 
-const { View, Util } = require('../../../core');
+const { View }   = require('../../../core');
+
+const { interactions } = require('../interactions/hub');
 
 class HubView extends View {
 
-    createHub(interaction) {
+    /**
+     * @param {Hub} hub
+     *
+     * @return {import('discord.js').MessageCreateOptions}
+     */
+    editHub(hub) {
 
-        return new Util.Modal(interaction, {
-            title      : `Creating a hub`,
+        return {
+            ephemeral  : true,
+            content    : `Editing hub ${ channelMention(hub.channel.id) }`,
             components : [
-                {
-                    id          : 'name',
-                    label       : 'Name',
-                    placeholder : 'Your Hub name',
-                    type        : Util.Modal.InputType.Text,
-                    style       : TextInputStyle.Short,
-                    max_length  : 100,
-                    required    : true,
-                    value       : 'Cool hub name'
-                },
-                {
-                    id          : 'defaultSizeString',
-                    label       : 'Channel default size',
-                    placeholder : 'Default size of the temporary channels',
-                    type        : Util.Modal.InputType.Text,
-                    style       : TextInputStyle.Short,
-                    min_length  : 1,
-                    max_length  : 3,
-                    required    : true,
-                    value       : '10'
-                },
-                {
-                    id          : 'defaultType',
-                    label       : 'Channel default visibility',
-                    placeholder : 'Default size of the temporary channels',
-                    type        : Util.Modal.InputType.Select,
-                    style       : TextInputStyle.Short,
-                    required    : true,
-                    value       : 'public'
-                }
-            ],
-            reply      : async (modalInteraction, { name, defaultSizeString, defaultType }) => {
-
-                const defaultSize = parseInt(defaultSizeString, 10);
-
-                if (isNaN(defaultSize) || defaultSize < 1 || defaultSize > 99) {
-
-                    return await modalInteraction.reply({ content : 'Invalid default size must be between 1 and 99', ephemeral : true });
-                }
-
-                const { HubService } = this.services();
-
-                const hub = await HubService.createHub(modalInteraction.guild, { name, defaultSize, defaultType });
-
-                await modalInteraction.reply({ content : `Channel ${ channelMention(hub.id) } created`, ephemeral : true });
-            }
-        });
+                new ActionRowBuilder()
+                    .addComponents([
+                        new StringSelectMenuBuilder()
+                            .setCustomId(interactions.setDefaultType.customId)
+                            .setPlaceholder('Channel default visibility')
+                            .setMinValues(1).setMaxValues(1)
+                            .setOptions([
+                                { label : 'Public', value : 'public', emoji : { name : '📢' }, default : hub.config.defaultType === 'public' },
+                                { label : 'Locked', value : 'locked', emoji : { name : '🔒' }, default : hub.config.defaultType === 'locked' },
+                                { label : 'Private', value : 'private', emoji : { name : '🥷' }, default : hub.config.defaultType === 'private' }
+                            ])
+                    ]),
+                new ActionRowBuilder()
+                    .addComponents([
+                        new ButtonBuilder()
+                            .setCustomId(interactions.editDefaultSize.customId)
+                            .setStyle(ButtonStyle.Secondary)
+                            .setLabel('Edit channel default size')
+                            .setEmoji({ name : '🔢' })
+                    ])
+            ]
+        };
     }
 
+    /**
+     * @param {Hub} hub
+     *
+     * @return {import('discord.js').MessageCreateOptions}
+     */
+    editDefaultSize({ config, channel }) {
+
+        return {
+            ephemeral  : true,
+            content    : `Choose a new default size for ${ channelMention(channel.id) }`,
+            components : [
+                new ActionRowBuilder()
+                    .addComponents([
+                        new StringSelectMenuBuilder()
+                            .setCustomId(interactions.setDefaultSize.customId)
+                            .setMinValues(1).setMaxValues(1)
+                            .setPlaceholder('Choose a user limit')
+                            .addOptions([
+                                { label : 'Unlimited', value : '0', default : config.defaultSize === 0 },
+                                ...[2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30]
+                                    .map((value) => ({
+                                        label   : String(value),
+                                        value   : String(value),
+                                        default : config.defaultSize === value
+                                    }))
+                            ])
+                    ])
+            ]
+        };
+    }
 }
 
 module.exports = HubView;
