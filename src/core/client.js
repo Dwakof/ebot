@@ -18,7 +18,7 @@ const { CoreEvents } = require('./constants');
 
 const CommandHandler            = require('./struct/command/commandHandler');
 const ApplicationCommandHandler = require('./struct/applicationCommand/applicationCommandHandler');
-const InteractionHandler = require('./struct/interaction/interactionHandler');
+const InteractionHandler        = require('./struct/interaction/interactionHandler');
 const ListenerHandler           = require('./struct/listener/listenerHandler');
 const Module                    = require('./struct/module');
 
@@ -83,6 +83,56 @@ module.exports = class EbotClient extends AkairoClient {
 
             this.logger.info({ msg : 'Sentry is initialized', event : CoreEvents.SENTRY_INITIALIZED, emitter : 'core' });
         }
+    }
+
+    get logger() {
+
+        return this.#logger;
+    }
+
+    get sentry() {
+
+        if (this.#settings.core.sentry.enabled) {
+
+            return this.#sentry;
+        }
+
+        return false;
+    }
+
+    get commandHandler() {
+
+        return this.#commandHandler;
+    }
+
+    get applicationCommandHandler() {
+
+        return this.#applicationCommandHandler;
+    }
+
+    get interactionHandler() {
+
+        return this.#interactionHandler;
+    }
+
+    get listenerHandler() {
+
+        return this.#listenerHandler;
+    }
+
+    get inhibitorHandler() {
+
+        return this.#inhibitorHandler;
+    }
+
+    get clientId() {
+
+        return this.#settings.core.discord.clientId;
+    }
+
+    get version() {
+
+        return this.#settings.version;
     }
 
     async #setupCoreListenerHandlers() {
@@ -180,7 +230,10 @@ module.exports = class EbotClient extends AkairoClient {
 
         for (const name of await Fs.readdir(modulesPath)) {
 
-            await this.registerModule(name, Path.join(modulesPath, name), this.#settings.modules[name]);
+            if (!this.#settings.core.disabledModules.includes(name)) {
+
+                await this.registerModule(name, Path.join(modulesPath, name), this.#settings.modules[name]);
+            }
         }
     }
 
@@ -331,21 +384,6 @@ module.exports = class EbotClient extends AkairoClient {
         return this;
     }
 
-    get logger() {
-
-        return this.#logger;
-    }
-
-    get sentry() {
-
-        if (this.#settings.core.sentry.enabled) {
-
-            return this.#sentry;
-        }
-
-        return false;
-    }
-
     providers(moduleName) {
 
         if (this.#modules.has(moduleName)) {
@@ -388,31 +426,6 @@ module.exports = class EbotClient extends AkairoClient {
         }
 
         throw new Error(`module ${ moduleName } not found`);
-    }
-
-    get commandHandler() {
-
-        return this.#commandHandler;
-    }
-
-    get applicationCommandHandler() {
-
-        return this.#applicationCommandHandler;
-    }
-
-    get interactionHandler() {
-
-        return this.#interactionHandler;
-    }
-
-    get listenerHandler() {
-
-        return this.#listenerHandler;
-    }
-
-    get inhibitorHandler() {
-
-        return this.#inhibitorHandler;
     }
 
     async warmupCache() {
@@ -495,15 +508,5 @@ module.exports = class EbotClient extends AkairoClient {
 
             this.sentry.captureException(error);
         }
-    }
-
-    get clientId() {
-
-        return this.#settings.core.discord.clientId;
-    }
-
-    get version() {
-
-        return this.#settings.version;
     }
 };
