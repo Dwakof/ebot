@@ -317,7 +317,9 @@ class Control extends Interaction {
 
             if (isNaN(userLimit)) {
 
-                // TODO
+                await interaction.reply({ content : `Invalid user limit ❌`, ephemeral : true });
+
+                return;
             }
 
             await interaction.reply({ content : `Changing user limit to ${ inlineCode(String(userLimit || 'unlimited')) }`, ephemeral : true });
