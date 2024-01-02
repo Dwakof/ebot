@@ -33,7 +33,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
      */
     commands;
 
-    constructor(client, {}) {
+    constructor(client) {
 
         super(client, { classToHandle : ApplicationCommand });
 

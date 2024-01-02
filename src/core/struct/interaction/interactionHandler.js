@@ -22,7 +22,7 @@ class InteractionHandler extends AkairoHandler {
      */
     interactions;
 
-    constructor(client, {}) {
+    constructor(client) {
 
         super(client, { classToHandle : Interaction });
 
