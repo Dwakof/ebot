@@ -3,7 +3,7 @@
 const Path             = require('path');
 const Confidence       = require('@hapipal/confidence');
 const Dotenv           = require('dotenv');
-const { ActivityType } =  require('discord-api-types/v10');
+const { ActivityType } = require('discord-api-types/v10');
 
 const Pkg = require('../../package.json');
 
@@ -19,7 +19,7 @@ const knexDefault = new Confidence.Store({
 const store = new Confidence.Store({
     version : Pkg.version,
     core    : {
-        discord     : {
+        discord         : {
             $filter     : { $env : 'NODE_ENV' },
             $base       : {
                 clientId : { $env : 'DISCORD_CLIENT_ID' },
@@ -53,7 +53,7 @@ const store = new Confidence.Store({
                 }
             }
         },
-        logger      : {
+        logger          : {
             $filter     : { $env : 'NODE_ENV' },
             $base       : {
                 name   : 'ebot',
@@ -66,7 +66,7 @@ const store = new Confidence.Store({
                     target  : 'pino-pretty',
                     options : {
                         colorize      : { $env : 'LOG_COLOR', $coerce : 'boolean', $default : true },
-                        ignore        : 'event,emitter,command,interaction',
+                        ignore        : 'event,emitter,command,interaction,metadata',
                         messageFormat : '[{emitter}.{event}] : {msg}',
                         translateTime : true
                     }
@@ -74,7 +74,7 @@ const store = new Confidence.Store({
             },
             production  : {}
         },
-        sentry      : {
+        sentry          : {
             $filter     : { $env : 'NODE_ENV' },
             $base       : {
                 enabled          : false,
@@ -90,11 +90,12 @@ const store = new Confidence.Store({
                 enabled : { $env : 'EBOT_SENTRY_ENABLED', $coerce : 'boolean', $default : true }
             }
         },
-        cacheWarmup : {
+        cacheWarmup     : {
             guilds : { $env : 'EBOT_CACHE_WARMUP_GUILDS', $coerce : 'array', $default : [] },
             users  : { $env : 'EBOT_CACHE_WARMUP_USERS', $coerce : 'array', $default : [] }
         },
-        module      : {
+        disabledModules : { $env : 'EBOT_DISABLED_MODULES', $coerce : 'array', $default : [] },
+        module          : {
             knex      : {
                 client     : 'pg',
                 connection : {
@@ -122,13 +123,13 @@ const store = new Confidence.Store({
         }
     },
     modules : {
-        ai           : {
+        ai       : {
             openai : {
                 organization : { $env : 'OPENAI_ORGANIZATION' },
                 apiKey       : { $env : 'OPENAI_API_KEY' }
             }
         },
-        karma        : {
+        karma    : {
             knex : {
                 client     : 'pg',
                 connection : {
@@ -140,7 +141,7 @@ const store = new Confidence.Store({
                 }
             }
         },
-        mimic        : {
+        mimic    : {
             knex : {
                 client     : 'pg',
                 connection : {
@@ -152,7 +153,7 @@ const store = new Confidence.Store({
                 }
             }
         },
-        history      : {
+        history  : {
             knex : {
                 client     : 'pg',
                 connection : {
@@ -164,19 +165,7 @@ const store = new Confidence.Store({
                 }
             }
         },
-        reactionRole : {
-            knex : {
-                client     : 'pg',
-                connection : {
-                    host     : { $env : 'REACTION_ROLE_POSTGRES_HOST', $default : knexDefault.host },
-                    user     : { $env : 'REACTION_ROLE_POSTGRES_USER', $default : knexDefault.user },
-                    password : { $env : 'REACTION_ROLE_POSTGRES_PASS', $default : knexDefault.password },
-                    database : { $env : 'REACTION_ROLE_POSTGRES_DB', $default : 'reaction_role' },
-                    port     : { $env : 'REACTION_ROLE_POSTGRES_PORT', $coerce : 'number', $default : knexDefault.port }
-                }
-            }
-        },
-        weather      : {
+        weather  : {
             openWeatherApiKey : { $env : 'OPEN_WEATHER_API_KEY' },
             LocationIQApiKey  : { $env : 'LOCATION_IQ_API_KEY' },
             knex              : {
@@ -190,7 +179,7 @@ const store = new Confidence.Store({
                 }
             }
         },
-        tools        : {
+        tools    : {
             googleImages   : {
                 apiKey   : { $env : 'GOOGLE_CSE_API_KEY' },
                 engineId : { $env : 'GOOGLE_CSE_ENGINE_ID' }
@@ -199,7 +188,7 @@ const store = new Confidence.Store({
                 apiKey : { $env : 'IS_THERE_ANY_DEAL_API_KEY' }
             }
         },
-        currency     : {
+        currency : {
             freeCurrencyApi : {
                 apiKey : { $env : 'FREE_CURRENCY_API_KEY' }
             }

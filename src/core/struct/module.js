@@ -111,6 +111,7 @@ class Module {
     #commands            = new Map();
     #listeners           = new Map();
     #inhibitors          = new Map();
+    #interactions        = new Map();
     #providers           = new Map();
     #services            = new Map();
     #views               = new Map();
@@ -125,6 +126,14 @@ class Module {
 
         this.#name = name;
         this.#path = path;
+    }
+
+    /**
+     * @return {Module~Store}
+     */
+    get store() {
+
+        return this.#store;
     }
 
     /**
@@ -178,6 +187,11 @@ class Module {
         if (components.includes('applicationCommands')) {
 
             await this.registerApplicationCommands();
+        }
+
+        if (components.includes('interactions')) {
+
+            await this.registerInteractions();
         }
     }
 
@@ -248,6 +262,11 @@ class Module {
         return this.registerAkairoModule(this.#applicationCommands, this.#client.applicationCommandHandler, 'applicationCommands', 'applicationCommand');
     }
 
+    registerInteractions() {
+
+        return this.registerAkairoModule(this.#interactions, this.#client.interactionHandler, 'interactions', 'interaction');
+    }
+
     async registerProviders() {
 
         for (const { name, path, file } of await CoreUtil.requireDir(Path.join(this.#path, 'providers'), true)) {
@@ -268,16 +287,20 @@ class Module {
 
                 if (this.#providers.has(id)) {
 
+                    // noinspection ExceptionCaughtLocallyJS
                     throw new Error('A provider under the same ID was already registered');
                 }
 
                 this.#providers.set(id, { path, provider });
 
                 this.#client.logger.trace({
+                    msg      : `Provider ${ this.#name }.${ id } has been registered`,
                     event    : CoreEvents.PROVIDER_REGISTERED,
                     emitter  : 'core',
-                    module   : this.#name,
-                    provider : id
+                    metadata : {
+                        module   : this.#name,
+                        provider : id
+                    }
                 });
             }
             catch (error) {
@@ -295,6 +318,7 @@ class Module {
 
                 if (!file instanceof Service) {
 
+                    // noinspection ExceptionCaughtLocallyJS
                     throw new Error('Only instance of Service can be registered as service');
                 }
 
@@ -303,16 +327,20 @@ class Module {
 
                 if (this.#services.has(id)) {
 
+                    // noinspection ExceptionCaughtLocallyJS
                     throw new Error('A service under the same name was already registered');
                 }
 
                 this.#services.set(id, { path, service });
 
                 this.#client.logger.trace({
-                    event   : CoreEvents.SERVICE_REGISTERED,
-                    emitter : 'core',
-                    module  : this.#name,
-                    service : id
+                    msg      : `Service ${ this.#name }.${ id } has been registered`,
+                    event    : CoreEvents.SERVICE_REGISTERED,
+                    emitter  : 'core',
+                    metadata : {
+                        module  : this.#name,
+                        service : id
+                    }
                 });
             }
             catch (error) {
@@ -330,6 +358,7 @@ class Module {
 
                 if (!file instanceof View) {
 
+                    // noinspection ExceptionCaughtLocallyJS
                     throw new Error('Only instance of View can be registered as view');
                 }
 
@@ -338,16 +367,20 @@ class Module {
 
                 if (this.#views.has(id)) {
 
+                    // noinspection ExceptionCaughtLocallyJS
                     throw new Error('A view under the same name was already registered');
                 }
 
                 this.#views.set(id, { path, view });
 
                 this.#client.logger.trace({
-                    event   : CoreEvents.VIEW_REGISTERED,
-                    emitter : 'core',
-                    module  : this.#name,
-                    view    : id
+                    msg      : `View ${ this.#name }.${ id } has been registered`,
+                    event    : CoreEvents.VIEW_REGISTERED,
+                    emitter  : 'core',
+                    metadata : {
+                        module : this.#name,
+                        view   : id
+                    }
                 });
             }
             catch (error) {
@@ -364,10 +397,13 @@ class Module {
             await provider.init(this.#settings);
 
             this.#client.logger.debug({
+                msg      : `Provider ${ this.#name }.${ id } has been initialized`,
                 event    : CoreEvents.PROVIDER_INITIALIZED,
                 emitter  : 'core',
-                module   : this.#name,
-                provider : id
+                metadata : {
+                    module   : this.#name,
+                    provider : id
+                }
             });
         }
 
@@ -376,10 +412,13 @@ class Module {
             await service.init(this.#settings);
 
             this.#client.logger.debug({
-                event   : CoreEvents.SERVICE_INITIALIZED,
-                emitter : 'core',
-                module  : this.#name,
-                service : id
+                msg      : `Service ${ this.#name }.${ id } has been initialized`,
+                event    : CoreEvents.SERVICE_INITIALIZED,
+                emitter  : 'core',
+                metadata : {
+                    module  : this.#name,
+                    service : id
+                }
             });
         }
 
@@ -388,10 +427,13 @@ class Module {
             await view.init(this.#settings);
 
             this.#client.logger.debug({
-                event   : CoreEvents.VIEW_INITIALIZED,
-                emitter : 'core',
-                module  : this.#name,
-                view    : id
+                msg      : `View ${ this.#name }.${ id } has been initialized`,
+                event    : CoreEvents.VIEW_INITIALIZED,
+                emitter  : 'core',
+                metadata : {
+                    module : this.#name,
+                    view   : id
+                }
             });
         }
     }
@@ -421,14 +463,6 @@ class Module {
 
                 return { ...views, [name] : view };
             }, {});
-    }
-
-    /**
-     * @return {Module~Store}
-     */
-    get store() {
-
-        return this.#store;
     }
 }
 

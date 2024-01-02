@@ -8,7 +8,6 @@ module.exports = class ChartService extends Service {
 
     async init() {
 
-        // eslint-disable-next-line node/no-unsupported-features/es-syntax
         const { Chart, controllers, elements, plugins, scales } = await import('chart.js');
 
         Chart.defaults.font.family = `'Noto Sans', 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif`;
@@ -18,12 +17,10 @@ module.exports = class ChartService extends Service {
         Chart.register(...Object.values(plugins));
         Chart.register(...Object.values(scales));
 
-        // eslint-disable-next-line node/no-unsupported-features/es-syntax
         const { MatrixController, MatrixElement } = await import('chartjs-chart-matrix');
 
         Chart.register(MatrixController, MatrixElement);
 
-        // eslint-disable-next-line node/no-unsupported-features/es-syntax
         await import('chartjs-adapter-luxon');
 
         this.chartJS = Chart;

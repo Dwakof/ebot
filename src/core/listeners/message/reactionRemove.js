@@ -33,7 +33,6 @@ module.exports = class MessageReactionRemoveListener extends Listener {
                     id         : reaction.emoji.id,
                     identifier : reaction.emoji.identifier,
                     name       : reaction.emoji.name,
-                    url        : reaction.emoji?.url,
                     guildId    : reaction.emoji?.guild?.id,
                     guildName  : reaction.emoji?.guild?.name
                 },

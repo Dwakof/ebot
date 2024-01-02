@@ -38,6 +38,14 @@ class Service {
     }
 
     /**
+     * @return {Module~Store}
+     */
+    get store() {
+
+        return this.client.store(this.module);
+    }
+
+    /**
      * Method to override that is called when the client is started.
      */
     init(settings) {
@@ -57,14 +65,6 @@ class Service {
     providers(module = this.module) {
 
         return this.client.providers(module);
-    }
-
-    /**
-     * @return {Module~Store}
-     */
-    get store() {
-
-        return this.client.store(this.module);
     }
 
     /**
@@ -136,9 +136,14 @@ class Service {
 
     #cron(cronDefinitions) {
 
+        const sentry = this.client.sentry;
+
         for (const [cron, { schedule, job, options = {} }] of Object.entries(cronDefinitions)) {
 
             Hoek.assert(Cron.validate(schedule), `Invalid cron schedule: ${ schedule } for cron ${ cron } in service ${ this.id } of module ${ this.module }`);
+
+            const monitorSlug   = `${ this.module }-${ this.id }-${ cron }`;
+            const monitorConfig = { schedule : { type : 'crontab', value : schedule.split(' ').slice(1).join(' ') } };
 
             let method = job;
 
@@ -158,6 +163,8 @@ class Service {
                 const id    = Util.uuid();
                 const start = DateTime.now();
 
+                let checkInId;
+
                 try {
 
                     this.client.logger.info({
@@ -166,6 +173,11 @@ class Service {
                         emitter : 'core'
                     });
 
+                    if (sentry) {
+
+                        checkInId = sentry.captureCheckIn({ monitorSlug, status : 'in_progress' }, monitorConfig);
+                    }
+
                     await method.call(this, this.client);
 
                     this.client.logger.info({
@@ -173,6 +185,11 @@ class Service {
                         event   : CoreEvents.SCHEDULE_ENDED,
                         emitter : 'core'
                     });
+
+                    if (sentry) {
+
+                        sentry.captureCheckIn({ checkInId, monitorSlug, status : 'ok' }, monitorConfig);
+                    }
                 }
                 catch (err) {
 
@@ -182,6 +199,11 @@ class Service {
                         emitter : 'core',
                         err
                     });
+
+                    if (sentry) {
+
+                        sentry.captureCheckIn({ checkInId, monitorSlug, status : 'error' }, monitorConfig);
+                    }
                 }
 
             }, options);

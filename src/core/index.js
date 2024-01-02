@@ -11,10 +11,12 @@ module.exports.View       = require('./struct/view');
 module.exports.CommandHandler            = require('./struct/command/commandHandler');
 module.exports.ListenerHandler           = require('./struct/listener/listenerHandler');
 module.exports.ApplicationCommandHandler = require('./struct/applicationCommand/applicationCommandHandler');
+module.exports.InteractionHandler        = require('./struct/interaction/interactionHandler');
 
 module.exports.Command            = require('./struct/command/command');
 module.exports.Listener           = require('./struct/listener/listener');
 module.exports.ApplicationCommand = require('./struct/applicationCommand/applicationCommand');
+module.exports.Interaction        = require('./struct/interaction/interaction');
 
 module.exports.Util = require('./util');
 

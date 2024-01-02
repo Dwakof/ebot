@@ -8,7 +8,7 @@ const { ServiceApi, Util } = require('../../../core');
 
 module.exports = class CurrencyService extends ServiceApi {
 
-    static ENDPOINT = 'https://api.exchangerate.host';
+    static ENDPOINT = 'https://api.apilayer.com/';
 
     /**
      * @type {Map<CurrencyCode, Currency>}
@@ -17,9 +17,11 @@ module.exports = class CurrencyService extends ServiceApi {
 
     #index;
 
-    async init() {
+    async init(settings) {
 
-        super.init();
+        super.init(settings);
+
+        this.defaultHeaders = { apikey : settings.freeCurrencyApi.apiKey };
 
         const { rates } = await this.getRates();
 
@@ -62,7 +64,7 @@ module.exports = class CurrencyService extends ServiceApi {
      */
     getRates(currency = 'USD', queryOptions = {}) {
 
-        return this.api.get('/latest', { base : currency, ...queryOptions });
+        return this.api.get('/fixer/latest', { base : currency, ...queryOptions });
     }
 
     /**
@@ -79,7 +81,7 @@ module.exports = class CurrencyService extends ServiceApi {
         const start_date = new DateTime(from ?? DateTime.now().minus({ month : 1 })).toISODate();
         const end_date   = new DateTime(to ?? DateTime.now()).toISODate();
 
-        return this.api.get('/timeseries', { base : currency, start_date, end_date, symbols : currencies, ...queryOptions });
+        return this.api.get('/fixer/timeseries', { base : currency, start_date, end_date, symbols : currencies, ...queryOptions });
     }
 
     /**
@@ -107,7 +109,7 @@ module.exports = class CurrencyService extends ServiceApi {
         const rates = new Map();
 
         let _start_date = start_date;
-        let _end_date   = start_date.plus({ days : 365 });
+        let _end_date   = start_date.plus({ day : 365 });
 
         while (_end_date.toMillis() < end_date.toMillis()) {
 
@@ -118,8 +120,8 @@ module.exports = class CurrencyService extends ServiceApi {
                 rates.set(date, rate);
             }
 
-            _start_date = _start_date.plus({ days : 365 });
-            _end_date   = _end_date.plus({ days : 365 });
+            _start_date = _start_date.plus({ day : 365 });
+            _end_date   = _end_date.plus({ day : 365 });
 
             if (_end_date.toMillis() > end_date.toMillis()) {
 

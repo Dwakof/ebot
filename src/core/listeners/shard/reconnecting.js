@@ -13,10 +13,10 @@ module.exports = class ShardReconnectingListener extends Listener {
     exec(shardId) {
 
         this.client.logger.info({
-            msg     : 'Shard is reconnecting',
+            msg     : `Shard ${ shardId } is reconnecting`,
             event   : this.event,
             emitter : this.emitter,
-            shardId
+            metadata : { shardId }
         });
     }
 };
