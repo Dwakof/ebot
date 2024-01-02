@@ -1,3 +1,25 @@
+# [0.27.0](https://github.com/Dwakof/ebot/compare/v0.26.0...v0.27.0) (2024-01-02)
+
+
+### Bug Fixes
+
+* change ESLint configuration ([455c612](https://github.com/Dwakof/ebot/commit/455c61289675100ee6130d6494d6bc3f1158e0df))
+* deprecated discord component ([0fc8d73](https://github.com/Dwakof/ebot/commit/0fc8d735b2fd059dd62423c2c49f451f3957dd8b))
+* exchangerate.host sold to apilayer.com ([ef26665](https://github.com/Dwakof/ebot/commit/ef26665bcce48394ccd9428c0e0c5a4d1987f31e))
+* MaxCDN is dead ([adf2b5f](https://github.com/Dwakof/ebot/commit/adf2b5faec175e88709193d72aef37dc4b8b75bf))
+* migrate to node 20 ([c60bf9d](https://github.com/Dwakof/ebot/commit/c60bf9d722c6bbdf9db8d563c2f6f3ed0ea69ca1))
+* return error to user ([20d5b54](https://github.com/Dwakof/ebot/commit/20d5b5424699572802c2d275357e66684ad9eb29))
+* rework hub management as modal doesn't support SelectMenu anymore (sadge) ([3083b48](https://github.com/Dwakof/ebot/commit/3083b48678c0a870b50b85a250c70f765450cb15))
+
+
+### Features
+
+* add Interaction system for long-running interaction (different from `interactiveReply` which is time based interaction) ([69d4b69](https://github.com/Dwakof/ebot/commit/69d4b69be7732a6055efeeb63d6f7f07950654ac))
+* add Sentry cron monitoring ([8cad45d](https://github.com/Dwakof/ebot/commit/8cad45d36ad508ae36daada0507bb842beae0f6b))
+* Add Temporary Voice channel system ([3cdd07f](https://github.com/Dwakof/ebot/commit/3cdd07f3442d9312d0e1fea2d23d74923a7d879e))
+* allow disabling modules ([23e58e3](https://github.com/Dwakof/ebot/commit/23e58e34478265069726e6be168b52f3b31d52e0))
+* update packages ([4455df7](https://github.com/Dwakof/ebot/commit/4455df7f7d389d0200a0f86a406a04c91c15a1fb))
+
 # [0.26.0](https://github.com/Dwakof/ebot/compare/v0.25.11...v0.26.0) (2023-07-10)
 
 
