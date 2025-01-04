@@ -28,7 +28,7 @@ class TemporaryChannelService extends Service {
     static get cron() {
 
         return {
-            build : {
+            cleanupOldChannels : {
                 schedule : '0 */10 * * * *',
                 job      : 'cleanupOldChannels'
             }
