@@ -27,6 +27,7 @@ class HubView extends View {
                             .setMinValues(1).setMaxValues(1)
                             .setOptions([
                                 { label : 'Public', value : 'public', emoji : { name : '📢' }, default : hub.config.defaultType === 'public' },
+                                { label : 'Inherit', value : 'inherit', emoji : { name : '📂' }, default : hub.config.defaultType === 'inherit' },
                                 { label : 'Locked', value : 'locked', emoji : { name : '🔒' }, default : hub.config.defaultType === 'locked' },
                                 { label : 'Private', value : 'private', emoji : { name : '🥷' }, default : hub.config.defaultType === 'private' }
                             ])
