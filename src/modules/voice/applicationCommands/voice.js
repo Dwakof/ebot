@@ -10,7 +10,7 @@ module.exports = class Voice extends ApplicationCommand {
     constructor() {
 
         super('voice', {
-            global        : false,
+            global        : true,
             directMessage : false,
             category      : 'voice',
             description   : 'Manage Hubs and temporary voice channels',
