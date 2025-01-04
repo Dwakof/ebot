@@ -10,7 +10,7 @@ module.exports = class Voice extends ApplicationCommand {
     constructor() {
 
         super('voice', {
-            global        : false,
+            global        : true,
             directMessage : false,
             category      : 'voice',
             description   : 'Manage Hubs and temporary voice channels',
@@ -47,6 +47,7 @@ module.exports = class Voice extends ApplicationCommand {
                                 required    : false,
                                 choices     : {
                                     'Public'  : 'public',
+                                    'Inherit' : 'inherit',
                                     'Locked'  : 'locked',
                                     'Private' : 'private'
                                 }
@@ -115,7 +116,7 @@ module.exports = class Voice extends ApplicationCommand {
         }));
     }
 
-    async createHub(interaction, { name, 'default-size' : defaultSize = 10, 'default-type' : defaultType = 'public' }) {
+    async createHub(interaction, { name, 'default-size' : defaultSize = 10, 'default-type' : defaultType = 'inherit' }) {
 
         const { HubService } = this.services();
 

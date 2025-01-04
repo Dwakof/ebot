@@ -3,7 +3,7 @@
 const { ActionRowBuilder, ButtonBuilder, UserSelectMenuBuilder, MentionableSelectMenuBuilder, StringSelectMenuBuilder, ButtonStyle } = require('discord.js');
 const { userMention, inlineCode, roleMention }                                                                                 = require('discord.js');
 
-const { View } = require('../../../core');
+const { View, Util } = require('../../../core');
 
 const { interactions } = require('../interactions/control');
 
@@ -44,8 +44,11 @@ class ControlView extends View {
             .setAuthor({ iconURL : owner.user.displayAvatarURL(), name : `Temporary channel control interface` })
             .addFields([
                 { name : '📢 Public', value : 'Channel is open for everyone to join except blacklisted members', inline : true },
+                { name : '📂 Inherit', value : 'Channel inherit default permission from the category plus allow whitelisted members and block blacklisted members', inline : true },
+                { name : Util.BLANK_CHAR, value : Util.BLANK_CHAR, inline : true },
                 { name : '🔒 Locked', value : 'Channel is visible to everyone except blacklisted members, only whitelisted members can join', inline : true },
                 { name : '🥷 Private', value : 'Channel is hidden, only whitelisted members can see it and join', inline : true },
+                { name : Util.BLANK_CHAR, value : Util.BLANK_CHAR, inline : true },
                 { name : `👑 Owner :`, value : userMention(owner.user.id), inline : true },
                 { name : `🌎 Region :`, value : inlineCode(channel.rtcRegion ?? 'Automatic'), inline : true },
                 { name : `🔢 Limit :`, value : inlineCode(channel.userLimit || '∞'), inline : true },
@@ -64,6 +67,12 @@ class ControlView extends View {
                             .setDisabled(config.type === 'public')
                             .setLabel('Public')
                             .setEmoji({ name : '📢' }),
+                        new ButtonBuilder()
+                            .setCustomId(interactions.setInherit.customId)
+                            .setStyle(config.type === 'inherit' ? ButtonStyle.Primary : ButtonStyle.Secondary)
+                            .setDisabled(config.type === 'inherit')
+                            .setLabel('Inherit')
+                            .setEmoji({ name : '📂' }),
                         new ButtonBuilder()
                             .setCustomId(interactions.setLocked.customId)
                             .setStyle(config.type === 'locked' ? ButtonStyle.Primary : ButtonStyle.Secondary)

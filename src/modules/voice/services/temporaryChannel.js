@@ -1,8 +1,8 @@
 'use strict';
 
 // eslint-disable-next-line no-unused-vars
-const { Snowflake, GuildMember, VoiceChannel, PermissionsBitField, ChannelType } = require('discord.js');
-const { DiscordAPIError }                                                        = require('@discordjs/rest');
+const { Snowflake, GuildMember, VoiceChannel, PermissionsBitField, ChannelType, OverwriteData } = require('discord.js');
+const { DiscordAPIError }                                                                       = require('@discordjs/rest');
 
 const { Service, Util } = require('../../../core');
 
@@ -14,12 +14,12 @@ class TemporaryChannelService extends Service {
 
     /**
      * @typedef {Object} TemporaryChannel
-     * @property {import('discord.js').GuildVoice}                         channel
+     * @property {import('discord.js').VoiceChannel}                       channel
      * @property {import('discord.js').GuildMember}                        owner
      * @property {Object}                                                  config
      * @property {Snowflake}                                                 config.ownerId
      * @property {Snowflake}                                                 config.messageId
-     * @property {'public'|'locked'|'private'}                               config.type
+     * @property {'public'|'inherit'|'locked'|'private'}                     config.type
      * @property {Map<Snowflake, { id : Snowflake, type : 'role'|'user' }>}  config.whitelist
      * @property {Map<Snowflake, { id : Snowflake, type : 'role'|'user' }>}  config.blacklist
      * @property {number}                                                    config.size
@@ -28,7 +28,7 @@ class TemporaryChannelService extends Service {
     static get cron() {
 
         return {
-            build : {
+            cleanupOldChannels : {
                 schedule : '0 */10 * * * *',
                 job      : 'cleanupOldChannels'
             }
@@ -51,12 +51,13 @@ class TemporaryChannelService extends Service {
     }
 
     /**
-     * @param {import('discord.js').Guild}        guild
-     * @param {TemporaryChannel['config']} config
+     * @param {TemporaryChannel} temporaryChannel
      *
      * @returns {import('discord.js').OverwriteResolvable[]}
      */
-    buildPermissions(guild, config) {
+    buildPermissions(temporaryChannel) {
+
+        const { channel, config } = temporaryChannel;
 
         const view = [
             PermissionsBitField.Flags.ReadMessageHistory,
@@ -69,6 +70,7 @@ class TemporaryChannelService extends Service {
             PermissionsBitField.Flags.Speak
         ];
 
+        /** @type {import('discord.js').OverwriteData[]} */
         const permissions = [
             { id : config.ownerId, allow : [...view, ...access] },
             { id : this.client.user.id, allow : [PermissionsBitField.Flags.ManageChannels, ...view, ...access] }
@@ -78,21 +80,36 @@ class TemporaryChannelService extends Service {
 
             case 'public': {
 
-                permissions.push({ id : guild.roles.everyone.id, allow : access });
+                permissions.push({ id : channel.guild.roles.everyone.id, allow : access });
+
+                break;
+            }
+
+            case 'inherit': {
+
+                if (channel.parent) {
+
+                    const parentPermissions = channel.parent.permissionOverwrites.cache.values();
+
+                    for (const overwrite of parentPermissions) {
+
+                        permissions.push(overwrite);
+                    }
+                }
 
                 break;
             }
 
             case 'locked': {
 
-                permissions.push({ id : guild.roles.everyone.id, allow : view, deny : access });
+                permissions.push({ id : channel.guild.roles.everyone.id, allow : view, deny : access });
 
                 break;
             }
 
             case 'private': {
 
-                permissions.push({ id : guild.roles.everyone.id, deny : [...view, ...access] });
+                permissions.push({ id : channel.guild.roles.everyone.id, deny : [...view, ...access] });
 
                 break;
             }
@@ -132,32 +149,32 @@ class TemporaryChannelService extends Service {
         };
 
         const channel = await hub.channel.guild.channels.create({
-            name                 : `${ owner.displayName }'s channel`,
-            type                 : ChannelType.GuildVoice,
-            parent               : hub.channel.parent,
-            userLimit            : config.size,
-            permissionOverwrites : this.buildPermissions(hub.channel.guild, config)
+            name      : `${ owner.displayName }'s channel`,
+            type      : ChannelType.GuildVoice,
+            parent    : hub.channel.parent,
+            userLimit : config.size
         });
 
         const message = await channel.send(ControlView.controlMessage({ channel, owner, config }));
 
         config.messageId = message.id;
 
-        await Promise.all([
-            this.update({ channel, owner, config }),
-            this.store.set('control', channel.guild.id, message.id, { channelId : channel.id })
-        ]);
-
         this.client.logger.info({
             msg      : `Created temporary channel ${ channel.name } in ${ hub.channel.guild.name } for : ${ owner.displayName }`,
             emitter  : `${ this.module }.${ this.id }`,
             event    : 'createTemporaryChannel',
             metadata : {
-                guildId   : hub.guildId,
+                guildId   : channel.guildId,
                 channelId : channel.id,
                 ownerId   : owner.id
             }
         });
+
+        await Promise.all([
+            this.update({ channel, owner, config }),
+            this.updatePermission({ channel, owner, config }),
+            this.store.set('control', channel.guild.id, message.id, { channelId : channel.id })
+        ]);
 
         return { channel, owner, config };
     }
@@ -250,9 +267,20 @@ class TemporaryChannelService extends Service {
     /**
      * @param {TemporaryChannel} temporaryChannel
      */
-    async updatePermission({ channel, config }) {
+    async updatePermission(temporaryChannel) {
 
-        await channel.permissionOverwrites.set(this.buildPermissions(channel.guild, config));
+        await temporaryChannel.channel.permissionOverwrites.set(this.buildPermissions(temporaryChannel));
+
+        this.client.logger.info({
+            msg      : `Updated permission for temporary channel ${ temporaryChannel.channel.name } in ${ temporaryChannel.channel.guild.name }`,
+            emitter  : `${ this.module }.${ this.id }`,
+            event    : 'updatePermissionTemporaryChannel',
+            metadata : {
+                guildId   : temporaryChannel.channel.guildId,
+                channelId : temporaryChannel.channel.id,
+                ownerId   : temporaryChannel.config.ownerId
+            }
+        });
     }
 
     /**

@@ -15,6 +15,7 @@ class Control extends Interaction {
 
         return {
             setPublic  : { method : 'setPublic', customId : 'voice:control:set_public' },
+            setInherit : { method : 'setInherit', customId : 'voice:control:set_inherit' },
             setLocked  : { method : 'setLocked', customId : 'voice:control:set_locked' },
             setPrivate : { method : 'setPrivate', customId : 'voice:control:set_private' },
 
@@ -33,7 +34,7 @@ class Control extends Interaction {
     }
 
     /**
-     * @param {import('discord.js').MessageComponentInteraction}                 interaction
+     * @param {import('discord.js').MessageComponentInteraction}                      interaction
      * @param {function(channel : TemporaryChannel) : Promise<TemporaryChannel|null>} handler
      */
     async handle(interaction, handler) {
@@ -112,6 +113,14 @@ class Control extends Interaction {
     setPublic(interaction) {
 
         return this.changeType(interaction, 'public');
+    }
+
+    /**
+     * @param {import('discord.js').ButtonInteraction} interaction
+     **/
+    setInherit(interaction) {
+
+        return this.changeType(interaction, 'inherit');
     }
 
     /**
