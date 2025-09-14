@@ -1,7 +1,8 @@
 'use strict';
 
 const Knex           = require('knex');
-const { initialize } = require('objection');
+const { initialize, Model, AjvValidator } = require('objection');
+const AjvFormat = require('ajv-formats');
 
 const { KnexAsyncIterator } = require('../../util');
 
@@ -15,6 +16,20 @@ Knex.QueryBuilder.extend('asyncIterator', function () {
     return this;
 });
 
+class ObjectionModel extends Model {
+
+    static createValidator() {
+
+        return new AjvValidator({
+            options : { allowUnionTypes : true },
+            onCreateAjv(ajv) {
+
+                AjvFormat(ajv);
+            }
+        });
+    }
+}
+
 module.exports = class ObjectionProvider {
 
     #knex;
@@ -24,6 +39,8 @@ module.exports = class ObjectionProvider {
      * @type {Object.<Model>}
      */
     #models;
+
+    static ObjectionModel = ObjectionModel;
 
     /**
      *
