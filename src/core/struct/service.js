@@ -16,6 +16,9 @@ class Service {
      */
     client;
 
+    /** @type {import('pino').Logger} */
+    #logger;
+
     /**
      * @param {EbotClient} client
      * @param {String}     module
@@ -26,6 +29,8 @@ class Service {
         this.module = module;
         this.id     = new.target.name;
 
+        this.#logger = client.logger.child({ module : this.module, service : this.id, emitter : `${ this.module }.${ this.id }` });
+
         if (this.constructor.caching) {
 
             this.#caching(this.constructor.caching);
@@ -35,6 +40,11 @@ class Service {
 
             this.#cron(this.constructor.cron);
         }
+    }
+
+    get logger() {
+
+        return this.#logger;
     }
 
     /**
@@ -78,7 +88,7 @@ class Service {
 
             const method = this[methodName];
 
-            this.client.logger.info({
+            this.logger.info({
                 msg     : `${ this.module }.${ this.id } created a cache segment "${ methodName }" with a default ttl of ${ Util.getTimeString(segment.defaultTtl) }`,
                 event   : CoreEvents.CACHE_SEGMENT_CREATED,
                 emitter : 'core'
@@ -152,7 +162,7 @@ class Service {
                 method = this[job];
             }
 
-            this.client.logger.info({
+            this.logger.info({
                 msg     : `${ this.module }.${ this.id } created a schedule "${ schedule }" for cron job ${ cron }`,
                 event   : CoreEvents.SCHEDULE_CREATED,
                 emitter : 'core'
@@ -167,7 +177,7 @@ class Service {
 
                 try {
 
-                    this.client.logger.info({
+                    this.logger.info({
                         msg     : `${ this.module }.${ this.id } Starting job "${ cron }" with id ${ id }`,
                         event   : CoreEvents.SCHEDULE_STARTED,
                         emitter : 'core'
@@ -180,7 +190,7 @@ class Service {
 
                     await method.call(this, this.client);
 
-                    this.client.logger.info({
+                    this.logger.info({
                         msg     : `${ this.module }.${ this.id } Job "${ cron }" with id ${ id } finished in ${ Util.getTimeString(DateTime.now().diff(start)) }`,
                         event   : CoreEvents.SCHEDULE_ENDED,
                         emitter : 'core'
@@ -193,7 +203,7 @@ class Service {
                 }
                 catch (err) {
 
-                    this.client.logger.error({
+                    this.logger.error({
                         msg     : `[${ this.module }.${ this.id }] Job "${ cron }" with id ${ id } failed in ${ Util.getTimeString(DateTime.now().diff(start)) }`,
                         event   : CoreEvents.SCHEDULE_FAILED,
                         emitter : 'core',

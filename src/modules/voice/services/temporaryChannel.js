@@ -159,9 +159,8 @@ class TemporaryChannelService extends Service {
 
         config.messageId = message.id;
 
-        this.client.logger.info({
+        this.logger.info({
             msg      : `Created temporary channel ${ channel.name } in ${ hub.channel.guild.name } for : ${ owner.displayName }`,
-            emitter  : `${ this.module }.${ this.id }`,
             event    : 'createTemporaryChannel',
             metadata : {
                 guildId   : channel.guildId,
@@ -271,9 +270,8 @@ class TemporaryChannelService extends Service {
 
         await temporaryChannel.channel.permissionOverwrites.set(this.buildPermissions(temporaryChannel));
 
-        this.client.logger.info({
+        this.logger.info({
             msg      : `Updated permission for temporary channel ${ temporaryChannel.channel.name } in ${ temporaryChannel.channel.guild.name }`,
-            emitter  : `${ this.module }.${ this.id }`,
             event    : 'updatePermissionTemporaryChannel',
             metadata : {
                 guildId   : temporaryChannel.channel.guildId,
@@ -319,9 +317,8 @@ class TemporaryChannelService extends Service {
             this.store.delete('control', channel.guild.id, temp.value.messageId)
         ]);
 
-        this.client.logger.info({
+        this.logger.info({
             msg      : `Deleted temporary channel ${ channel.name } in ${ channel.guild.name } for : ${ temp.value.ownerId }`,
-            emitter  : `${ this.module }.${ this.id }`,
             event    : 'deleteTemporaryChannel',
             metadata : {
                 guildId   : channel.guildId,
@@ -381,9 +378,8 @@ class TemporaryChannelService extends Service {
                         continue;
                     }
 
-                    this.client.logger.error({
+                    this.logger.error({
                         msg      : `Failed to cleanup temporary channel ${ channelId } in ${ guild.name }`,
-                        emitter  : `${ this.module }.${ this.id }`,
                         event    : 'cleanupOldChannels',
                         metadata : { channelId, guildId : guild.id },
                         err

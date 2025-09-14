@@ -106,7 +106,7 @@ module.exports = class SyncService extends Service {
 
                 task.failed(err);
 
-                this.client.logger.error(err, `Could not sync message for channel ${ channelId }`);
+                this.logger.error(err, `Could not sync message for channel ${ channelId }`);
             }
             finally {
 
@@ -179,7 +179,7 @@ module.exports = class SyncService extends Service {
 
                 task.failed(err);
 
-                this.client.logger.error(err, `Could not sync message for guild ${ guildId }`);
+                this.logger.error(err, `Could not sync message for guild ${ guildId }`);
             }
             finally {
 
@@ -223,7 +223,7 @@ module.exports = class SyncService extends Service {
         }
         catch (err) {
 
-            this.client.logger.error({ msg : `Could not sync guild ${ guildId }`, err });
+            this.logger.error({ msg : `Could not sync guild ${ guildId }`, err });
         }
         finally {
 
@@ -266,7 +266,7 @@ module.exports = class SyncService extends Service {
         }
         catch (err) {
 
-            this.client.logger.error({ msg : `Could not sync channel ${ channelId }`, err });
+            this.logger.error({ msg : `Could not sync channel ${ channelId }`, err });
         }
         finally {
 

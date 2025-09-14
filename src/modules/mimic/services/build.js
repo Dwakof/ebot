@@ -14,6 +14,16 @@ module.exports = class BuildService extends Service {
     static USER_STATE  = 'user_build';
     static GUILD_STATE = 'guild_build';
 
+    static get cron() {
+
+        return {
+            build : {
+                schedule : '0 0 * * * *',
+                job      : 'cronBuild'
+            }
+        };
+    }
+
     /**
      * @param guildId
      * @param type
@@ -55,7 +65,7 @@ module.exports = class BuildService extends Service {
 
                 const model = new Chain();
 
-                this.client.logger.debug(`[${ this.module }.${ this.id }] Building model guildId=${ guildId } type=${ type } id=${ id }`);
+                this.logger.debug(`[${ this.module }.${ this.id }] Building model guildId=${ guildId } type=${ type } id=${ id }`);
 
                 for await (const { content } of messageGenerator(query)) {
 
@@ -72,16 +82,13 @@ module.exports = class BuildService extends Service {
 
                 task.done();
 
-                this.client.logger.debug(`[${ this.module }.${ this.id }] Done building model guildId=${ guildId } type=${ type } id=${ id } took=${ Util.getTimeString(task.took()) }`);
+                this.logger.debug(`[${ this.module }.${ this.id }] Done building model guildId=${ guildId } type=${ type } id=${ id } took=${ Util.getTimeString(task.took()) }`);
             }
             catch (err) {
 
                 task.failed(err);
 
-                this.client.logger.error({
-                    msg : `Could not rebuild model for ${ type } ${ id } in guild ${ guildId }`,
-                    err
-                });
+                this.logger.error({ msg : `Could not rebuild model for ${ type } ${ id } in guild ${ guildId }`, err });
             }
             finally {
 
@@ -200,7 +207,7 @@ module.exports = class BuildService extends Service {
 
                 task.failed(error);
 
-                this.client.logger.error(error, `Could not rebuild model for guild ${ guildId }`);
+                this.logger.error(error, `Could not rebuild model for guild ${ guildId }`);
             }
             finally {
 
@@ -320,7 +327,7 @@ module.exports = class BuildService extends Service {
         }
         catch (err) {
 
-            this.client.logger.error({ msg : `Could not build model for guild ${ guildId }`, err });
+            this.logger.error({ msg : `Could not build model for guild ${ guildId }`, err });
         }
         finally {
 
@@ -340,18 +347,8 @@ module.exports = class BuildService extends Service {
             }
             catch (err) {
 
-                this.client.logger.error({ msg : `Could not build model for guild ${ guildId }`, err });
+                this.logger.error({ msg : `Could not build model for guild ${ guildId }`, err });
             }
         }
-    }
-
-    static get cron() {
-
-        return {
-            build : {
-                schedule : '0 0 * * * *',
-                job      : 'cronBuild'
-            }
-        };
     }
 };
