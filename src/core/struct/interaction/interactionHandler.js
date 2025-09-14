@@ -44,7 +44,7 @@ class InteractionHandler extends AkairoHandler {
 
     setup() {
 
-        this.client.once('ready', () => {
+        this.client.once('clientReady', () => {
 
             this.client.on('interactionCreate', (interaction) => {
 
