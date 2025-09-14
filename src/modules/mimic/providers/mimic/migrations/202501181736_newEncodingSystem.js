@@ -22,7 +22,7 @@ module.exports = {
             table.dropColumns('model');
         });
 
-        await knex.schema.alterTable('reply', (table) => {
+        await knex.schema.alterTable('model', (table) => {
 
             table.json('model');
         });
