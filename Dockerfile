@@ -1,4 +1,4 @@
-FROM node:20.10 AS base
+FROM node:24 AS base
 
 ENV APP_PATH=/app
 

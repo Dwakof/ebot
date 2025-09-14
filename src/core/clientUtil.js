@@ -152,7 +152,6 @@ module.exports = class ClientUtil extends Base {
             _payload = { embeds : [payload] };
         }
 
-
         if (obj instanceof BaseInteraction) {
 
             if (obj.deferred || obj.replied) {

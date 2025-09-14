@@ -23,6 +23,9 @@
 !.github
 !.releaserc.js
 !.eslintignore
+!eslint.config.cjs
+!eslint.config.mjs
+!tsconfig.json
 
 # ADD DOCKER FILES
 !.dockerignore

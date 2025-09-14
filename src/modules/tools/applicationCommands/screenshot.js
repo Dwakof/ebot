@@ -35,9 +35,7 @@ module.exports = class ScreenshotCommand extends ApplicationCommand {
             await reply.edit('📸');
             await reply.edit('📷');
 
-            const buffer = await bufferPromise;
-
-            await reply.edit({ files : [buffer], content : Util.BLANK_CHAR_SPACE });
+            await reply.edit({ files : [await bufferPromise], content : Util.BLANK_CHAR_SPACE });
         }
         catch (error) {
 

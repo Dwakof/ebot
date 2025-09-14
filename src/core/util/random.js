@@ -1,6 +1,6 @@
 'use strict';
 
-const Crypto = require('crypto');
+const Crypto = require('node:crypto');
 
 module.exports = {
 

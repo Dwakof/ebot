@@ -187,6 +187,7 @@ module.exports = class ScreenshotService extends Service {
                             type      : 'invite'
                         });
                     }
+                    // eslint-disable-next-line no-unused-vars
                     catch (error) {
 
                         // This invite link might be expired or invalid, idk what to do other than nothing
@@ -293,7 +294,7 @@ module.exports = class ScreenshotService extends Service {
 
             const element = await page.$('#messages');
 
-            return await page.screenshot({ type : 'png', clip : await element.boundingBox() });
+            return Buffer.from(await page.screenshot({ type : 'png', clip : await element.boundingBox() }));
         }
         finally {
 

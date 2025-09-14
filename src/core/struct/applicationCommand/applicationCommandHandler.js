@@ -242,8 +242,6 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
      */
     async handle(interaction) {
 
-        let transaction;
-
         const { commandName, options } = interaction;
 
         if (!commandName) {
@@ -274,77 +272,52 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
 
         try {
 
-            if (this.client.sentry) {
+            await this.client.sentry.startSpan({
+                op       : `applicationCommand`,
+                name     : `[${ this.client.util.capitalize(applicationCommand.categoryID) }] ${ id }`,
+                metadata : {
+                    method : 'APPLICATION_COMMAND'
+                }
+            }, async () => {
 
-                transaction = this.client.sentry.startTransaction({
-                    op       : `applicationCommand`,
-                    name     : `[${ this.client.util.capitalize(applicationCommand.categoryID) }] ${ id }`,
-                    metadata : {
-                        method : 'APPLICATION_COMMAND'
-                    }
+                const scope = this.client.sentry.getCurrentScope();
+
+                scope.setContext('interaction', {
+                    id        : interaction.id,
+                    channelId : interaction.channelId,
+                    guild     : interaction.member.guild.name,
+                    guildId   : interaction.guildId
                 });
 
-                this.client.sentry.configureScope((scope) => {
+                if (args.length > 0) {
 
-                    scope.setContext('interaction', {
-                        id        : interaction.id,
-                        channelId : interaction.channelId,
-                        guild     : interaction.member.guild.name,
-                        guildId   : interaction.guildId
-                    });
+                    scope.setContext('args', ApplicationCommandHandler.#parsingArgs(interaction, args));
+                }
 
-                    if (args.length > 0) {
-
-                        scope.setContext('args', ApplicationCommandHandler.#parsingArgs(interaction, args));
-                    }
-
-                    scope.setUser({
-                        id       : interaction.user.id,
-                        username : `${ interaction.user.username }#${ interaction.user.discriminator }`
-                    });
-
-                    if (transaction) {
-
-                        scope.setSpan(transaction);
-                    }
+                scope.setUser({
+                    id       : interaction.user.id,
+                    username : `${ interaction.user.username }#${ interaction.user.discriminator }`
                 });
-            }
 
-            this.emit(ApplicationCommandHandler.Events.COMMAND_STARTED, interaction, applicationCommand);
+                this.emit(ApplicationCommandHandler.Events.COMMAND_STARTED, interaction, applicationCommand);
 
-            const reply = await applicationCommand.runCommand(id, interaction);
+                const reply = await applicationCommand.runCommand(id, interaction);
 
-            if (reply instanceof Util.InteractiveReply || reply instanceof Util.Modal) {
+                if (reply instanceof Util.InteractiveReply || reply instanceof Util.Modal) {
 
-                await reply.send();
-            }
+                    await reply.send();
+                }
 
-            this.emit(ApplicationCommandHandler.Events.COMMAND_FINISHED, interaction, applicationCommand);
-
-            if (transaction) {
-
-                transaction.status = 'ok';
-            }
+                this.emit(ApplicationCommandHandler.Events.COMMAND_FINISHED, interaction, applicationCommand);
+            });
         }
         catch (error) {
-
-            if (transaction) {
-
-                transaction.status = 'unknown';
-            }
 
             this.emit(ApplicationCommandHandler.Events.ERROR, error, interaction, applicationCommand);
 
             this.client.handleError(applicationCommand, error);
 
             await this.client.util.send(interaction, 'Whoopsy, something went wrong with the command');
-        }
-        finally {
-
-            if (transaction) {
-
-                transaction.finish();
-            }
         }
     }
 

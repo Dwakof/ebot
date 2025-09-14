@@ -1,7 +1,6 @@
 'use strict';
 
 const Sentry  = require('@sentry/node');
-const Tracing = require('@sentry/tracing');
 
 const Path = require('path');
 const Pino = require('pino');
@@ -56,7 +55,7 @@ module.exports = class EbotClient extends AkairoClient {
                 GatewayIntentBits.GuildMembers,
                 GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.GuildMessageReactions,
-                GatewayIntentBits.GuildEmojisAndStickers,
+                GatewayIntentBits.GuildExpressions,
                 GatewayIntentBits.GuildVoiceStates,
                 GatewayIntentBits.MessageContent
             ]
@@ -74,8 +73,8 @@ module.exports = class EbotClient extends AkairoClient {
             Sentry.init({
                 ...this.#settings.core.sentry,
                 integrations : [
-                    new Sentry.Integrations.Http({ tracing : true }),
-                    new Tracing.Integrations.Postgres()
+                    Sentry.httpIntegration(),
+                    Sentry.postgresIntegration()
                 ]
             });
 
@@ -275,20 +274,6 @@ module.exports = class EbotClient extends AkairoClient {
             module.loadAll();
         }
 
-        this.#initialized = true;
-
-        this.logger.debug({ msg : 'Ebot core is initialized', event : 'initialized', emitter : 'core' });
-
-        return this;
-    }
-
-    async start() {
-
-        if (!this.#initialized) {
-
-            await this.initialize();
-        }
-
         this.API.on('response', ({ method, route }, { status, statusText }) => {
 
             this.logger.debug({
@@ -306,11 +291,6 @@ module.exports = class EbotClient extends AkairoClient {
                 emitter : 'client.rest'
             });
         });
-
-        for (const [, { module }] of this.#modules.entries()) {
-
-            await module.init();
-        }
 
         if (this.#listenerHandler) {
 
@@ -371,6 +351,28 @@ module.exports = class EbotClient extends AkairoClient {
                 event   : CoreEvents.INTERACTION_HANDLER_REGISTERED,
                 emitter : 'core'
             });
+        }
+
+        this.#initialized = true;
+
+        this.logger.debug({ msg : 'Ebot core is initialized', event : 'initialized', emitter : 'core' });
+
+        return this;
+    }
+
+    async initModules() {
+
+        for (const [, { module }] of this.#modules.entries()) {
+
+            await module.init();
+        }
+    }
+
+    async start() {
+
+        if (!this.#initialized) {
+
+            await this.initialize();
         }
 
         await this.login(this.#settings.core.discord.token);
@@ -498,12 +500,9 @@ module.exports = class EbotClient extends AkairoClient {
 
         if (this.sentry) {
 
-            this.sentry.configureScope((scope) => {
-
-                scope.setContext('module', {
-                    categoryID : module.categoryID,
-                    id         : module.id
-                });
+            this.sentry.getCurrentScope().setContext('module', {
+                categoryID : module.categoryID,
+                id         : module.id
             });
 
             this.sentry.captureException(error);
