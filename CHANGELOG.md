@@ -1,3 +1,17 @@
+# [0.28.0](https://github.com/Dwakof/ebot/compare/v0.27.0...v0.28.0) (2025-01-04)
+
+
+### Bug Fixes
+
+* make voice application commands global ([8a6e80c](https://github.com/Dwakof/ebot/commit/8a6e80c5e53e7242e674c70289c109b198ecf40f))
+* proper cronjob name for cleaning up old channels ([1474826](https://github.com/Dwakof/ebot/commit/147482685bc5b2c1d54e389ba56ad7c97397d767))
+
+
+### Features
+
+* Add new permission type `inherit` to temporary voice channels ([687c6de](https://github.com/Dwakof/ebot/commit/687c6de9317120f2c66c00c78c32c83315f86d4f))
+* listen to category's permissions change to rebuild permissions of its children with type `inherit` ([8417136](https://github.com/Dwakof/ebot/commit/84171362d9323912559c79b04ac604262eda6063))
+
 # [0.27.0](https://github.com/Dwakof/ebot/compare/v0.26.0...v0.27.0) (2024-01-02)
 
 
