@@ -2,23 +2,24 @@
 
 const { Util } = require('../../../core');
 
+const Zstd = require('@mongodb-js/zstd');
+
 const State = require('./state');
 const Model = require('./model');
 
-module.exports = class Chain {
+const Encoder = require('./encoder.mts');
+
+class Chain {
 
     static BEGIN = '¶BEGIN¶';
     static END   = '¶END¶';
 
-    /**
-     * @type {Number}
-     */
-    order;
+    static operand = Util.memoize((v) => (Math.round(10 * Math.log(v) / Math.LN10) || 1));
 
     /**
-     * @type {boolean}
+     * @type {number}
      */
-    compiled;
+    order;
 
     /**
      * @type {Model}
@@ -27,7 +28,7 @@ module.exports = class Chain {
 
     /**
      *
-     * @param {Number} [order=3]
+     * @param {number} [order=2]
      * @param {Model}  [model]
      */
     constructor(order = 2, model) {
@@ -41,13 +42,127 @@ module.exports = class Chain {
         else {
 
             this.model = new Model();
-        }
 
-        this.compiled = false;
+            this.model.dictionary.addWord(Chain.BEGIN);
+        }
+    }
+
+    get beginStateValue() {
+
+        return Array(this.order).fill(Chain.BEGIN);
+    }
+
+    get beginState() {
+
+        return this.model.buildState(this.beginStateValue);
     }
 
     /**
-     * @param {Array<String>|Buffer|String} corpus
+     * @private
+     * @param {import('./encoder.mts').Chain & import('./encoder.mjs').BebopRecord} chain
+     * @returns {Chain}
+     */
+    static fromBebopObject(chain) {
+
+        const model = new Model();
+
+        model.states = chain.model.states;
+
+        for (const [word, id] of chain.model.dictionary) {
+
+            model.dictionary.set(word, id);
+        }
+
+        return new Chain(chain.order, model);
+    }
+
+    /**
+     * @param {string} string
+     *
+     * @return {Chain}
+     */
+    static fromJSON(string) {
+
+        return Chain.fromBebopObject(Encoder.Chain.fromJSON(string));
+    }
+
+    /**
+     * @param {Buffer} buffer
+     * @returns {Promise<Chain>}
+     */
+    static async decode(buffer) {
+
+        const data = await Zstd.decompress(buffer);
+
+        return Chain.fromBebopObject(Encoder.Chain.decode(data));
+    }
+
+    /**
+     * @template T,V
+     * @param {Map<T,V>} map
+     *
+     * @return {[T[], { total : number, results : number[] }]}
+     */
+    static compileNext(map) {
+
+        return [Array.from(map.keys()), Chain.accumulate(Array.from(map.values()))];
+    }
+
+    /**
+     * @template T
+     * @param {Array<T>} array
+     *
+     * @return {{ total : number, results : number[] }}
+     */
+    static accumulate(array) {
+
+        return array.reduce((acc, value) => {
+
+            acc.total = acc.total + Chain.operand(value);
+            acc.results.push(acc.total);
+
+            return acc;
+
+        }, { total : 0, results : [] });
+    }
+
+    /**
+     * returns an insertion point which comes after (to the right of) any existing entries of `value` in `array`.
+     *
+     * @template T
+     * @param {Array<T>}    array
+     * @param {T}           value
+     * @param {number}      [low=0]
+     * @param {number|null} [high=null]
+     *
+     * @return {number} index
+     */
+    static bisect(array, value, low = 0, high = null) {
+
+        if (high === null) {
+
+            high = array.length;
+        }
+
+        while (low < high) {
+
+            const middle = Math.floor((low + high) / 2);
+
+            if (value < array[middle]) {
+
+                high = middle;
+            }
+            else {
+
+                low = middle + 1;
+            }
+        }
+
+        return low;
+    }
+
+    /**
+     * @param {Array<string>|Buffer|string} corpus
      *
      * @return {Chain}
      */
@@ -75,7 +190,7 @@ module.exports = class Chain {
 
                 for (let i = 0; i < words.length + 1; ++i) {
 
-                    const state  = State.fromValue(items.slice(i, i + this.order));
+                    const state  = this.model.buildState(items.slice(i, i + this.order));
                     const follow = items[i + this.order];
 
                     this.model.increase(state, follow);
@@ -99,7 +214,7 @@ module.exports = class Chain {
     /**
      * @param {State} state
      *
-     * @return {String} word
+     * @return {number} id
      */
     move(state) {
 
@@ -109,13 +224,15 @@ module.exports = class Chain {
     }
 
     /**
-     * @param {State|String} [initState]
+     * @param {State|string} [initState]
      *
-     * @return {Generator<String, void, *>}
+     * @return {Generator<string, void, *>}
      */
     * gen(initState = this.beginState) {
 
         let state = initState;
+
+        const ending = this.model.dictionary.getId(Chain.END);
 
         if (typeof state === 'string' || state instanceof String) {
 
@@ -126,7 +243,7 @@ module.exports = class Chain {
                 ...words.filter((word) => ![Chain.END, Chain.BEGIN].includes(word))
             ];
 
-            state = State.fromValue(items.slice(-1 * this.order));
+            state = this.model.buildState(items.slice(-1 * this.order));
 
             if (this.model.has(state)) {
 
@@ -138,80 +255,30 @@ module.exports = class Chain {
             }
         }
 
-        let word;
+        let wordId;
 
         do {
 
-            word = this.move(state);
+            wordId = this.move(state);
 
-            if (word !== Chain.END) {
+            if (wordId !== ending) {
 
-                yield word;
+                yield this.model.dictionary.getWord(wordId);
 
-                state = State.fromValue([...state.value.slice(1), word]);
+                state = new State([...state.values.slice(1), wordId]);
             }
 
-        } while (word !== Chain.END);
+        } while (wordId !== ending);
     }
 
     /**
-     * @param {State|String} [initState]
+     * @param {State|string} [initState]
      *
-     * @return {String[]}
+     * @return {string[]}
      */
     walk(initState) {
 
         return [...this.gen(initState)];
-    }
-
-    /**
-     * return {Object} serialized object
-     */
-    toJSON() {
-
-        return { order : this.order, model : this.model.serialize() };
-    }
-
-    /**
-     * @param {String|Buffer|Object} object
-     *
-     * @return {Chain} chain
-     */
-    static fromJSON(object) {
-
-        if (Buffer.isBuffer(object)) {
-
-            return Chain.fromJSON(object.toString());
-        }
-
-        if (typeof object === 'string' || object instanceof String) {
-
-            return Chain.fromJSON(JSON.parse(object));
-        }
-
-        const model = Model.deserialize(object.model);
-
-        return new Chain(object.order, model);
-    }
-
-    get beginStateValue() {
-
-        return Array(this.order).fill(Chain.BEGIN);
-    }
-
-    get beginState() {
-
-        return State.fromValue(this.beginStateValue);
-    }
-
-    /**
-     * @param {Map} map
-     *
-     * @return {Array}
-     */
-    static compileNext(map) {
-
-        return [Array.from(map.keys()), Chain.accumulate(Array.from(map.values()))];
     }
 
     /**
@@ -223,57 +290,35 @@ module.exports = class Chain {
      */
 
     /**
-     * @template T
-     * @param {Array<T>} array
-     *
-     * @return {Array<T>}
+     * @private
+     * @returns {import('./encoder.mts').Chain}
      */
-    static accumulate(array) {
+    getEncoder() {
 
-        return array.reduce((acc, value) => {
-
-            acc.total = acc.total + Chain.operand(value);
-            acc.results.push(acc.total);
-
-            return acc;
-
-        }, { total : 0, results : [] });
+        return Encoder.Chain({
+            order : this.order,
+            model : {
+                states     : this.model.states,
+                dictionary : this.model.dictionary.words
+            }
+        });
     }
 
     /**
-     * returns an insertion point which comes after (to the right of) any existing entries of `value` in `array`.
-     *
-     * @template T
-     * @param {Array<T>} array
-     * @param {T} value
-     * @param {Number} [low=0]
-     * @param {Number} [high=null]
-     *
-     * @return {Number} index
+     * @return {string} serialized object
      */
-    static bisect(array, value, low = 0, high = null) {
+    stringify() {
 
-        if (high === null) {
-
-            high = array.length;
-        }
-
-        while (low < high) {
-
-            const middle = Math.floor((low + high) / 2);
-
-            if (value < array[middle]) {
-
-                high = middle;
-            }
-            else {
-
-                low = middle + 1;
-            }
-        }
-
-        return low;
+        return this.getEncoder().stringify();
     }
 
-    static operand = Util.memoize((v) => (Math.round(10 * Math.log(v) / Math.LN10) || 1));
-};
+    /**
+     * @returns {Promise<Buffer>}
+     */
+    encode() {
+
+        return Zstd.compress(this.getEncoder().encode(), 10);
+    }
+}
+
+module.exports = Chain;

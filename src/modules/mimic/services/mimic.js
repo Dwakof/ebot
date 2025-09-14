@@ -6,15 +6,27 @@ const { Chain } = require('../utils');
 
 module.exports = class MimicService extends Service {
 
+    static get caching() {
+
+        return {
+            getModel : {
+                cache : {
+                    ttl : 30 * Util.SECOND,
+                    max : 5
+                }
+            }
+        };
+    }
+
     async getModel(guildId, userId) {
 
         const { Mimic } = this.providers();
 
         const { Model } = Mimic.models;
 
-        const { model : json } = await Model.query().findById([guildId, userId]).throwIfNotFound();
+        const { model : buffer } = await Model.query().findById([guildId, userId]).throwIfNotFound();
 
-        return Chain.fromJSON(json);
+        return Chain.decode(buffer);
     }
 
     async mimic(guildId, userId, initialState = '', retry = 5) {
@@ -38,18 +50,6 @@ module.exports = class MimicService extends Service {
         }
 
         return response;
-    }
-
-    static get caching() {
-
-        return {
-            getModel : {
-                cache : {
-                    ttl : 30 * Util.SECOND,
-                    max : 5
-                }
-            }
-        };
     }
 };
 

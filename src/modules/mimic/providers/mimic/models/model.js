@@ -14,11 +14,6 @@ class Model extends ObjectionProvider.ObjectionModel {
         return ['guildId', 'userId'];
     }
 
-    static get jsonAttributes() {
-
-        return ['model'];
-    }
-
     static get jsonSchema() {
 
         return {
@@ -28,7 +23,7 @@ class Model extends ObjectionProvider.ObjectionModel {
             properties : {
                 guildId   : { type : 'string' },
                 userId    : { type : 'string' },
-                model     : { type : 'object' },
+                model     : { type : ['object', 'string'] },
                 createdAt : { type : ['object', 'number', 'string'], format : 'date' },
                 updatedAt : { type : ['object', 'number', 'string'], format : 'date' }
             }

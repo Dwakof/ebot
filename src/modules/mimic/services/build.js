@@ -77,8 +77,8 @@ module.exports = class BuildService extends Service {
                     task.increase('messages');
                 }
 
-                await Model.query().insert({ guildId, userId : id, model : model.toJSON() })
-                    .onConflict(Model.idColumn).merge();
+                await Model.query().insert({ guildId, userId : id, model : await model.encode() })
+                    .onConflict(Model.idColumn).merge(['model', 'updatedAt']);
 
                 task.done();
 

@@ -1,0 +1,10 @@
+
+struct Chain {
+    uint16 order;
+    Model model;
+}
+
+struct Model {
+    map[float64, map[float64, uint32]] states;
+    map[string, float64] dictionary;
+}
