@@ -96,7 +96,6 @@ module.exports = class Weather extends ApplicationCommand {
                 AirQualityService.getAirQualityData(location.lat, location.lon)
             ]);
 
-            console.dir({ weather, airQuality }, { depth : null });
 
             const embeds = [
                 { label : 'Current', embed : CurrentWeatherView.render(weather, airQuality, location) },

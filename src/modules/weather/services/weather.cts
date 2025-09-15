@@ -138,7 +138,7 @@ class WeatherService extends ServiceApi {
 
             weather.daily.push({
                 day                 : new Date(day + 'Z'),
-                code                : data.hourly.weather_code[idx],
+                code                : data.daily.weather_code[idx],
                 sunrise             : new Date(data.daily.sunrise[idx] as string + 'Z'),
                 sunset              : new Date(data.daily.sunset[idx] as string + 'Z'),
                 humidity            : data.daily.relative_humidity_2m_mean[idx] as number,

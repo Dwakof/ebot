@@ -100,7 +100,7 @@ module.exports = class WeatherForecastView extends View {
             rows.push(`:wind_chime: ${ inlineCode(`${ CommonView.speed(day.wind.speed) } ${ CommonView.toCardinalDirection(day.wind.direction) }`) }`);
         }
 
-        if (day.wind.speed !== 0) {
+        if (day.wind.gusts) {
 
             rows.push(`:dash: ${ inlineCode(CommonView.speed(day.wind.gusts)) }`);
         }
