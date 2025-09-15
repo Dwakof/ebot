@@ -7,13 +7,13 @@ const { time : Time, TimestampStyles, inlineCode } = require('discord.js');
 module.exports = class WeatherForecastView extends View {
 
     /**
-     * @param {Array<WeatherForecastDay>} daily
-     * @param {Location}                  location
-     * @param {Number}                    [maxDays=5]
+     * @param {import('../services/weather.cts').WeatherData} weather
+     * @param {Location}                                      location
+     * @param {number}                                        [maxDays=5]
      *
      * @return {EmbedBuilder}
      */
-    daily(daily, location, maxDays = 5) {
+    daily(weather, location, maxDays = 5) {
 
         const { CommonView } = this.views();
 
@@ -21,7 +21,7 @@ module.exports = class WeatherForecastView extends View {
 
         embed.setDescription(Util.BLANK_CHAR);
 
-        for (const day of daily.slice(0, maxDays)) {
+        for (const day of weather.daily.slice(0, maxDays)) {
 
             this.weather(embed, day);
             this.temperature(embed, day, Util.BLANK_CHAR);
@@ -31,72 +31,78 @@ module.exports = class WeatherForecastView extends View {
         return embed;
     }
 
-    weather(embed, day = {}) {
+    /**
+     * @param {EmbedBuilder}                                       embed
+     * @param {import('../services/weather.cts').DailyWeatherData} day
+     * @return {EmbedBuilder}
+     */
+    weather(embed, day) {
 
         const { CommonView } = this.views();
 
-        const { sunrise, sunset, dt, weather = [], moon_phase } = day;
-
-        const rows = [];
-
-        rows.push(`${ Time(sunrise, TimestampStyles.ShortTime) } ➞ ${ Time(sunset, TimestampStyles.ShortTime) }`);
-
-        for (const w of weather) {
-
-            rows.push(`${ CommonView.conditionToEmoji(w, true) } ${ inlineCode(w.description) }`);
-        }
-
         return embed.addFields([
             {
-                name   : `${ Time(dt, TimestampStyles.LongDate) } ${ CommonView.moon(moon_phase ?? -1) }`,
-                value  : rows.join('\n'),
-                inline : true
-            }
-        ]);
-    }
-
-    temperature(embed, day, title = 'Temperature') {
-
-        const { CommonView } = this.views();
-
-        const { temp, feels_like } = day;
-
-        return embed.addFields([
-            {
-                name   : title,
+                name   : Time(day.day, TimestampStyles.LongDate),
                 value  : [
-                    `:thermometer: ${ inlineCode(`${ CommonView.temperature(temp.min) }, ${ CommonView.temperature(temp.max) }`) }`,
-                    `:dash: ${ inlineCode(`${ CommonView.temperature(feels_like.morn) }, ${ CommonView.temperature(feels_like.eve) }`) }`
+                    `${ Time(day.sunrise, TimestampStyles.ShortTime) } ➞ ${ Time(day.sunset, TimestampStyles.ShortTime) }`,
+                    CommonView.wmoCodeToString(day.code)
                 ].join('\n'),
                 inline : true
             }
         ]);
     }
 
+    /**
+     * @param {EmbedBuilder}                                       embed
+     * @param {import('../services/weather.cts').DailyWeatherData} day
+     * @param {string}                                             [title]
+     * @return {EmbedBuilder}
+     */
+    temperature(embed, day, title = 'Temperature') {
+
+        const { CommonView } = this.views();
+
+        return embed.addFields([
+            {
+                name   : title,
+                value  : [
+                    `:thermometer: ${ inlineCode(`${ CommonView.temperature(day.temperature.min) }, ${ CommonView.temperature(day.temperature.max) }`) }`,
+                    `:dash: ${ inlineCode(`${ CommonView.temperature(day.apparentTemperature.min) }, ${ CommonView.temperature(day.apparentTemperature.max) }`) }`
+                ].join('\n'),
+                inline : true
+            }
+        ]);
+    }
+
+    /**
+     * @param {EmbedBuilder}                                       embed
+     * @param {import('../services/weather.cts').DailyWeatherData} day
+     * @param {string}                                             [title]
+     * @return {EmbedBuilder}
+     */
     air(embed, day, title = 'Air') {
 
         const { CommonView }     = this.views();
-        const { WeatherService } = this.services();
-
-        const { humidity, pressure, wind_speed = 0, wind_deg = -1, wind_gust = 0 } = day;
 
         const rows = [];
 
-        if (humidity) {
-            rows.push(`:droplet: ${ inlineCode(`${ humidity } %`.padStart(5, ' ')) } ${ inlineCode(`${ pressure } hPa`) }`);
+        if (day.humidity) {
+
+            rows.push(`:droplet: ${ inlineCode(`${ Math.round(day.humidity) } %`.padStart(5, ' ')) } ${ inlineCode(`${ Math.round(day.pressure) } hPa`) }`);
         }
 
-        if (!wind_speed) {
+        if (day.wind.speed === 0) {
 
             rows.push(`:wind_chime: ${ inlineCode('no wind') }`);
         }
         else {
 
-            rows.push(`:wind_chime: ${ inlineCode(`${ CommonView.speed(wind_speed) } ${ WeatherService.toDirection(wind_deg) }`) }`);
+            rows.push(`:wind_chime: ${ inlineCode(`${ CommonView.speed(day.wind.speed) } ${ CommonView.toCardinalDirection(day.wind.direction) }`) }`);
         }
 
-        if (wind_gust) {
-            rows.push(`:dash: ${ inlineCode(CommonView.speed(wind_gust)) }`);
+        if (day.wind.speed !== 0) {
+
+            rows.push(`:dash: ${ inlineCode(CommonView.speed(day.wind.gusts)) }`);
         }
 
         rows.push(Util.BLANK_CHAR);

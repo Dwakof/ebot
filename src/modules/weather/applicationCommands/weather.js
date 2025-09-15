@@ -64,8 +64,8 @@ module.exports = class Weather extends ApplicationCommand {
 
         await interaction.deferReply();
 
-        const { LocationService, WeatherService, HistoryService }                       = this.services();
-        const { CurrentWeatherView, WeatherForecastView, WeatherAlertView, CommonView } = this.views();
+        const { LocationService, WeatherService, AirQualityService, HistoryService } = this.services();
+        const { CurrentWeatherView, WeatherForecastView, CommonView }                = this.views();
 
         let location;
 
@@ -91,27 +91,29 @@ module.exports = class Weather extends ApplicationCommand {
 
         try {
 
-            const [{ current, daily, alerts }, { list : [airQuality] }] = await Promise.all([
-                WeatherService.oneCall(location.lat, location.lon),
-                WeatherService.airQuality(location.lat, location.lon)
+            const [weather, airQuality] = await Promise.all([
+                WeatherService.getWeatherData(location.lat, location.lon),
+                AirQualityService.getAirQualityData(location.lat, location.lon)
             ]);
 
+            console.dir({ weather, airQuality }, { depth : null });
+
             const embeds = [
-                { label : 'Current', embed : CurrentWeatherView.render(current, airQuality, location) },
-                { label : 'Forecast', embed : WeatherForecastView.daily(daily, location) }
+                { label : 'Current', embed : CurrentWeatherView.render(weather, airQuality, location) },
+                { label : 'Forecast', embed : WeatherForecastView.daily(weather, location) }
             ];
 
-            if (alerts?.length > 0) {
-
-                embeds.push({
-                    label : 'Alerts',
-                    embed : WeatherAlertView.render(alerts, location),
-                    style : {
-                        selected   : ButtonStyle.Danger,
-                        unselected : ButtonStyle.Danger
-                    }
-                });
-            }
+            // if (alerts?.length > 0) {
+            //
+            //     embeds.push({
+            //         label : 'Alerts',
+            //         embed : WeatherAlertView.render(alerts, location),
+            //         style : {
+            //             selected   : ButtonStyle.Danger,
+            //             unselected : ButtonStyle.Danger
+            //         }
+            //     });
+            // }
 
             return new Util.DashboardEmbeds(interaction, embeds);
         }

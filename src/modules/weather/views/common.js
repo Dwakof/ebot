@@ -1,148 +1,86 @@
 'use strict';
 
-const { View }       = require('../../../core');
 const { inlineCode } = require('discord.js');
 
-module.exports = class CommonView extends View {
+const { View, Util } = require('../../../core');
 
-    static EMOJI_MAPPING = {
-        day   : {
-            // Thunderstorm
-            200 : '⛈', // thunderstorm with light rain
-            201 : '⛈', // thunderstorm with rain
-            202 : '⛈', // thunderstorm with heavy rain
-            210 : '🌩', // light thunderstorm
-            211 : '🌩', // thunderstorm
-            212 : '🌩', // heavy thunderstorm
-            221 : '⛈', // ragged thunderstorm
-            230 : '⛈', // thunderstorm with light drizzle
-            231 : '⛈', // thunderstorm with drizzle
-            232 : '⛈', // thunderstorm with heavy drizzle
-            // Drizzle
-            300 : '🌧', // light intensity drizzle
-            301 : '🌧', // drizzle
-            302 : '🌧', // heavy intensity drizzle
-            310 : '🌧', // light intensity drizzle rain
-            311 : '🌧', // drizzle rain
-            312 : '🌧', // heavy intensity drizzle rain
-            313 : '🌧', // shower rain and drizzle
-            314 : '🌧', // heavy shower rain and drizzle
-            321 : '🌧', // shower drizzle
-            // Rain
-            500 : '🌦', // light rain
-            501 : '🌦', // moderate rain
-            502 : '🌦', // heavy intensity rain
-            503 : '🌦', // very heavy rain
-            504 : '🌦', // extreme rain
-            511 : '🌨', // freezing rain
-            520 : '🌧', // light intensity shower rain
-            521 : '🌧', // shower rain
-            522 : '🌧', // heavy intensity shower rain
-            531 : '🌧', // ragged shower rain
-            // Snow
-            600 : '🌨', // light snow
-            601 : '🌨', // snow
-            602 : '🌨', // heavy snow
-            611 : '🌨', // sleet
-            612 : '🌨', // light shower sleet
-            613 : '🌨', // shower sleet
-            615 : '🌨', // light rain and snow
-            616 : '🌨', // rain and snow
-            620 : '🌨', // light shower snow
-            621 : '🌨', // shower snow
-            622 : '🌨', // heavy shower snow
-            // Atmosphere
-            701 : '🌫',   // mist
-            711 : '🌫',   // smoke
-            721 : '🌫',   // haze
-            731 : '🌫',   // sand, dust whirls
-            741 : '🌫',   // fog
-            751 : '🌫',   // sand
-            761 : '🌫',   // dust
-            762 : '🌋🌫', // volcanic ash
-            771 : '🌫',   // squalls
-            781 : '🌪',   // tornado
-            // Clouds
-            800 : '☀', // clear sky
-            801 : '🌤', // few clouds
-            802 : '⛅', // scattered clouds
-            803 : '🌥', // broken clouds
-            804 : '☁' // overcast clouds
-        },
-        night : {
-            // Thunderstorm
-            200 : '⛈', // thunderstorm with light rain
-            201 : '⛈', // thunderstorm with rain
-            202 : '⛈', // thunderstorm with heavy rain
-            210 : '🌩', // light thunderstorm
-            211 : '🌩', // thunderstorm
-            212 : '🌩', // heavy thunderstorm
-            221 : '⛈', // ragged thunderstorm
-            230 : '⛈', // thunderstorm with light drizzle
-            231 : '⛈', // thunderstorm with drizzle
-            232 : '⛈', // thunderstorm with heavy drizzle
-            // Drizzle
-            300 : '🌧', // light intensity drizzle
-            301 : '🌧', // drizzle
-            302 : '🌧', // heavy intensity drizzle
-            310 : '🌧', // light intensity drizzle rain
-            311 : '🌧', // drizzle rain
-            312 : '🌧', // heavy intensity drizzle rain
-            313 : '🌧', // shower rain and drizzle
-            314 : '🌧', // heavy shower rain and drizzle
-            321 : '🌧', // shower drizzle
-            // Rain
-            500 : '🌦', // light rain
-            501 : '🌦', // moderate rain
-            502 : '🌦', // heavy intensity rain
-            503 : '🌦', // very heavy rain
-            504 : '🌦', // extreme rain
-            511 : '🌨', // freezing rain
-            520 : '🌧', // light intensity shower rain
-            521 : '🌧', // shower rain
-            522 : '🌧', // heavy intensity shower rain
-            531 : '🌧', // ragged shower rain
-            // Snow
-            600 : '🌨', // light snow
-            601 : '🌨', // snow
-            602 : '🌨', // heavy snow
-            611 : '🌨', // sleet
-            612 : '🌨', // light shower sleet
-            613 : '🌨', // shower sleet
-            615 : '🌨', // light rain and snow
-            616 : '🌨', // rain and snow
-            620 : '🌨', // light shower snow
-            621 : '🌨', // shower snow
-            622 : '🌨', // heavy shower snow
-            // Atmosphere
-            701 : '🌫',   // mist
-            711 : '🌫',   // smoke
-            721 : '🌫',   // haze
-            731 : '🌫',   // sand, dust whirls
-            741 : '🌫',   // fog
-            751 : '🌫',   // sand
-            761 : '🌫',   // dust
-            762 : '🌋🌫', // volcanic ash
-            771 : '🌫',   // squalls
-            781 : '🌪',   // tornado
-            // Clouds
-            800 : '🌙', // clear sky
-            801 : '🌙', // few clouds
-            802 : '☁', // scattered clouds
-            803 : '☁', // broken clouds
-            804 : '☁' // overcast clouds
-        }
+class CommonView extends View {
+
+    static AQI_THRESHOLD   = [100, 80, 60, 40, 20, 0];
+    static AQI_DESCRIPTION = ['Good', 'Fair', 'Moderate', 'Poor', 'Very poor', 'Extremely poor'];
+    static AQI_TO_EMOJI    = [
+        ['🌳', '🌲', '🌴', '🎋'],
+        ['🙂'],
+        ['😐'],
+        ['🙁'],
+        ['😷'],
+        ['🧟']
+    ];
+
+    static UVI_THRESHOLD   = [11, 8, 6, 3, 0];
+    static UVI_DESCRIPTION = ['Low', 'Moderate', 'High', 'Very High', 'Extreme'];
+
+    static WME_MAPPING = {
+        0  : { owm : '01', emoji : { day : '☀', night : '🌙' }, description : { day : 'Sunny', night : 'Clear' } },
+        1  : { owm : '01', emoji : { day : '🌤', night : '🌙' }, description : { day : 'Mainly Sunny', night : 'Mainly Clear' } },
+        2  : { owm : '02', emoji : { day : '⛅', night : '☁' }, description : { day : 'Partly Cloudy', night : 'Partly Cloudy' } },
+        3  : { owm : '03', emoji : { day : '☁', night : '☁' }, description : { day : 'Cloudy', night : 'Cloudy' } },
+        45 : { owm : '50', emoji : { day : '🌫', night : '🌫' }, description : { day : 'Foggy', night : 'Foggy' } },
+        48 : { owm : '50', emoji : { day : '🌫', night : '🌫' }, description : { day : 'Rime Fog', night : 'Rime Fog' } },
+        51 : { owm : '09', emoji : { day : '🌧', night : '🌧' }, description : { day : 'Light Drizzle', night : 'Light Drizzle' } },
+        53 : { owm : '09', emoji : { day : '🌧', night : '🌧' }, description : { day : 'Drizzle', night : 'Drizzle' } },
+        55 : { owm : '09', emoji : { day : '🌧', night : '🌧' }, description : { day : 'Heavy Drizzle', night : 'Heavy Drizzle' } },
+        56 : { owm : '09', emoji : { day : '🌧', night : '🌧' }, description : { day : 'Light Freezing Drizzle', night : 'Light Freezing Drizzle' } },
+        57 : { owm : '09', emoji : { day : '🌧', night : '🌧' }, description : { day : 'Freezing Drizzle', night : 'Freezing Drizzle' } },
+        61 : { owm : '10', emoji : { day : '🌧', night : '🌧' }, description : { day : 'Light Rain', night : 'Light Rain' } },
+        63 : { owm : '10', emoji : { day : '🌧', night : '🌧' }, description : { day : 'Rain', night : 'Rain' } },
+        65 : { owm : '10', emoji : { day : '🌧', night : '🌧' }, description : { day : 'Heavy Rain', night : 'Heavy Rain' } },
+        66 : { owm : '10', emoji : { day : '🌧', night : '🌧' }, description : { day : 'Light Freezing Rain', night : 'Light Freezing Rain' } },
+        67 : { owm : '10', emoji : { day : '🌧', night : '🌧' }, description : { day : 'Freezing Rain', night : 'Freezing Rain' } },
+        71 : { owm : '13', emoji : { day : '🌨', night : '🌨' }, description : { day : 'Light Snow', night : 'Light Snow' } },
+        73 : { owm : '13', emoji : { day : '🌨', night : '🌨' }, description : { day : 'Snow', night : 'Snow' } },
+        75 : { owm : '13', emoji : { day : '🌨', night : '🌨' }, description : { day : 'Heavy Snow', night : 'Heavy Snow' } },
+        77 : { owm : '13', emoji : { day : '🌨', night : '🌨' }, description : { day : 'Snow Grains', night : 'Snow Grains' } },
+        80 : { owm : '09', emoji : { day : '🌧', night : '🌧' }, description : { day : 'Light Showers', night : 'Light Showers' } },
+        81 : { owm : '09', emoji : { day : '🌧', night : '🌧' }, description : { day : 'Showers', night : 'Showers' } },
+        82 : { owm : '09', emoji : { day : '🌧', night : '🌧' }, description : { day : 'Heavy Showers', night : 'Heavy Showers' } },
+        85 : { owm : '13', emoji : { day : '🌨', night : '🌨' }, description : { day : 'Light Snow Showers', night : 'Light Snow Showers' } },
+        86 : { owm : '13', emoji : { day : '🌨', night : '🌨' }, description : { day : 'Snow Showers', night : 'Snow Showers' } },
+        95 : { owm : '11', emoji : { day : '🌩', night : '🌩' }, description : { day : 'Thunderstorm', night : 'Thunderstorm' } },
+        96 : { owm : '11', emoji : { day : '⛈', night : '⛈' }, description : { day : 'Light Thunderstorms With Hail', night : 'Light Thunderstorms With Hail' } },
+        99 : { owm : '11', emoji : { day : '⛈', night : '⛈' }, description : { day : 'Thunderstorm With Hail', night : 'Thunderstorm With Hail' } }
     };
 
-    temperature(temperature) {
+    CardinalDirection        = ['N', 'E', 'S', 'W'];
+    IntercardinalDirection   = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    SixteenCardinalDirection = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
 
-        const { WeatherService } = this.services();
+    /**
+     * @param {number}   degree
+     * @param {string[]} [cardinalDirections]
+     *
+     * @return {string}
+     */
+    toCardinalDirection(degree, cardinalDirections = this.IntercardinalDirection) {
 
-        const celsius = WeatherService.kelvinToCelsius(temperature);
+        const cardinalSize = 360 / cardinalDirections.length;
 
-        return `${ celsius }°C (${ WeatherService.celsiusToFahrenheit(celsius) }°F)`;
+        return cardinalDirections[Math.floor((degree + (cardinalSize / 2)) % 360 / cardinalSize)];
     }
 
+    /**
+     * @param {number} temperature
+     * @return {string}
+     */
+    temperature(temperature) {
+
+        return `${ Math.round(temperature) }°C (${ Math.round(temperature * 9 / 5 + 32) }°F)`;
+    }
+
+    /**
+     * @param {number} speed
+     * @return {string}
+     */
     speed(speed) {
 
         return `${ Math.round(speed * 3.6) } Km/h (${ Math.round(speed * 2.23694) } Mph)`;
@@ -166,48 +104,110 @@ module.exports = class CommonView extends View {
     }
 
     /**
-     * @param {WeatherCondition} condition
-     * @param {Boolean}          [day=true]
-     *
-     * @returns {String}
+     * @param {number} aqi
+     * @return {string}
      */
-    conditionToEmoji(condition, day = true) {
+    aqi(aqi) {
+
+        const idx = CommonView.AQI_THRESHOLD.length - CommonView.AQI_THRESHOLD.findIndex((t) => aqi > t);
+
+        return `${ Util.randomValue(CommonView.AQI_TO_EMOJI[idx]) } ${ inlineCode(CommonView.AQI_DESCRIPTION[idx]) }`;
+    }
+
+    /**
+     * @param {number} uvi
+     * @return {string}
+     */
+    uvi(uvi) {
+
+        const idx = CommonView.UVI_THRESHOLD.length - CommonView.UVI_THRESHOLD.findIndex((t) => uvi > t);
+
+        return `:sunny: ${ inlineCode(CommonView.UVI_DESCRIPTION[idx]) } (${ uvi })`;
+    }
+
+    /**
+     * @param {number}  code
+     * @param {boolean} [day=true]
+     *
+     * @returns {string}
+     */
+    wmoCodeToEmoji(code, day = true) {
 
         if (day) {
 
-            return CommonView.EMOJI_MAPPING.day[condition.id];
+            return CommonView.WME_MAPPING[code].emoji.day;
         }
 
-        return CommonView.EMOJI_MAPPING.night[condition.id];
+        return CommonView.WME_MAPPING[code].emoji.night;
     }
 
+    /**
+     * @param {number}  code
+     * @param {boolean} [day=true]
+     * @param {string}  [size='4x']
+     *
+     * @returns {string}
+     */
+    wmoCodeToIconUrl(code, day = true, size = '4x') {
+
+        return `https://openweathermap.org/img/wn/${ CommonView.WME_MAPPING[code].owm }${ day ? 'd' : 'n' }@${ size }.png`;
+    }
 
     /**
-     * @param {EmbedBuilder}            embed
-     * @param {Array<WeatherCondition>} conditions
-     * @param {Boolean}                 [day=true]
-     * @param {String}                  [title='Weather']
+     * @param {number}  code
+     * @param {boolean} [day=true]
+     *
+     * @return {string}
+     */
+    wmoCodeToDescription(code, day = true) {
+
+        if (day) {
+
+            return CommonView.WME_MAPPING[code].description.day;
+        }
+
+        return CommonView.WME_MAPPING[code].description.night;
+    }
+
+    /**
+     * @param {number}  code
+     * @param {Boolean} [day=true]
+     *
+     * @return {string}
+     */
+    wmoCodeToString(code, day = true) {
+
+        return `${ this.wmoCodeToEmoji(code, day) } ${ inlineCode(this.wmoCodeToDescription(code, day)) }`;
+    }
+
+    /**
+     * @param {EmbedBuilder} embed
+     * @param {number}       code
+     * @param {Boolean}      [day=true]
+     * @param {String}       [title='Weather']
      *
      * @return {EmbedBuilder}
      */
-    condition(embed, conditions = [], day = true, title = 'Weather') {
+    wmoCodeField(embed, code, day = true, title = 'Weather') {
 
         return embed.addFields([
             {
                 name   : title,
-                value  : conditions.map((w) => `${ this.conditionToEmoji(w, day) } ${ inlineCode(w.description) }`).join('\n'),
+                value  : this.wmoCodeToString(code, day),
                 inline : true
             }
         ]);
     }
 
     /**
-     * @param {Number} phase
+     * @param {number} phase
      *
-     * @returns {String}
+     * @returns {string}
      */
     moon(phase) {
 
         return ['🌑', '🌓', '🌕', '🌗', '🌑'][phase * 4] || '';
     }
-};
+}
+
+module.exports = CommonView;
