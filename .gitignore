@@ -26,6 +26,7 @@
 !eslint.config.cjs
 !eslint.config.mjs
 !tsconfig.json
+!.editorconfig
 
 # ADD DOCKER FILES
 !.dockerignore
