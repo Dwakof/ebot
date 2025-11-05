@@ -25,9 +25,7 @@ module.exports = class VoiceStateUpdateListener extends Listener {
 
             if (hub) {
 
-                const { channel } = await TemporaryChannelService.createTemporaryChannel(hub, newState.member);
-
-                await newState.setChannel(channel, 'Temporary channel created');
+                await TemporaryChannelService.createTemporaryChannel(hub, newState.member, newState);
 
                 return;
             }

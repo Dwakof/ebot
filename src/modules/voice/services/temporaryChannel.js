@@ -131,10 +131,11 @@ class TemporaryChannelService extends Service {
     /**
      * @param {Hub}                               hub
      * @param {import('discord.js').GuildMember}  owner
+     * @param {import('discord.js').VoiceState}   [voiceState]
      *
      * @returns {TemporaryChannel}
      */
-    async createTemporaryChannel(hub, owner) {
+    async createTemporaryChannel(hub, owner, voiceState) {
 
         const { ControlView } = this.views();
 
@@ -154,6 +155,11 @@ class TemporaryChannelService extends Service {
             parent    : hub.channel.parent,
             userLimit : config.size
         });
+
+        if (voiceState) {
+
+            await voiceState.setChannel(channel, 'Temporary channel created');
+        }
 
         const message = await channel.send(ControlView.controlMessage({ channel, owner, config }));
 
