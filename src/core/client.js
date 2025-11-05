@@ -362,9 +362,17 @@ module.exports = class EbotClient extends AkairoClient {
 
     async initModules() {
 
-        for (const [, { module }] of this.#modules.entries()) {
+        for (const [name, { module }] of this.#modules.entries()) {
 
-            await module.init();
+            try {
+
+                await module.init();
+            }
+            catch (error) {
+
+                this.handleError(module, error, `Error while initializing module ${ name }`);
+                throw error;
+            }
         }
     }
 
