@@ -2,7 +2,7 @@
 
 const { StringSelectMenuBuilder, ActionRowBuilder, channelMention, ButtonBuilder, ButtonStyle } = require('discord.js');
 
-const { View }   = require('../../../core');
+const { View } = require('../../../core');
 
 const { interactions } = require('../interactions/hub');
 
@@ -21,24 +21,19 @@ class HubView extends View {
             components : [
                 new ActionRowBuilder()
                     .addComponents([
-                        new StringSelectMenuBuilder()
-                            .setCustomId(interactions.setDefaultType.customId)
-                            .setPlaceholder('Channel default visibility')
-                            .setMinValues(1).setMaxValues(1)
-                            .setOptions([
-                                { label : 'Public', value : 'public', emoji : { name : '📢' }, default : hub.config.defaultType === 'public' },
-                                { label : 'Inherit', value : 'inherit', emoji : { name : '📂' }, default : hub.config.defaultType === 'inherit' },
-                                { label : 'Locked', value : 'locked', emoji : { name : '🔒' }, default : hub.config.defaultType === 'locked' },
-                                { label : 'Private', value : 'private', emoji : { name : '🥷' }, default : hub.config.defaultType === 'private' }
-                            ])
-                    ]),
-                new ActionRowBuilder()
-                    .addComponents([
                         new ButtonBuilder()
                             .setCustomId(interactions.editDefaultSize.customId)
                             .setStyle(ButtonStyle.Secondary)
                             .setLabel('Edit channel default size')
                             .setEmoji({ name : '🔢' })
+                    ]),
+                new ActionRowBuilder()
+                    .addComponents([
+                        new ButtonBuilder()
+                            .setCustomId(interactions.editDefaultType.customId)
+                            .setStyle(ButtonStyle.Secondary)
+                            .setLabel('Edit channel default visibility')
+                            .setEmoji({ name : '👁️' })
                     ])
             ]
         };
@@ -69,6 +64,34 @@ class HubView extends View {
                                         value   : String(value),
                                         default : config.defaultSize === value
                                     }))
+                            ])
+                    ])
+            ]
+        };
+    }
+
+    /**
+     * @param {Hub} hub
+     *
+     * @return {import('discord.js').MessageCreateOptions}
+     */
+    editDefaultType({ config, channel }) {
+
+        return {
+            ephemeral  : true,
+            content    : `Choose a new default visibility for ${ channelMention(channel.id) }`,
+            components : [
+                new ActionRowBuilder()
+                    .addComponents([
+                        new StringSelectMenuBuilder()
+                            .setCustomId(interactions.setDefaultType.customId)
+                            .setPlaceholder('Channel default visibility')
+                            .setMinValues(1).setMaxValues(1)
+                            .setOptions([
+                                { label : 'Public', value : 'public', emoji : { name : '📢' }, default : config.defaultType === 'public' },
+                                { label : 'Inherit', value : 'inherit', emoji : { name : '📂' }, default : config.defaultType === 'inherit' },
+                                { label : 'Locked', value : 'locked', emoji : { name : '🔒' }, default : config.defaultType === 'locked' },
+                                { label : 'Private', value : 'private', emoji : { name : '🥷' }, default : config.defaultType === 'private' }
                             ])
                     ])
             ]
