@@ -97,7 +97,15 @@ module.exports = class Voice extends ApplicationCommand {
 
             return interaction.respond(
                 channels.slice(0, 25)
-                    .map(({ name, parent, id }) => ({ name : `${ parent.name } - ${ name }`, value : id }))
+                    .map(({ name, parent, id }) => {
+
+                        if (parent) {
+
+                            return { name : `${ parent.name } - ${ name }`, value : id };
+                        }
+
+                        return { name, value : id };
+                    })
             );
         }
 
