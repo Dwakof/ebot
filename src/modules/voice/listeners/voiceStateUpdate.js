@@ -39,7 +39,7 @@ module.exports = class VoiceStateUpdateListener extends Listener {
 
                 if (temporaryChannel) {
 
-                    // Clean up in 3 minutes
+                    // Clean up in 3 seconds
                     setTimeout(() => TemporaryChannelService.deleteTemporaryChannel(temporaryChannel.channel), 1_000 * 3);
                 }
             }
