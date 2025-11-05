@@ -87,20 +87,14 @@ module.exports = class Mimic extends ApplicationCommand {
 
     mimicEbot(interaction, { start }) {
 
-        if (this.client.sentry) {
-
-            this.client.sentry.setTag('mimicked_user_id', 'ebot');
-        }
+        this.client.sentry.setTag('mimicked_user_id', 'ebot');
 
         return this.mimic(interaction, 'ebot', start);
     }
 
     mimicGuild(interaction, { start }) {
 
-        if (this.client.sentry) {
-
-            this.client.sentry.setTag('mimicked_user_id', 'guild');
-        }
+        this.client.sentry.setTag('mimicked_user_id', 'guild');
 
         return this.mimic(interaction, 'guild', start);
     }
@@ -110,11 +104,8 @@ module.exports = class Mimic extends ApplicationCommand {
         const userId   = user?.id;
         const username = `${ user?.username }#${ user?.discriminator }`;
 
-        if (this.client.sentry) {
-
-            this.client.sentry.setTag('mimicked_user_id', userId);
-            this.client.sentry.setTag('mimicked_username', username);
-        }
+        this.client.sentry.setTag('mimicked_user_id', userId);
+        this.client.sentry.setTag('mimicked_username', username);
 
         return this.mimic(interaction, userId, start);
     }

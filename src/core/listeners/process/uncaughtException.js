@@ -13,10 +13,7 @@ module.exports = class ProcessUncaughtExceptionListener extends Listener {
 
         this.client.logger.error({ event : this.event, emitter : this.emitter, err, msg : err.toString() });
 
-        if (this.client.sentry) {
-
-            this.client.sentry.captureException(err);
-        }
+        this.client.sentry.captureException(err);
 
         throw err;
     }

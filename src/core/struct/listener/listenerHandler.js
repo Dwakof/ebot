@@ -39,7 +39,7 @@ module.exports = class ListenerHandler extends AkairoListenerHandler {
 
             try {
 
-                if (this.client.sentry && Object.keys(args).length > 0) {
+                if (Object.keys(args).length > 0) {
 
                     this.client.sentry.getCurrentScope().setContext('args', CoreUtil.serializeArgs(args));
                 }

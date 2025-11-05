@@ -183,10 +183,7 @@ class Service {
                         emitter : 'core'
                     });
 
-                    if (sentry) {
-
-                        checkInId = sentry.captureCheckIn({ monitorSlug, status : 'in_progress' }, monitorConfig);
-                    }
+                    checkInId = sentry.captureCheckIn({ monitorSlug, status : 'in_progress' }, monitorConfig);
 
                     await method.call(this, this.client);
 
@@ -196,10 +193,7 @@ class Service {
                         emitter : 'core'
                     });
 
-                    if (sentry) {
-
-                        sentry.captureCheckIn({ checkInId, monitorSlug, status : 'ok' }, monitorConfig);
-                    }
+                    sentry.captureCheckIn({ checkInId, monitorSlug, status : 'ok' }, monitorConfig);
                 }
                 catch (err) {
 
@@ -210,10 +204,7 @@ class Service {
                         err
                     });
 
-                    if (sentry) {
-
-                        sentry.captureCheckIn({ checkInId, monitorSlug, status : 'error' }, monitorConfig);
-                    }
+                    sentry.captureCheckIn({ checkInId, monitorSlug, status : 'error' }, monitorConfig);
                 }
 
             }, options);

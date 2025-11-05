@@ -20,9 +20,6 @@ module.exports = class ShardErrorListener extends Listener {
             err      : error
         });
 
-        if (this.client.sentry) {
-
-            this.client.sentry.captureException(error);
-        }
+        this.client.sentry.captureException(error);
     }
 };

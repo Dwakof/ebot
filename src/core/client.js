@@ -2,6 +2,8 @@
 
 const Sentry  = require('@sentry/node');
 
+Error.stackTraceLimit = 30;
+
 const Path = require('path');
 const Pino = require('pino');
 const Hoek = require('@hapi/hoek');
@@ -68,20 +70,17 @@ module.exports = class EbotClient extends AkairoClient {
 
         this.#logger = Pino(this.#settings.core.logger);
 
-        if (this.#settings.core.sentry.enabled) {
+        Sentry.init({
+            ...this.#settings.core.sentry,
+            integrations : [
+                Sentry.httpIntegration(),
+                Sentry.postgresIntegration()
+            ]
+        });
 
-            Sentry.init({
-                ...this.#settings.core.sentry,
-                integrations : [
-                    Sentry.httpIntegration(),
-                    Sentry.postgresIntegration()
-                ]
-            });
+        this.#sentry = Sentry;
 
-            this.#sentry = Sentry;
-
-            this.logger.info({ msg : 'Sentry is initialized', event : CoreEvents.SENTRY_INITIALIZED, emitter : 'core' });
-        }
+        this.logger.info({ msg : 'Sentry is initialized', event : CoreEvents.SENTRY_INITIALIZED, emitter : 'core' });
     }
 
     get logger() {
@@ -91,12 +90,7 @@ module.exports = class EbotClient extends AkairoClient {
 
     get sentry() {
 
-        if (this.#settings.core.sentry.enabled) {
-
-            return this.#sentry;
-        }
-
-        return false;
+        return this.#sentry;
     }
 
     get commandHandler() {
@@ -506,14 +500,11 @@ module.exports = class EbotClient extends AkairoClient {
             err          : error
         });
 
-        if (this.sentry) {
+        this.sentry.getCurrentScope().setContext('module', {
+            categoryID : module.categoryID,
+            id         : module.id
+        });
 
-            this.sentry.getCurrentScope().setContext('module', {
-                categoryID : module.categoryID,
-                id         : module.id
-            });
-
-            this.sentry.captureException(error);
-        }
+        this.sentry.captureException(error);
     }
 };
