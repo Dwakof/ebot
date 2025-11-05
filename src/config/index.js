@@ -78,20 +78,10 @@ const store = new Confidence.Store({
             production  : {}
         },
         sentry          : {
-            $filter     : { $env : 'NODE_ENV' },
-            $base       : {
-                enabled          : false,
-                dsn              : { $env : 'SENTRY_ENDPOINT' },
-                release          : `ebot@${ Pkg.version }`,
-                environment      : { $env : 'NODE_ENV' },
-                tracesSampleRate : { $env : 'SENTRY_TRACE_SAMPLE_RATE', $coerce : 'number', $default : 1.0 }
-            },
-            development : {
-                enabled : { $env : 'EBOT_SENTRY_ENABLED', $coerce : 'boolean', $default : false }
-            },
-            production  : {
-                enabled : { $env : 'EBOT_SENTRY_ENABLED', $coerce : 'boolean', $default : true }
-            }
+            dsn              : { $env : 'SENTRY_ENDPOINT', $default : '' },
+            release          : `ebot@${ Pkg.version }`,
+            environment      : { $env : 'NODE_ENV' },
+            tracesSampleRate : { $env : 'SENTRY_TRACE_SAMPLE_RATE', $coerce : 'number', $default : 1.0 }
         },
         cacheWarmup     : {
             guilds : { $env : 'EBOT_CACHE_WARMUP_GUILDS', $coerce : 'array', $default : [] },
