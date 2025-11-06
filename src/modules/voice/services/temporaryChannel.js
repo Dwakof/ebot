@@ -156,9 +156,25 @@ class TemporaryChannelService extends Service {
             userLimit : config.size
         });
 
+        let retryMove = false;
+
         if (voiceState) {
 
-            await voiceState.setChannel(channel, 'Temporary channel created');
+            try {
+
+                await voiceState.setChannel(channel, 'Temporary channel created');
+            }
+            catch (err) {
+
+                this.logger.error({
+                    msg      : `Failed to move user to temporary channel ${ channel.name }`,
+                    event    : 'createTemporaryChannel',
+                    metadata : { guildId : channel.guildId, channelId : channel.id, ownerId : owner.id },
+                    err
+                });
+
+                retryMove = true;
+            }
         }
 
         const message = await channel.send(ControlView.controlMessage({ channel, owner, config }));
@@ -180,6 +196,23 @@ class TemporaryChannelService extends Service {
             this.updatePermission({ channel, owner, config }),
             this.store.set('control', channel.guild.id, message.id, { channelId : channel.id })
         ]);
+
+        if (voiceState && retryMove) {
+
+            try {
+
+                await voiceState.setChannel(channel, 'Temporary channel created');
+            }
+            catch (err) {
+
+                this.logger.error({
+                    msg      : `Failed to move user to temporary channel ${ channel.name }`,
+                    event    : 'createTemporaryChannel',
+                    metadata : { guildId : channel.guildId, channelId : channel.id, ownerId : owner.id },
+                    err
+                });
+            }
+        }
 
         return { channel, owner, config };
     }
