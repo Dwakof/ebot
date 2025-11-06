@@ -152,6 +152,11 @@ class CurrentWeatherView extends View {
             rows.push(CommonView.uvi(airQuality.uvi));
         }
 
+        if (rows.length === 0) {
+
+            return embed;
+        }
+
         return embed.addFields([{ name : title.join('/'), value : rows.join('\n'), inline : true }]);
     }
 }
