@@ -1,6 +1,6 @@
 'use strict';
 
-const { ButtonStyle } = require('discord.js');
+// const { ButtonStyle } = require('discord.js');
 
 const { ApplicationCommand, Util } = require('../../../core');
 
