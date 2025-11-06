@@ -79,8 +79,10 @@ module.exports = class BuildService extends Service {
 
                 const buffer = await model.encode();
 
-                await Model.knex()
-                    .insert({ guildId, userId : id, model : buffer })
+                const knex = Model.knex();
+
+                await knex
+                    .insert({ guildId, userId : id, model : buffer, createdAt : knex.fn.now(), updatedAt : knex.fn.now() })
                     .into(Model.tableName)
                     .onConflict(Model.idColumn)
                     .merge(['model', 'updatedAt']);
