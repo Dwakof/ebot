@@ -51,10 +51,10 @@ module.exports = class CommandHandler extends AkairoCommandHandler {
 
                 scope.setContext('message', {
                     id        : message.id,
-                    channel   : message.channel.name,
-                    channelId : message.channel.id,
-                    guild     : message.guild.name,
-                    guildId   : message.guild.id,
+                    channel   : message.channel?.name ?? message.channel?.id ?? null,
+                    channelId : message.channel?.id ?? null,
+                    guild     : message.guild?.name ?? null,
+                    guildId   : message.guild?.id ?? null,
                     content   : message.cleanContent
                 });
 

@@ -113,7 +113,7 @@ class InteractionHandler extends AkairoHandler {
                     id        : interaction.id,
                     messageId : interaction.message?.id,
                     channelId : interaction.channelId,
-                    guild     : interaction.member.guild.name,
+                    guild     : interaction.guild?.name ?? null,
                     guildId   : interaction.guildId
                 });
 

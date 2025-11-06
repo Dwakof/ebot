@@ -285,7 +285,7 @@ module.exports = class ApplicationCommandHandler extends AkairoHandler {
                 scope.setContext('interaction', {
                     id        : interaction.id,
                     channelId : interaction.channelId,
-                    guild     : interaction.member.guild.name,
+                    guild     : interaction.guild?.name,
                     guildId   : interaction.guildId
                 });
 
