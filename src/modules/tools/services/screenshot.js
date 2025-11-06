@@ -81,7 +81,7 @@ module.exports = class ScreenshotService extends Service {
      * @param {String} messageId
      * @param {String} channelId
      *
-     * @return {Promise<Buffer>}
+     * @return {Promise<Uint8Array>}
      */
     async screenshotMessageId(messageId, channelId) {
 
@@ -114,7 +114,7 @@ module.exports = class ScreenshotService extends Service {
     /**
      * @param {Message} message
      *
-     * @return {Promise<Buffer>}
+     * @return {Promise<Uint8Array>}
      */
     async screenshotMessage(message) {
 
@@ -294,7 +294,7 @@ module.exports = class ScreenshotService extends Service {
 
             const element = await page.$('#messages');
 
-            return Buffer.from(await page.screenshot({ type : 'png', clip : await element.boundingBox() }));
+            return page.screenshot({ type : 'png', clip : await element.boundingBox() });
         }
         finally {
 
