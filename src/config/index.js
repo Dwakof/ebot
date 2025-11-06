@@ -10,6 +10,8 @@ const Pkg = require('../../package.json');
 Dotenv.config({ path : process.env.DOTENV_PATH || Path.join(__dirname, '../../.env') });
 
 const knexDefault = new Confidence.Store({
+    client   : { $env : 'POSTGRES_CLIENT', $default : 'pg' },
+    fs       : { $env : 'POSTGRES_FOLDER', $default : './data' },
     host     : { $env : 'POSTGRES_HOST', $default : 'localhost' },
     user     : { $env : 'POSTGRES_USER', $default : 'ebot' },
     password : { $env : 'POSTGRES_PASS', $default : 'ebot' },
@@ -90,8 +92,9 @@ const store = new Confidence.Store({
         disabledModules : { $env : 'EBOT_DISABLED_MODULES', $coerce : 'array', $default : [] },
         module          : {
             knex      : {
-                client     : 'pg',
+                client     : { $env : 'CORE_POSTGRES_CLIENT', $default : knexDefault.client },
                 connection : {
+                    fs       : { $env : 'CORE_POSTGRES_FOLDER', $default : knexDefault.fs },
                     host     : { $env : 'CORE_POSTGRES_HOST', $default : knexDefault.host },
                     user     : { $env : 'CORE_POSTGRES_USER', $default : knexDefault.user },
                     password : { $env : 'CORE_POSTGRES_PASS', $default : knexDefault.password },
@@ -124,8 +127,9 @@ const store = new Confidence.Store({
         },
         karma    : {
             knex : {
-                client     : 'pg',
+                client     : { $env : 'KARMA_POSTGRES_CLIENT', $default : knexDefault.client },
                 connection : {
+                    fs       : { $env : 'KARMA_POSTGRES_FOLDER', $default : knexDefault.fs },
                     host     : { $env : 'KARMA_POSTGRES_HOST', $default : knexDefault.host },
                     user     : { $env : 'KARMA_POSTGRES_USER', $default : knexDefault.user },
                     password : { $env : 'KARMA_POSTGRES_PASS', $default : knexDefault.password },
@@ -136,8 +140,9 @@ const store = new Confidence.Store({
         },
         mimic    : {
             knex : {
-                client     : 'pg',
+                client     : { $env : 'MIMIC_POSTGRES_CLIENT', $default : knexDefault.client },
                 connection : {
+                    fs       : { $env : 'MIMIC_POSTGRES_FOLDER', $default : knexDefault.fs },
                     host     : { $env : 'MIMIC_POSTGRES_HOST', $default : knexDefault.host },
                     user     : { $env : 'MIMIC_POSTGRES_USER', $default : knexDefault.user },
                     password : { $env : 'MIMIC_POSTGRES_PASS', $default : knexDefault.password },
@@ -148,8 +153,9 @@ const store = new Confidence.Store({
         },
         history  : {
             knex : {
-                client     : 'pg',
+                client     : { $env : 'HISTORY_POSTGRES_CLIENT', $default : knexDefault.client },
                 connection : {
+                    fs       : { $env : 'HISTORY_POSTGRES_FOLDER', $default : knexDefault.fs },
                     host     : { $env : 'HISTORY_POSTGRES_HOST', $default : knexDefault.host },
                     user     : { $env : 'HISTORY_POSTGRES_USER', $default : knexDefault.user },
                     password : { $env : 'HISTORY_POSTGRES_PASS', $default : knexDefault.password },
@@ -162,8 +168,9 @@ const store = new Confidence.Store({
             openWeatherApiKey : { $env : 'OPEN_WEATHER_API_KEY' },
             LocationIQApiKey  : { $env : 'LOCATION_IQ_API_KEY' },
             knex              : {
-                client     : 'pg',
+                client     : { $env : 'WEATHER_POSTGRES_CLIENT', $default : knexDefault.client },
                 connection : {
+                    fs       : { $env : 'WEATHER_POSTGRES_FOLDER', $default : knexDefault.fs },
                     host     : { $env : 'WEATHER_POSTGRES_HOST', $default : knexDefault.host },
                     user     : { $env : 'WEATHER_POSTGRES_USER', $default : knexDefault.user },
                     password : { $env : 'WEATHER_POSTGRES_PASS', $default : knexDefault.password },
