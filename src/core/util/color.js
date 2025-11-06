@@ -14,9 +14,17 @@ Color.brewer = new Proxy({}, {
 
         return scales.get(prop.toLowerCase());
     },
+    has(target, prop) {
+
+        return scales.has(prop.toLowerCase());
+    },
+    ownKeys(target) {
+
+        return keys;
+    },
     getOwnPropertyNames() {
 
-        return Object.getOwnPropertyNames(keys);
+        return keys;
     }
 });
 
