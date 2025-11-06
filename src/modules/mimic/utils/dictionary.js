@@ -35,10 +35,16 @@ class Dictionary extends Map {
         }
     }
 
+    /**
+     * @param {string} word
+     * @param {number} id
+     * @returns {Dictionary}
+     */
     set(word, id) {
 
         this.words.set(word, id);
         this.reverse[id] = word;
+        return this;
     }
 
     /**
