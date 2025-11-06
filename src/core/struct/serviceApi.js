@@ -61,6 +61,7 @@ class ServiceApi extends Service {
             if (value instanceof Date) {
 
                 query[key] = encodeQueryValue(value);
+                continue;
             }
 
             if (Array.isArray(value)) {
