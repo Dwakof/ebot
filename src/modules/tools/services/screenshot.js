@@ -294,7 +294,7 @@ module.exports = class ScreenshotService extends Service {
 
             const element = await page.$('#messages');
 
-            return page.screenshot({ type : 'png', clip : await element.boundingBox() });
+            return await page.screenshot({ type : 'png', clip : await element.boundingBox() });
         }
         finally {
 
