@@ -9,7 +9,7 @@ class CurrentWeatherView extends View {
     /**
      * @param {import('../services/weather.cts').WeatherData}       weather
      * @param {import('../services/airQuality.cts').AirQualityData} airQuality
-     * @param {Location}                                            location
+     * @param {import('../services/location.cts').Location}         location
      */
     render(weather, airQuality, location) {
 
@@ -33,10 +33,10 @@ class CurrentWeatherView extends View {
     }
 
     /**
-     * @param {EmbedBuilder}                                  embed
+     * @param {import('discord.js').EmbedBuilder}             embed
      * @param {import('../services/weather.cts').WeatherData} weather
      *
-     * @return {EmbedBuilder}
+     * @return {import('discord.js').EmbedBuilder}
      */
     sun(embed, weather) {
 
@@ -53,7 +53,7 @@ class CurrentWeatherView extends View {
     }
 
     /**
-     * @param {EmbedBuilder}                                  embed
+     * @param {import('discord.js').EmbedBuilder}             embed
      * @param {import('../services/weather.cts').WeatherData} weather
      *
      * @return {EmbedBuilder}
@@ -75,10 +75,10 @@ class CurrentWeatherView extends View {
     }
 
     /**
-     * @param {EmbedBuilder}                                  embed
+     * @param {import('discord.js').EmbedBuilder}             embed
      * @param {import('../services/weather.cts').WeatherData} weather
      *
-     * @return {EmbedBuilder}
+     * @return {import('discord.js').EmbedBuilder}
      */
     wind(embed, weather) {
 
@@ -108,10 +108,10 @@ class CurrentWeatherView extends View {
     }
 
     /**
-     * @param {EmbedBuilder}                                  embed
+     * @param {import('discord.js').EmbedBuilder}             embed
      * @param {import('../services/weather.cts').WeatherData} weather
      *
-     * @return {EmbedBuilder}
+     * @return {import('discord.js').EmbedBuilder}
      */
     humidityPressure(embed, weather) {
 
@@ -128,10 +128,10 @@ class CurrentWeatherView extends View {
     }
 
     /**
-     * @param {EmbedBuilder}                                        embed
+     * @param {import('discord.js').EmbedBuilder}                   embed
      * @param {import('../services/airQuality.cts').AirQualityData} airQuality
      *
-     * @return {EmbedBuilder}
+     * @return {import('discord.js').EmbedBuilder}
      */
     airQualityUVIndex(embed, airQuality) {
 

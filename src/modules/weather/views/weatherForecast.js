@@ -8,10 +8,10 @@ module.exports = class WeatherForecastView extends View {
 
     /**
      * @param {import('../services/weather.cts').WeatherData} weather
-     * @param {Location}                                      location
+     * @param {import('../services/location.cts').Location}   location
      * @param {number}                                        [maxDays=5]
      *
-     * @return {EmbedBuilder}
+     * @return {import('discord.js').EmbedBuilder}
      */
     daily(weather, location, maxDays = 5) {
 
@@ -32,9 +32,9 @@ module.exports = class WeatherForecastView extends View {
     }
 
     /**
-     * @param {EmbedBuilder}                                       embed
+     * @param {import('discord.js').EmbedBuilder}                  embed
      * @param {import('../services/weather.cts').DailyWeatherData} day
-     * @return {EmbedBuilder}
+     * @return {import('discord.js').EmbedBuilder}
      */
     weather(embed, day) {
 
@@ -53,10 +53,10 @@ module.exports = class WeatherForecastView extends View {
     }
 
     /**
-     * @param {EmbedBuilder}                                       embed
+     * @param {import('discord.js').EmbedBuilder}                  embed
      * @param {import('../services/weather.cts').DailyWeatherData} day
      * @param {string}                                             [title]
-     * @return {EmbedBuilder}
+     * @return {import('discord.js').EmbedBuilder}
      */
     temperature(embed, day, title = 'Temperature') {
 
@@ -75,10 +75,10 @@ module.exports = class WeatherForecastView extends View {
     }
 
     /**
-     * @param {EmbedBuilder}                                       embed
+     * @param {import('discord.js').EmbedBuilder}                  embed
      * @param {import('../services/weather.cts').DailyWeatherData} day
      * @param {string}                                             [title]
-     * @return {EmbedBuilder}
+     * @return {import('discord.js').EmbedBuilder}
      */
     air(embed, day, title = 'Air') {
 
