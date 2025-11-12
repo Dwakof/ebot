@@ -1,3 +1,42 @@
+# [0.29.0](https://github.com/Dwakof/ebot/compare/v0.28.0...v0.29.0) (2025-11-12)
+
+
+### Bug Fixes
+
+* .editorconfig (people won't like my config) ([eda6bf0](https://github.com/Dwakof/ebot/commit/eda6bf0ad838dd9247c5485b8ff4f14a5215f7d8))
+* avoid unnecessary Buffer wrapper for screenshot service ([5bc6bbf](https://github.com/Dwakof/ebot/commit/5bc6bbf5fa6827c83582b27142a24210759ae625))
+* better proxy trap for color util ([ac1f2d2](https://github.com/Dwakof/ebot/commit/ac1f2d2fa3dccb087115a7289879cf608a1d4f47))
+* buffer storage needs to bypass objection (probably an issue with jsonschema config ([49f8d6e](https://github.com/Dwakof/ebot/commit/49f8d6ea24846969be4408205b5306f78d4d7285))
+* bypassing Objection requires setting the createdAt/updatedAt manually. ([d28483c](https://github.com/Dwakof/ebot/commit/d28483c16807fc8979b3b8bd75da924cb65d318f))
+* Date encoding in query params by ServiceApi was broken ([99cb355](https://github.com/Dwakof/ebot/commit/99cb355fe736f709b11c435a25f9f933eeffb5c7))
+* discord.js v15 depreciation ([e11dc87](https://github.com/Dwakof/ebot/commit/e11dc8784962d3d1f88836549e47ff9e31493a5e))
+* don't add empty airQuality rows to embed ([eabd109](https://github.com/Dwakof/ebot/commit/eabd1091a5b5607eefd5e4d0db5f792afa084a93))
+* edge case when voice hub does not have a parent ([9efe131](https://github.com/Dwakof/ebot/commit/9efe131f79aa387ce7fe2fe73ab7215545d30bce))
+* handle case where bot command/message/interaction was triggered outside of a guild ([b79b7ce](https://github.com/Dwakof/ebot/commit/b79b7ce2208fe87d4eee43368e74c474a3605a3b))
+* handle edge case where moving user to the newly created temporary voice channel is failing ([5631752](https://github.com/Dwakof/ebot/commit/5631752796d653cdd4d541e7b0180fdf88b5d236))
+* log & throw error when a module fails to be initialized ([6411ea0](https://github.com/Dwakof/ebot/commit/6411ea0f4fd5f0093abdf77150fdb4efda8380dc))
+* make voiceHubEdit use buttons to be clearer ([d0481c3](https://github.com/Dwakof/ebot/commit/d0481c3b18416663359c4f92e2da061ec73e5ebe))
+* migration typo ([41c137c](https://github.com/Dwakof/ebot/commit/41c137c5874476d219e44b72ccb66adb1244ee68))
+* missing `ufo` in package.json ([d1f0700](https://github.com/Dwakof/ebot/commit/d1f0700c032c07fd97204ebe32006710fa9ed25b))
+* move the user faster to the temporary channel ([65c62d1](https://github.com/Dwakof/ebot/commit/65c62d10a73a72452503741454e092693eb6a834))
+* page closure could be done before the screenshot ([eab4793](https://github.com/Dwakof/ebot/commit/eab4793272b9858bb7456f385f15a8afac06eeeb))
+* remove AjvValidator for Store model as it is already implemented in ObjectionModel now ([51ebd22](https://github.com/Dwakof/ebot/commit/51ebd22575dade442fba297c54ad2d5c107d172b))
+* sentry config ([9c0a0cf](https://github.com/Dwakof/ebot/commit/9c0a0cf8fc6df3cb7ec1b083c0035393ccc75fe6))
+* serialize queryParams array with comma ([be497cd](https://github.com/Dwakof/ebot/commit/be497cd4a18e3b5c0d710eef28e5bfc202be9050))
+* service get a dedicated child logger ([1e2474d](https://github.com/Dwakof/ebot/commit/1e2474d206e1cf380e6856ff3239ead15c56d7a7))
+* skip checking if sentry is set up or not being usage ([73e63dc](https://github.com/Dwakof/ebot/commit/73e63dcb2d9af38c33e68aa4ebe97e866092c73a))
+* use `--experimental-transform-types` ([520b6f5](https://github.com/Dwakof/ebot/commit/520b6f5ec6434392b79e3a8bb072d30cd3bcb401))
+
+
+### Features
+
+* add support for pglite (and very low support for sqlite) + update dependencies ([af0ae1e](https://github.com/Dwakof/ebot/commit/af0ae1e272d6185a09729579aede0149a8678b18))
+* animated icon from https://bas.dev/work/meteocons ([3dfc328](https://github.com/Dwakof/ebot/commit/3dfc328385d45212478c6f7aa3f88876ffcd9de1))
+* exported extended objection model directly from the core with AJV validation pre-registered ([e7f0c4a](https://github.com/Dwakof/ebot/commit/e7f0c4aec1edbe7657d21f00b43fe55223ff858b))
+* many changes ([50e1b44](https://github.com/Dwakof/ebot/commit/50e1b44d54c2bc35e3b609a5b34ea99fb663aa5d))
+* replace `OpenWeatherMap` with `Open-Meteo` + prepare for hourly weather data ([dda43c1](https://github.com/Dwakof/ebot/commit/dda43c152c806b86d7352094fe3b6f7ef0979aed))
+* Rework Mimic model storage using Bebop binary serialization + zstd; benchmarks show 2.6x faster deserialization and 3.3x smaller serialized model ([9fa43e0](https://github.com/Dwakof/ebot/commit/9fa43e0e1a48680675aa66255d39f4ef42ee04bc))
+
 # [0.28.0](https://github.com/Dwakof/ebot/compare/v0.27.0...v0.28.0) (2025-01-04)
 
 
