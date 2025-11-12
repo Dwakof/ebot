@@ -1,11 +1,20 @@
 'use strict';
 
 const Dictionary = require('./dictionary');
+const State      = require('./state');
 
-module.exports = class Model {
+class Model {
 
     /**
-     * @type {Map<State.key, Map<Number, Number>>}
+     * @typedef {Map<number, number>} Followers
+     */
+
+    /**
+     * @typedef {Map<string, number>} WordFollowers
+     */
+
+    /**
+     * @type {Map<number, Followers>}
      */
     states = new Map();
 
@@ -17,11 +26,11 @@ module.exports = class Model {
     /**
      * @param {State} state
      *
-     * @return Map<String, Number> followers
+     * @return {Followers} followers
      */
     get(state) {
 
-        return this.output(this.states.get(state.key));
+        return this.states.get(state.key);
     }
 
     /**
@@ -37,15 +46,11 @@ module.exports = class Model {
     /**
      * @param {State} state
      *
-     * @return {Map<String, Number>} followers
+     * @return {Followers} followers
      */
     initialize(state) {
 
-        for (const word of state.value) {
-
-            this.dictionary.addWord(word);
-        }
-
+        /** @type {Followers} */
         const followers = new Map();
 
         this.set(state, followers);
@@ -55,18 +60,18 @@ module.exports = class Model {
 
     /**
      * @param {State} state
-     * @param {Map<String, Number>} followers
+     * @param {Followers} followers
      */
     set(state, followers) {
 
-        this.states.set(state.key, this.input(followers));
+        this.states.set(state.key, followers);
 
         return this;
     }
 
     /**
      * @param {State}  state
-     * @param {String} word
+     * @param {string} word
      */
     increase(state, word) {
 
@@ -77,21 +82,28 @@ module.exports = class Model {
             followers = this.initialize(state);
         }
 
-        const index = this.dictionary.addWord(word);
+        const id = this.dictionary.addWord(word);
 
-        let value = followers.get(index) || 0;
+        let value = followers.get(id) || 0;
 
         value++;
 
-        followers.set(index, value);
-
-        this.states.set(state.key, followers);
+        followers.set(id, value);
 
         return value;
     }
 
     /**
-     * @return {IterableIterator<[State.key, Map<String, Number>]>}
+     * @param {string[]} words
+     * @return {State}
+     */
+    buildState(words) {
+
+        return new State(this.dictionary.toStateValues(words));
+    }
+
+    /**
+     * @return {IterableIterator<[State.key, WordFollowers]>}
      */
     * entries() {
 
@@ -102,62 +114,67 @@ module.exports = class Model {
     }
 
     /**
-     * @return {IterableIterator<[State.key, Map<String, Number>]>}
+     * @return {IterableIterator<[State.key, WordFollowers]>}
      */
     [Symbol.iterator]() {
 
         return this.entries();
     }
 
-    serialize() {
+    // serialize() {
+    //
+    //     const states     = [];
+    //     const dictionary = [];
+    //
+    //     for (const [key, followers] of this.states.entries()) {
+    //
+    //         if (followers.size !== 0) {
+    //
+    //             states.push([key, [...followers]]);
+    //         }
+    //     }
+    //
+    //     for (const [word, id] of this.dictionary.entries()) {
+    //
+    //         dictionary.push([word, id]);
+    //     }
+    //
+    //     return { states, dictionary };
+    // }
+    //
+    // static deserialize({ states = [], dictionary = [] } = {}) {
+    //
+    //     const model = new Model();
+    //
+    //     model.dictionary = new Dictionary(dictionary);
+    //
+    //     for (const [key, followers] of states) {
+    //
+    //         const value = new Map();
+    //
+    //         for (const [word, weight] of followers) {
+    //
+    //             value.set(word, weight);
+    //         }
+    //
+    //         model.states.set(key, value);
+    //     }
+    //
+    //     return model;
+    // }
 
-        const states     = [];
-        const dictionary = [];
-
-        for (const [key, followers] of this.states.entries()) {
-
-            if (followers.size !== 0) {
-
-                states.push([key, [...followers]]);
-            }
-        }
-
-        for (const [word, id] of this.dictionary.entries()) {
-
-            dictionary.push([word, id]);
-        }
-
-        return { states, dictionary };
-    }
-
-    static deserialize({ states = [], dictionary = [] } = {}) {
-
-        const model = new Model();
-
-        model.dictionary = new Dictionary(dictionary);
-
-        for (const [key, followers] of states) {
-
-            const value = new Map();
-
-            for (const [word, weight] of followers) {
-
-                value.set(word, weight);
-            }
-
-            model.states.set(key, value);
-        }
-
-        return model;
-    }
-
+    /**
+     * @param {Followers} followers
+     * @returns {WordFollowers}
+     */
     output(followers) {
 
         if (!followers) {
 
-            return followers;
+            return undefined;
         }
 
+        /** @type {WordFollowers} */
         const output = new Map();
 
         for (const [id, weight] of followers.entries()) {
@@ -168,24 +185,29 @@ module.exports = class Model {
         return output;
     }
 
+    /**
+     * @param {WordFollowers} followers
+     * @returns {Followers}
+     */
     input(followers) {
 
+        if (!followers) {
+
+            return undefined;
+        }
+
+        /** @type {Followers} */
         const input = new Map();
 
         for (const [word, weight] of followers.entries()) {
 
-            let index = this.dictionary.get(word);
+            const id = this.dictionary.addWord(word);
 
-            if (!index) {
-
-                index = this.dictionary.size;
-
-                this.dictionary.set(word, index);
-            }
-
-            input.set(index, weight);
+            input.set(id, weight);
         }
 
         return input;
     }
-};
+}
+
+module.exports = Model;

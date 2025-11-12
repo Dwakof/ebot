@@ -21,7 +21,7 @@ updates:
   - yoannma
   ignore:
     - dependency-name: "node"
-      versions: ["19.x", "21.x", "23.x", "25.x"]
+      versions: ["25.x", "27.x", "29.x"]
 
 # Enable version updates for Github Actions
 - package-ecosystem: "github-actions"

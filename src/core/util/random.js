@@ -1,6 +1,6 @@
 'use strict';
 
-const Crypto = require('crypto');
+const { randomUUID } = require('node:crypto');
 
 module.exports = {
 
@@ -13,7 +13,7 @@ module.exports = {
      */
     uuid(options) {
 
-        return Crypto.randomUUID(options);
+        return randomUUID(options);
     },
 
     /**

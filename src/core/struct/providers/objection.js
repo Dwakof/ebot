@@ -1,7 +1,15 @@
 'use strict';
 
-const Knex           = require('knex');
-const { initialize } = require('objection');
+const Path = require('node:path');
+const FsP  = require('node:fs/promises');
+
+const Knex                                = require('knex');
+const { initialize, Model, AjvValidator } = require('objection');
+const AjvFormat                           = require('ajv-formats');
+
+const KnexPGlite = require('knex-pglite');
+const { PGlite } = require('@electric-sql/pglite');
+const { NodeFS } = require('@electric-sql/pglite/nodefs');
 
 const { KnexAsyncIterator } = require('../../util');
 
@@ -15,6 +23,20 @@ Knex.QueryBuilder.extend('asyncIterator', function () {
     return this;
 });
 
+class ObjectionModel extends Model {
+
+    static createValidator() {
+
+        return new AjvValidator({
+            options : { allowUnionTypes : true },
+            onCreateAjv(ajv) {
+
+                AjvFormat(ajv);
+            }
+        });
+    }
+}
+
 module.exports = class ObjectionProvider {
 
     #knex;
@@ -24,6 +46,8 @@ module.exports = class ObjectionProvider {
      * @type {Object.<Model>}
      */
     #models;
+
+    static ObjectionModel = ObjectionModel;
 
     /**
      *
@@ -38,12 +62,7 @@ module.exports = class ObjectionProvider {
         }
 
         this.#settings = settings;
-
-
-        this.#models = models.reduce((acc, model) => {
-
-            return { ...acc, [model.name] : model };
-        }, {});
+        this.#models   = models.reduce((acc, model) => ({ ...acc, [model.name] : model }), {});
     }
 
     /**
@@ -52,11 +71,60 @@ module.exports = class ObjectionProvider {
      */
     async init() {
 
-        this.#knex = Knex(this.#settings);
+        switch (this.#settings.client) {
+
+            case 'pglite': {
+
+                try {
+
+                    const path = Path.join(this.#settings.connection.fs, this.#settings.connection.database);
+
+                    await FsP.mkdir(path, { recursive : true });
+
+                    const pg = await PGlite.create({ fs : new NodeFS(path) });
+
+                    this.#knex = Knex({ client : KnexPGlite, dialect : 'postgres', connection : () => ({ pglite : pg }), migrations : this.#settings.migrations });
+                }
+                catch (error) {
+
+                    throw new Error(`Unable to create a PGLite instance: ${ error.message }`, { cause : error });
+                }
+
+                break;
+            }
+
+            case 'sqlite' : {
+
+                const path = Path.join(this.#settings.connection.fs, `${ this.#settings.connection.database }.sqlite`);
+
+                this.#knex = Knex({ client : 'better-sqlite3', connection : { filename : path }, migrations : this.#settings.migrations, useNullAsDefault : true });
+
+                break;
+            }
+
+            case 'pg' : {
+
+                this.#knex = Knex(this.#settings);
+
+                break;
+            }
+
+            default : {
+
+                throw new Error(`Unsupported client ${ this.#settings.client }`);
+            }
+        }
 
         await this.ping();
 
-        await this.#knex.migrate.latest();
+        try {
+
+            await this.#knex.migrate.latest(this.#settings.migrations);
+        }
+        catch (error) {
+
+            throw new Error(`Unable to run migrations: ${ error.message }`, { cause : error });
+        }
 
         Object.values(this.models).forEach((model) => model.knex(this.#knex));
 
@@ -69,7 +137,6 @@ module.exports = class ObjectionProvider {
     }
 
     /**
-     *
      * @returns {*}
      */
     get models() {

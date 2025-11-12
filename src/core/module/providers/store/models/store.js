@@ -1,10 +1,8 @@
 'use strict';
 
-const { Model, AjvValidator } = require('objection');
+const { ObjectionModel } = require('../../../../struct/providers/objection');
 
-const AjvFormat = require('ajv-formats');
-
-module.exports = class Store extends Model {
+module.exports = class Store extends ObjectionModel {
 
     static get tableName() {
 
@@ -37,17 +35,6 @@ module.exports = class Store extends Model {
     static get jsonAttributes() {
 
         return ['value'];
-    }
-
-    static createValidator() {
-
-        return new AjvValidator({
-            options : { allowUnionTypes : true },
-            onCreateAjv(ajv) {
-
-                AjvFormat(ajv);
-            }
-        });
     }
 
     async $beforeInsert(queryContext) {

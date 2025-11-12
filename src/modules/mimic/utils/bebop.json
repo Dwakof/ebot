@@ -1,0 +1,10 @@
+{
+  "include": [
+    "*.bop"
+  ],
+  "generators": {
+    "ts": {
+      "outFile": "encoder.mts"
+    }
+  }
+}

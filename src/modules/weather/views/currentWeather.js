@@ -4,116 +4,87 @@ const { View, Util } = require('../../../core');
 
 const { time : Time, TimestampStyles, inlineCode } = require('discord.js');
 
-module.exports = class CurrentWeatherView extends View {
+class CurrentWeatherView extends View {
 
     /**
-     *
-     * @param {OneCallCurrentWeather} current
-     * @param {AirQuality}            airQuality
-     * @param {Location}              location
+     * @param {import('../services/weather.cts').WeatherData}       weather
+     * @param {import('../services/airQuality.cts').AirQualityData} airQuality
+     * @param {import('../services/location.cts').Location}         location
      */
-    render(current, airQuality, location) {
+    render(weather, airQuality, location) {
 
         const { CommonView } = this.views();
 
         const embed = this.embed()
             .setTitle(CommonView.location(location))
-            .setTimestamp(current.dt * 1000);
+            .setTimestamp(weather.current.time)
+            .setThumbnail(CommonView.wmoCodeToIconUrl(weather.current.code, weather.current.daytime));
 
-        const { sunrise, sunset, dt } = current;
+        CommonView.wmoCodeField(embed, weather.current.code, weather.current.daytime);
 
-        const day = sunrise < dt && dt < sunset;
+        this.sun(embed, weather);
+        this.temperature(embed, weather);
 
-        if (current?.weather?.length > 0) {
-
-            CommonView.condition(embed, current.weather, day);
-            this.weatherIcon(embed, current.weather[0], day);
-        }
-        else {
-
-            this.emptyRow(embed);
-        }
-
-        this.sun(embed, current);
-        this.temperature(embed, current);
-
-        this.wind(embed, current);
-        this.humidityPressure(embed, current);
-        this.airQualityUVIndex(embed, current, airQuality);
+        this.wind(embed, weather);
+        this.humidityPressure(embed, weather);
+        this.airQualityUVIndex(embed, airQuality);
 
         return embed;
     }
 
     /**
-     * @param {EmbedBuilder}          embed
-     * @param {WeatherCondition}      condition
-     * @param {Boolean}               [day=true]
+     * @param {import('discord.js').EmbedBuilder}             embed
+     * @param {import('../services/weather.cts').WeatherData} weather
      *
-     * @return {EmbedBuilder}
+     * @return {import('discord.js').EmbedBuilder}
      */
-    weatherIcon(embed, condition, day = true) {
-
-        const { WeatherService } = this.services();
-
-        return embed.setThumbnail(WeatherService.iconURL(condition.icon.slice(0, -1), day));
-    }
-
-    /**
-     * @param {EmbedBuilder}          embed
-     * @param {OneCallCurrentWeather} current
-     *
-     * @return {EmbedBuilder}
-     */
-    sun(embed, current) {
-
-        const { sunrise, sunset } = current;
+    sun(embed, weather) {
 
         return embed.addFields([
             {
+                inline : true,
                 name   : 'Sunrise/Sunset',
                 value  : [
-                    `🏙 ${ Time(sunrise, TimestampStyles.RelativeTime) }`,
-                    `🌆 ${ Time(sunset, TimestampStyles.RelativeTime) }`
-                ].join('\n'),
-                inline : true
+                    `🏙 ${ Time(weather.current.sunrise, TimestampStyles.RelativeTime) }`,
+                    `🌆 ${ Time(weather.current.sunset, TimestampStyles.RelativeTime) }`
+                ].join('\n')
             }
         ]);
     }
 
     /**
-     * @param {EmbedBuilder}          embed
-     * @param {OneCallCurrentWeather} current
+     * @param {import('discord.js').EmbedBuilder}             embed
+     * @param {import('../services/weather.cts').WeatherData} weather
      *
      * @return {EmbedBuilder}
      */
-    temperature(embed, current) {
+    temperature(embed, weather) {
 
         const { CommonView } = this.views();
 
         return embed.addFields([
             {
                 name   : 'Temps/Feels like',
+                inline : true,
                 value  : [
-                    `🌡 ${ CommonView.temperature(current.temp) }`,
-                    `💨 ${ CommonView.temperature(current.feels_like) }`
-                ].join('\n'),
-                inline : true
+                    `🌡 ${ CommonView.temperature(weather.current.temperature) }`,
+                    `💨 ${ CommonView.temperature(weather.current.apparentTemperature) }`
+                ].join('\n')
             }
         ]);
     }
 
     /**
-     * @param {EmbedBuilder}          embed
-     * @param {OneCallCurrentWeather} current
+     * @param {import('discord.js').EmbedBuilder}             embed
+     * @param {import('../services/weather.cts').WeatherData} weather
      *
-     * @return {EmbedBuilder}
+     * @return {import('discord.js').EmbedBuilder}
      */
-    wind(embed, current) {
+    wind(embed, weather) {
 
-        const { CommonView }     = this.views();
-        const { WeatherService } = this.services();
+        const { CommonView } = this.views();
 
-        if (current.wind_speed === 0) {
+        if (weather.current.wind.speed === 0) {
 
             return embed.addFields([{ name : 'Wind/Gust', value : `🎐 ${ inlineCode('no wind') }`, inline : true }]);
         }
@@ -125,11 +96,11 @@ module.exports = class CurrentWeatherView extends View {
                 value  : [
                     [
                         `🎐`,
-                        inlineCode(`${ CommonView.speed(current.wind_speed ?? 0) } ${ WeatherService.toDirection(current.wind_deg) }`)
+                        inlineCode(`${ CommonView.speed(weather.current.wind.speed ?? 0) } ${ CommonView.toCardinalDirection(weather.current.wind.direction) }`)
                     ].join(' '),
                     [
                         `💨`,
-                        inlineCode(`${ CommonView.speed(current.wind_gust ?? 0) }`)
+                        inlineCode(`${ CommonView.speed(weather.current.wind.gusts ?? 0) }`)
                     ].join(' ')
                 ].join('\n')
             }
@@ -137,63 +108,57 @@ module.exports = class CurrentWeatherView extends View {
     }
 
     /**
-     * @param {EmbedBuilder}          embed
-     * @param {OneCallCurrentWeather} current
+     * @param {import('discord.js').EmbedBuilder}             embed
+     * @param {import('../services/weather.cts').WeatherData} weather
      *
-     * @return {EmbedBuilder}
+     * @return {import('discord.js').EmbedBuilder}
      */
-    humidityPressure(embed, current) {
+    humidityPressure(embed, weather) {
 
         return embed.addFields([
             {
                 name   : 'Humidity/Pressure',
                 inline : true,
                 value  : [
-                    [`💧`, inlineCode(`${ current.humidity } %`)].join(' '),
-                    [`💨`, inlineCode(`${ current.pressure } hPa`)].join(' ')
+                    [`💧`, inlineCode(`${ weather.current.humidity } %`)].join(' '),
+                    [`💨`, inlineCode(`${ weather.current.pressure } hPa`)].join(' ')
                 ].join('\n')
             }
         ]);
     }
 
     /**
-     * @param {EmbedBuilder}          embed
-     * @param {OneCallCurrentWeather} current
-     * @param {AirQuality}            airQuality
+     * @param {import('discord.js').EmbedBuilder}                   embed
+     * @param {import('../services/airQuality.cts').AirQualityData} airQuality
      *
-     * @return {EmbedBuilder}
+     * @return {import('discord.js').EmbedBuilder}
      */
-    airQualityUVIndex(embed, current, airQuality) {
+    airQualityUVIndex(embed, airQuality) {
 
-        if (isNaN(current?.uvi) && isNaN(airQuality?.main?.aqi)) {
-
-            return this.emptyRow(embed);
-        }
+        const { CommonView } = this.views();
 
         const rows  = [];
         const title = [];
 
-        if (airQuality?.main?.aqi) {
-
-            const emoji   = [
-                ['🌳', '🌲', '🌴', '🎋'],
-                ['🙂'],
-                ['🙁'],
-                ['😷'],
-                ['🧟']
-            ];
-            const quality = ['Good', 'Fair', 'Moderate', 'Poor', 'Very poor'];
+        if (Util.isNumber(airQuality.aqi)) {
 
             title.push('Pollution');
-            rows.push(`${ Util.randomValue(emoji[airQuality.main.aqi - 1]) } ${ inlineCode(quality[airQuality.main.aqi - 1]) }`);
+            rows.push(CommonView.aqi(airQuality.aqi));
         }
 
-        if (Util.isNumber(current?.uvi) && current?.uvi > 0) {
+        if (Util.isNumber(airQuality.uvi) && airQuality.uvi > 0) {
 
             title.push('UV Index');
-            rows.push(`:sunny: ${ inlineCode(`${ current.uvi }`) }`);
+            rows.push(CommonView.uvi(airQuality.uvi));
+        }
+
+        if (rows.length === 0) {
+
+            return embed;
         }
 
         return embed.addFields([{ name : title.join('/'), value : rows.join('\n'), inline : true }]);
     }
-};
+}
+
+module.exports = CurrentWeatherView;

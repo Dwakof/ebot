@@ -1,7 +1,8 @@
 'use strict';
 
 const Sentry  = require('@sentry/node');
-const Tracing = require('@sentry/tracing');
+
+Error.stackTraceLimit = 30;
 
 const Path = require('path');
 const Pino = require('pino');
@@ -56,7 +57,7 @@ module.exports = class EbotClient extends AkairoClient {
                 GatewayIntentBits.GuildMembers,
                 GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.GuildMessageReactions,
-                GatewayIntentBits.GuildEmojisAndStickers,
+                GatewayIntentBits.GuildExpressions,
                 GatewayIntentBits.GuildVoiceStates,
                 GatewayIntentBits.MessageContent
             ]
@@ -69,20 +70,17 @@ module.exports = class EbotClient extends AkairoClient {
 
         this.#logger = Pino(this.#settings.core.logger);
 
-        if (this.#settings.core.sentry.enabled) {
+        Sentry.init({
+            ...this.#settings.core.sentry,
+            integrations : [
+                Sentry.httpIntegration(),
+                Sentry.postgresIntegration()
+            ]
+        });
 
-            Sentry.init({
-                ...this.#settings.core.sentry,
-                integrations : [
-                    new Sentry.Integrations.Http({ tracing : true }),
-                    new Tracing.Integrations.Postgres()
-                ]
-            });
+        this.#sentry = Sentry;
 
-            this.#sentry = Sentry;
-
-            this.logger.info({ msg : 'Sentry is initialized', event : CoreEvents.SENTRY_INITIALIZED, emitter : 'core' });
-        }
+        this.logger.info({ msg : 'Sentry is initialized', event : CoreEvents.SENTRY_INITIALIZED, emitter : 'core' });
     }
 
     get logger() {
@@ -92,12 +90,7 @@ module.exports = class EbotClient extends AkairoClient {
 
     get sentry() {
 
-        if (this.#settings.core.sentry.enabled) {
-
-            return this.#sentry;
-        }
-
-        return false;
+        return this.#sentry;
     }
 
     get commandHandler() {
@@ -275,20 +268,6 @@ module.exports = class EbotClient extends AkairoClient {
             module.loadAll();
         }
 
-        this.#initialized = true;
-
-        this.logger.debug({ msg : 'Ebot core is initialized', event : 'initialized', emitter : 'core' });
-
-        return this;
-    }
-
-    async start() {
-
-        if (!this.#initialized) {
-
-            await this.initialize();
-        }
-
         this.API.on('response', ({ method, route }, { status, statusText }) => {
 
             this.logger.debug({
@@ -306,11 +285,6 @@ module.exports = class EbotClient extends AkairoClient {
                 emitter : 'client.rest'
             });
         });
-
-        for (const [, { module }] of this.#modules.entries()) {
-
-            await module.init();
-        }
 
         if (this.#listenerHandler) {
 
@@ -371,6 +345,36 @@ module.exports = class EbotClient extends AkairoClient {
                 event   : CoreEvents.INTERACTION_HANDLER_REGISTERED,
                 emitter : 'core'
             });
+        }
+
+        this.#initialized = true;
+
+        this.logger.debug({ msg : 'Ebot core is initialized', event : 'initialized', emitter : 'core' });
+
+        return this;
+    }
+
+    async initModules() {
+
+        for (const [name, { module }] of this.#modules.entries()) {
+
+            try {
+
+                await module.init();
+            }
+            catch (error) {
+
+                this.handleError(module, error, `Error while initializing module ${ name }`);
+                throw error;
+            }
+        }
+    }
+
+    async start() {
+
+        if (!this.#initialized) {
+
+            await this.initialize();
         }
 
         await this.login(this.#settings.core.discord.token);
@@ -496,17 +500,11 @@ module.exports = class EbotClient extends AkairoClient {
             err          : error
         });
 
-        if (this.sentry) {
+        this.sentry.getCurrentScope().setContext('module', {
+            categoryID : module.categoryID,
+            id         : module.id
+        });
 
-            this.sentry.configureScope((scope) => {
-
-                scope.setContext('module', {
-                    categoryID : module.categoryID,
-                    id         : module.id
-                });
-            });
-
-            this.sentry.captureException(error);
-        }
+        this.sentry.captureException(error);
     }
 };

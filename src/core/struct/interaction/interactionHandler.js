@@ -44,7 +44,7 @@ class InteractionHandler extends AkairoHandler {
 
     setup() {
 
-        this.client.once('ready', () => {
+        this.client.once('clientReady', () => {
 
             this.client.on('interactionCreate', (interaction) => {
 
@@ -76,14 +76,14 @@ class InteractionHandler extends AkairoHandler {
         }
     }
 
+
+
     /**
      * @param {BaseInteraction|AutocompleteInteraction|BaseCommandInteraction|CommandInteraction} interaction
      *
      * @return {Promise<void>}
      */
     async handle(interaction) {
-
-        let transaction;
 
         if (!interaction.customId) {
 
@@ -99,73 +99,48 @@ class InteractionHandler extends AkairoHandler {
 
         try {
 
-            if (this.client.sentry) {
+            await this.client.sentry.startSpan({
+                op       : `interaction`,
+                name     : `[${ this.client.util.capitalize(interactionClass.categoryID) }] ${ interaction.customId }`,
+                metadata : {
+                    method : 'INTERACTION'
+                }
+            }, async () => {
 
-                transaction = this.client.sentry.startTransaction({
-                    op       : `interaction`,
-                    name     : `[${ this.client.util.capitalize(interactionClass.categoryID) }] ${ interaction.customId }`,
-                    metadata : {
-                        method : 'INTERACTION'
-                    }
+                const scope = this.client.sentry.getCurrentScope();
+
+                scope.setContext('interaction', {
+                    id        : interaction.id,
+                    messageId : interaction.message?.id,
+                    channelId : interaction.channelId,
+                    guild     : interaction.guild?.name ?? null,
+                    guildId   : interaction.guildId
                 });
 
-                this.client.sentry.configureScope((scope) => {
-
-                    scope.setContext('interaction', {
-                        id        : interaction.id,
-                        messageId : interaction.message?.id,
-                        channelId : interaction.channelId,
-                        guild     : interaction.member.guild.name,
-                        guildId   : interaction.guildId
-                    });
-
-                    scope.setUser({
-                        id       : interaction.user.id,
-                        username : `${ interaction.user.username }#${ interaction.user.discriminator }`
-                    });
-
-                    if (transaction) {
-
-                        scope.setSpan(transaction);
-                    }
+                scope.setUser({
+                    id       : interaction.user.id,
+                    username : `${ interaction.user.username }#${ interaction.user.discriminator }`
                 });
-            }
 
-            this.emit(InteractionHandler.Events.INTERACTION_STARTED, interaction, interactionClass);
+                this.emit(InteractionHandler.Events.INTERACTION_STARTED, interaction, interactionClass);
 
-            const reply = await interactionClass.run(interaction.customId, interaction);
+                const reply = await interactionClass.run(interaction.customId, interaction);
 
-            if (reply instanceof Util.InteractiveReply || reply instanceof Util.Modal) {
+                if (reply instanceof Util.InteractiveReply || reply instanceof Util.Modal) {
 
-                await reply.send();
-            }
+                    await reply.send();
+                }
 
-            this.emit(InteractionHandler.Events.INTERACTION_FINISHED, interaction, interactionClass);
-
-            if (transaction) {
-
-                transaction.status = 'ok';
-            }
+                this.emit(InteractionHandler.Events.INTERACTION_FINISHED, interaction, interactionClass);
+            });
         }
         catch (error) {
-
-            if (transaction) {
-
-                transaction.status = 'unknown';
-            }
 
             this.emit(InteractionHandler.Events.ERROR, error, interaction, interactionClass);
 
             this.client.handleError(interactionClass, error);
 
             await this.client.util.send(interaction, 'Whoopsy, something went wrong with the command');
-        }
-        finally {
-
-            if (transaction) {
-
-                transaction.finish();
-            }
         }
     }
 }

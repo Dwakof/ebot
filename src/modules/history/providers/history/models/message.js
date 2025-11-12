@@ -1,10 +1,8 @@
 'use strict';
 
-const { Model, AjvValidator } = require('objection');
+const { ObjectionProvider } = require('../../../../../core');
 
-const AjvFormat = require('ajv-formats');
-
-class Message extends Model {
+class Message extends ObjectionProvider.ObjectionModel {
 
     static get tableName() {
 
@@ -32,17 +30,6 @@ class Message extends Model {
                 updatedAt : { type : ['object', 'number', 'string'], format : 'date' }
             }
         };
-    }
-
-    static createValidator() {
-
-        return new AjvValidator({
-            options : { allowUnionTypes : true },
-            onCreateAjv(ajv) {
-
-                AjvFormat(ajv);
-            }
-        });
     }
 }
 

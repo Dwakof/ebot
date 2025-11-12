@@ -25,9 +25,7 @@ module.exports = class VoiceStateUpdateListener extends Listener {
 
             if (hub) {
 
-                const { channel } = await TemporaryChannelService.createTemporaryChannel(hub, newState.member);
-
-                await newState.setChannel(channel, 'Temporary channel created');
+                await TemporaryChannelService.createTemporaryChannel(hub, newState.member, newState);
 
                 return;
             }
@@ -41,7 +39,7 @@ module.exports = class VoiceStateUpdateListener extends Listener {
 
                 if (temporaryChannel) {
 
-                    // Clean up in 3 minutes
+                    // Clean up in 3 seconds
                     setTimeout(() => TemporaryChannelService.deleteTemporaryChannel(temporaryChannel.channel), 1_000 * 3);
                 }
             }

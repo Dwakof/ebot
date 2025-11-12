@@ -39,15 +39,9 @@ module.exports = class ListenerHandler extends AkairoListenerHandler {
 
             try {
 
-                if (this.client.sentry) {
+                if (Object.keys(args).length > 0) {
 
-                    this.client.sentry.configureScope((scope) => {
-
-                        if (Object.keys(args).length > 0) {
-
-                            scope.setContext('args', CoreUtil.serializeArgs(args));
-                        }
-                    });
+                    this.client.sentry.getCurrentScope().setContext('args', CoreUtil.serializeArgs(args));
                 }
 
                 exec.bind(listener)(...args);

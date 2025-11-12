@@ -1,9 +1,10 @@
 'use strict';
 
-const Hoek = require('@hapi/hoek');
+const Hoek                 = require('@hapi/hoek');
+const { Client }           = require('undici');
+const { encodeQueryValue } = require('ufo');
 
-const Service    = require('./service');
-const { Client } = require('undici');
+const Service = require('./service');
 
 class ServiceApi extends Service {
 
@@ -19,6 +20,22 @@ class ServiceApi extends Service {
         Hoek.assert(this.constructor.ENDPOINT, `static attribute ENDPOINT is required on ${ this.id }`);
     }
 
+    get api() {
+
+        return {
+
+            get : (path, queryParams = {}, options = {}) => {
+
+                return this.#call('GET', path, queryParams, options);
+            },
+
+            post : (path, body, queryParams = {}, options = {}) => {
+
+                return this.#call('POST', path, queryParams, { body, ...options });
+            }
+        };
+    }
+
     /**
      * Method to override that is called when the client is started.
      */
@@ -32,13 +49,43 @@ class ServiceApi extends Service {
         let body;
         let response;
 
+        const query = {};
+
+        for (const [key, value] of Object.entries({ ...this.defaultQueryParams, ...queryParams })) {
+
+            if (value === undefined) {
+
+                continue;
+            }
+
+            if (value instanceof Date) {
+
+                query[key] = encodeQueryValue(value);
+                continue;
+            }
+
+            if (Array.isArray(value)) {
+
+                const values = [];
+
+                for (const v of value) {
+
+                    if (v !== undefined) {
+
+                        values.push(encodeQueryValue(v));
+                    }
+                }
+
+                query[key] = values.join(',');
+                continue;
+            }
+
+            query[key] = value;
+        }
+
         try {
 
-            response = await this.#api.request({
-                ...options, path, method,
-                headers : { ...this.defaultHeaders, ...(options.headers ?? {}) },
-                query   : { ...this.defaultQueryParams, ...queryParams }
-            });
+            response = await this.#api.request({ ...options, path, method, query, headers : { ...this.defaultHeaders, ...(options.headers ?? {}) } });
         }
         catch (err) {
 
@@ -63,7 +110,15 @@ class ServiceApi extends Service {
 
         if (statusCode >= 400) {
 
-            this.client.logger.error({ msg : `${ this.id } : API error ${ statusCode }`, response : body, body : options.body, path, queryParams, statusCode, method });
+            this.client.logger.error({
+                msg      : `${ this.id } : API error ${ statusCode }`,
+                response : body,
+                body     : options.body,
+                path,
+                queryParams,
+                statusCode,
+                method
+            });
 
             const error = new Error(`${ this.id } : API error ${ statusCode }`);
 
@@ -73,22 +128,6 @@ class ServiceApi extends Service {
         }
 
         return body;
-    }
-
-    get api() {
-
-        return {
-
-            get : (path, queryParams = {}, options = {}) => {
-
-                return this.#call('GET', path, queryParams, options);
-            },
-
-            post : (path, body, queryParams = {}, options = {}) => {
-
-                return this.#call('POST', path, queryParams, { body, ...options });
-            }
-        };
     }
 }
 

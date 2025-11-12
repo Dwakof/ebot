@@ -1,54 +1,76 @@
 'use strict';
 
-module.exports = class Dictionary {
+const State = require('./state');
+
+const MAX_ID = Math.min(...State.inverseCantorPair(Number.MAX_SAFE_INTEGER));
+
+class Dictionary extends Map {
 
     /**
-     * @type {Map<String, Number>}
+     * @type {Map<string, number>}
      */
     words = new Map();
 
     /**
-     * @type {Map<Number, String>}
+     * @type {string[]}
      */
-    reverse = new Map();
+    reverse = [];
 
     /**
-     * @param mapping
+     * @param {Array<[string, number]>} mapping
      */
     constructor(mapping = []) {
 
+        super();
+
         for (const [word, id] of mapping) {
 
+            if (id >= MAX_ID) {
+
+                throw new Error('Max number of words per dictionary reached');
+            }
+
             this.words.set(word, id);
-            this.reverse.set(id, word);
+            this.reverse[id] = word;
         }
     }
 
+    /**
+     * @param {string} word
+     * @param {number} id
+     * @returns {Dictionary}
+     */
+    set(word, id) {
+
+        this.words.set(word, id);
+        this.reverse[id] = word;
+        return this;
+    }
+
+    /**
+     * @param {string} word
+     * @returns {number}
+     */
     addWord(word) {
 
-        let id = this.words.get(word);
+        let id = this.getId(word);
 
         if (id) {
 
             return id;
         }
 
-        id = this.words.size;
+        id = this.words.size + 1;
+
+        if (id >= MAX_ID) {
+
+            throw new Error('Max number of words per dictionary reached');
+        }
 
         this.words.set(word, id);
-        this.reverse.set(id, word);
+        this.reverse[id] = word;
 
         return id;
-    }
-
-    hasWord(word) {
-
-        return this.words.has(word);
-    }
-
-    hasId(id) {
-
-        return this.reverse.has(id);
     }
 
     getId(word) {
@@ -58,11 +80,20 @@ module.exports = class Dictionary {
 
     getWord(id) {
 
-        return this.reverse.get(id);
+        return this.reverse[id];
     }
 
     /**
-     * @return {Iterator<[String, Number]>}
+     * @param {string[]} words
+     * @returns {number[]}
+     */
+    toStateValues(words) {
+
+        return words.map((word) => this.addWord(word));
+    }
+
+    /**
+     * @return {IterableIterator<[string, number]>}
      */
     entries() {
 
@@ -70,10 +101,12 @@ module.exports = class Dictionary {
     }
 
     /**
-     * @return {IterableIterator<[String, Number]>}
+     * @return {IterableIterator<[string, number]>}
      */
     [Symbol.iterator]() {
 
         return this.words.entries();
     }
-};
+}
+
+module.exports = Dictionary;

@@ -1,4 +1,4 @@
-FROM node:20.10 AS base
+FROM node:24 AS base
 
 ENV APP_PATH=/app
 
@@ -49,4 +49,4 @@ COPY --chown=node:node --from=dependencies $APP_PATH/package*.json ./
 COPY --chown=node:node --from=dependencies $APP_PATH/node_modules  ./node_modules
 COPY --chown=node:node src $APP_PATH/src
 
-CMD [ "dumb-init", "node", "src/index.js" ]
+CMD [ "dumb-init", "node", "--experimental-transform-types", "src/index.js" ]

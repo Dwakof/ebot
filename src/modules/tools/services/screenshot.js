@@ -81,7 +81,7 @@ module.exports = class ScreenshotService extends Service {
      * @param {String} messageId
      * @param {String} channelId
      *
-     * @return {Promise<Buffer>}
+     * @return {Promise<Uint8Array>}
      */
     async screenshotMessageId(messageId, channelId) {
 
@@ -114,7 +114,7 @@ module.exports = class ScreenshotService extends Service {
     /**
      * @param {Message} message
      *
-     * @return {Promise<Buffer>}
+     * @return {Promise<Uint8Array>}
      */
     async screenshotMessage(message) {
 
@@ -187,6 +187,7 @@ module.exports = class ScreenshotService extends Service {
                             type      : 'invite'
                         });
                     }
+                    // eslint-disable-next-line no-unused-vars
                     catch (error) {
 
                         // This invite link might be expired or invalid, idk what to do other than nothing

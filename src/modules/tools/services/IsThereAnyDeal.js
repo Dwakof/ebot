@@ -99,6 +99,8 @@ module.exports = class IsThereAnyDealService extends ServiceApi {
         }
         catch (error) {
 
+            this.logger.error({ msg : `Error when trying to search for "${ query }" : ${ error.toString() }`, error });
+
             return false;
         }
     }

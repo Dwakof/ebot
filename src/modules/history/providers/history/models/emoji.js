@@ -1,10 +1,8 @@
 'use strict';
 
-const { Model, AjvValidator } = require('objection');
+const { ObjectionProvider } = require('../../../../../core');
 
-const AjvFormat = require('ajv-formats');
-
-class Emoji extends Model {
+class Emoji extends ObjectionProvider.ObjectionModel {
 
     static get tableName() {
 
@@ -42,7 +40,7 @@ class Emoji extends Model {
 
         return {
             message : {
-                relation   : Model.BelongsToOneRelation,
+                relation   : Emoji.BelongsToOneRelation,
                 modelClass : require('./message'),
                 join       : {
                     from : 'emoji.messageId',
@@ -50,17 +48,6 @@ class Emoji extends Model {
                 }
             }
         };
-    }
-
-    static createValidator() {
-
-        return new AjvValidator({
-            options : { allowUnionTypes : true },
-            onCreateAjv(ajv) {
-
-                AjvFormat(ajv);
-            }
-        });
     }
 }
 

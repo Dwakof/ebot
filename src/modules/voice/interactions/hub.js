@@ -15,6 +15,7 @@ class Hub extends Interaction {
 
         return {
             editDefaultSize : { method : 'editDefaultSize', customId : 'voice:hub:edit_default_size' },
+            editDefaultType : { method : 'editDefaultType', customId : 'voice:hub:edit_default_type' },
 
             setDefaultSize : { method : 'setDefaultSize', customId : 'voice:hub:set_default_size' },
             setDefaultType : { method : 'setDefaultType', customId : 'voice:hub:set_default_type' }
@@ -67,6 +68,19 @@ class Hub extends Interaction {
         return this.handle(interaction, async (hub) => {
 
             await interaction.reply(HubView.editDefaultSize(hub));
+        });
+    }
+
+    /**
+     * @param {import('discord.js').ButtonInteraction} interaction
+     **/
+    editDefaultType(interaction) {
+
+        const { HubView } = this.views();
+
+        return this.handle(interaction, async (hub) => {
+
+            await interaction.reply(HubView.editDefaultType(hub));
         });
     }
 
