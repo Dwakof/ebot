@@ -152,7 +152,7 @@ class Service {
 
             Hoek.assert(Cron.validate(schedule), `Invalid cron schedule: ${ schedule } for cron ${ cron } in service ${ this.id } of module ${ this.module }`);
 
-            const monitorSlug   = `${ this.module }-${ this.id }-${ cron }`;
+            const monitorSlug   = `${ this.module }:${ this.id }:${ cron }`;
             const monitorConfig = { schedule : { type : 'crontab', value : schedule.split(' ').slice(1).join(' ') } };
 
             let method = job;
