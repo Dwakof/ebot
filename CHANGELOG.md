@@ -1,3 +1,10 @@
+## [0.29.1](https://github.com/Dwakof/ebot/compare/v0.29.0...v0.29.1) (2025-11-13)
+
+
+### Bug Fixes
+
+* change sentry cronjob slugs naming scheme ([c029a84](https://github.com/Dwakof/ebot/commit/c029a845b60332f9865ebfb464402090784dfada))
+
 # [0.29.0](https://github.com/Dwakof/ebot/compare/v0.28.0...v0.29.0) (2025-11-12)
 
 
