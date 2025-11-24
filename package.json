@@ -27,7 +27,7 @@
     "@hapipal/confidence": "6.0.2",
     "@mongodb-js/zstd": "7.0.0",
     "@napi-rs/canvas": "0.1.82",
-    "@sentry/node": "10.25.0",
+    "@sentry/node": "10.27.0",
     "@sentry/tracing": "7.120.4",
     "@skyra/discord-components-core": "3.6.1",
     "ajv-formats": "3.0.1",
