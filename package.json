@@ -62,7 +62,7 @@
     "pug": "3.0.3",
     "puppeteer": "24.29.1",
     "ufo": "1.6.1",
-    "undici": "7.16.0"
+    "undici": "7.18.2"
   },
   "devDependencies": {
     "@babel/core": "7.28.5",
